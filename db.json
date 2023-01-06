@@ -1,0 +1,243 @@
+[
+    {
+        "id": "_pb_users_auth_",
+        "name": "users",
+        "type": "auth",
+        "system": false,
+        "schema": [
+            {
+                "id": "users_name",
+                "name": "name",
+                "type": "text",
+                "system": false,
+                "required": false,
+                "unique": false,
+                "options": {
+                    "min": null,
+                    "max": null,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "users_avatar",
+                "name": "avatar",
+                "type": "file",
+                "system": false,
+                "required": false,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "maxSize": 5242880,
+                    "mimeTypes": [
+                        "image/jpg",
+                        "image/jpeg",
+                        "image/png",
+                        "image/svg+xml",
+                        "image/gif"
+                    ],
+                    "thumbs": null
+                }
+            }
+        ],
+        "listRule": "id = @request.auth.id",
+        "viewRule": "id = @request.auth.id",
+        "createRule": "",
+        "updateRule": "id = @request.auth.id",
+        "deleteRule": "id = @request.auth.id",
+        "options": {
+            "allowEmailAuth": true,
+            "allowOAuth2Auth": true,
+            "allowUsernameAuth": true,
+            "exceptEmailDomains": null,
+            "manageRule": null,
+            "minPasswordLength": 8,
+            "onlyEmailDomains": null,
+            "requireEmail": false
+        }
+    },
+    {
+        "id": "mtrsc4frxciqt0y",
+        "name": "methods",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "fiuykqnd",
+                "name": "name",
+                "type": "text",
+                "system": false,
+                "required": true,
+                "unique": false,
+                "options": {
+                    "min": 3,
+                    "max": 25,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "hdkporg2",
+                "name": "rpdLimit",
+                "type": "number",
+                "system": false,
+                "required": false,
+                "unique": false,
+                "options": {
+                    "min": 1,
+                    "max": 100
+                }
+            },
+            {
+                "id": "rxqntl9n",
+                "name": "active",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "unique": false,
+                "options": {}
+            }
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "0t21ydrhlu55pgh",
+        "name": "elements",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "lypnwtdt",
+                "name": "name",
+                "type": "text",
+                "system": false,
+                "required": true,
+                "unique": false,
+                "options": {
+                    "min": 3,
+                    "max": 25,
+                    "pattern": "^[A-Za-z]*$"
+                }
+            },
+            {
+                "id": "e5b1wbrn",
+                "name": "symbol",
+                "type": "text",
+                "system": false,
+                "required": true,
+                "unique": false,
+                "options": {
+                    "min": 1,
+                    "max": 2,
+                    "pattern": "^[A-Z][a-z]?$"
+                }
+            },
+            {
+                "id": "zwgbfna9",
+                "name": "mass",
+                "type": "number",
+                "system": false,
+                "required": true,
+                "unique": false,
+                "options": {
+                    "min": 1,
+                    "max": 225
+                }
+            },
+            {
+                "id": "aqanctsu",
+                "name": "retired",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "unique": false,
+                "options": {}
+            }
+        ],
+        "listRule": "@request.auth.id != \"\"",
+        "viewRule": "@request.auth.id != \"\"",
+        "createRule": "@request.auth.id != \"\"",
+        "updateRule": "@request.auth.id != \"\"",
+        "deleteRule": "@request.auth.id != \"\"",
+        "options": {}
+    },
+    {
+        "id": "59ehbk1zraptm95",
+        "name": "methodElements",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "fgphbkwj",
+                "name": "method",
+                "type": "relation",
+                "system": false,
+                "required": true,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "collectionId": "mtrsc4frxciqt0y",
+                    "cascadeDelete": false
+                }
+            },
+            {
+                "id": "fh4qm2ab",
+                "name": "element",
+                "type": "relation",
+                "system": false,
+                "required": true,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "collectionId": "0t21ydrhlu55pgh",
+                    "cascadeDelete": false
+                }
+            }
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    },
+    {
+        "id": "1118d4urqulp27r",
+        "name": "referenceMaterials",
+        "type": "base",
+        "system": false,
+        "schema": [
+            {
+                "id": "44nwbsrz",
+                "name": "name",
+                "type": "text",
+                "system": false,
+                "required": true,
+                "unique": true,
+                "options": {
+                    "min": 3,
+                    "max": 25,
+                    "pattern": ""
+                }
+            },
+            {
+                "id": "4dekios6",
+                "name": "active",
+                "type": "bool",
+                "system": false,
+                "required": false,
+                "unique": false,
+                "options": {}
+            }
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
+        "updateRule": "",
+        "deleteRule": "",
+        "options": {}
+    }
+]
