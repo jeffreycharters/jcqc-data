@@ -94,6 +94,5 @@
 		<button on:click={() => toggleMethodActive(method)}
 			>{method.active ? 'Inactivate' : 'Activate'}</button
 		>
-		<a href="/edit/methods/{method.id}">Edit this method</a>
 	</div>
 {/each}
