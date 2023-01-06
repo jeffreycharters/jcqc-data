@@ -5,9 +5,10 @@ import type { LayoutLoad } from "./$types";
 export const prerender = true;
 
 export const load: LayoutLoad = async ({ url }) => {
-    const atLoginPage = url.pathname.includes('/login');
+    const reqPath = url.pathname;
+    const loginRequired = reqPath.includes('/edit');
     const userLoggedIn = !!pb.authStore.model;
 
-    if (!atLoginPage && !userLoggedIn) throw redirect(302, '/login')
+    if (loginRequired && !userLoggedIn) throw redirect(302, `/login`);
     return {}
 }

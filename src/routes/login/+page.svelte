@@ -1,13 +1,22 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { currentUser, pb } from '$lib/pocketbase';
 
 	let username: string;
 	let password: string;
 	let errorMessage = '';
 	let loggingIn = true;
+
+	function redirectLoggedInUser() {
+		if ($currentUser) goto('/edit', { invalidateAll: true });
+	}
+
+	redirectLoggedInUser();
+
 	async function login() {
 		try {
 			await pb.collection('users').authWithPassword(username, password);
+			redirectLoggedInUser();
 		} catch (err) {
 			const error = err as Error;
 			errorMessage = error.message;
