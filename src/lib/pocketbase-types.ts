@@ -6,6 +6,7 @@ export enum Collections {
 	Elements = "elements",
 	MethodElements = "methodElements",
 	Methods = "methods",
+	ReferenceMaterials = "referenceMaterials",
 	Users = "users",
 }
 
@@ -20,7 +21,7 @@ export type BaseSystemFields = {
 	updated: IsoDateString
 	collectionId: string
 	collectionName: Collections
-	expand?: { [key: string]: unknown }
+	expand?: { [key: string]: any }
 }
 
 export type AuthSystemFields = {
@@ -50,6 +51,11 @@ export type MethodsRecord = {
 	active?: boolean
 }
 
+export type ReferenceMaterialsRecord = {
+	name: string
+	active?: boolean
+}
+
 export type UsersRecord = {
 	name?: string
 	avatar?: string
@@ -59,11 +65,13 @@ export type UsersRecord = {
 export type ElementsResponse = ElementsRecord & BaseSystemFields
 export type MethodElementsResponse = MethodElementsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
+export type ReferenceMaterialsResponse = ReferenceMaterialsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 
 export type CollectionRecords = {
 	elements: ElementsRecord
 	methodElements: MethodElementsRecord
 	methods: MethodsRecord
+	referenceMaterials: ReferenceMaterialsRecord
 	users: UsersRecord
 }

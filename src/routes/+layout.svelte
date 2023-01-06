@@ -9,7 +9,7 @@
 
 <slot />
 
-<div>
+<div style="margin-top: 10px;">
 	{#if $currentUser}
 		Logged in as {$currentUser.username}.
 	{:else}
