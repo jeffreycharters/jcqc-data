@@ -30,6 +30,7 @@ export const load = (async ({ params }) => {
     return {
         method,
         usedElements,
-        unusedElements
+        unusedElements,
+        methodElements: usedElementList
     };
 }) satisfies PageLoad;

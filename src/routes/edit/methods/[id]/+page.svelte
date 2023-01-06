@@ -7,7 +7,7 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	let { method, usedElements, unusedElements } = data;
+	let { method, usedElements, unusedElements, methodElements } = data;
 	if (!method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
 	let { name, rpdLimit } = data.method || undefined;
@@ -33,6 +33,7 @@
 				newList.sort((a, b) => (a.name < b.name ? 1 : -1));
 				return newList;
 			});
+			addFormMessage('Saved!');
 		} catch (err) {
 			const error = err as Error;
 			addFormMessage(error.message);
@@ -47,6 +48,18 @@
 		usedElements = [...usedElements, element];
 		usedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 		unusedElements = unusedElements.filter((e) => e.id != element.id);
+	}
+
+	async function removeElement(element: ElementsResponse) {
+		const methodElementToRemove = methodElements.find(
+			(e) => e.element === element.id && e.method === method.id
+		);
+		if (!methodElementToRemove) return;
+		await pb.collection('methodElements').delete(methodElementToRemove.id);
+		unusedElements = [...unusedElements, element];
+		unusedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
+		unusedElements = unusedElements;
+		usedElements = usedElements.filter((e) => e.id != element.id);
 	}
 </script>
 
@@ -79,11 +92,22 @@
 <p>{method.name} is currently set up with the following elements.</p>
 
 {#each usedElements as element}
-	<div>{element.name}</div>
+	<div>
+		<sup>{element.mass}</sup>{element.symbol}
+		{element.name}
+		<button on:click={() => removeElement(element)}>Remove</button>
+	</div>
+{:else}
+	NONE!
 {/each}
 
 <p>Available unused elements:</p>
 
 {#each unusedElements as element}
-	<div>{element.name} <button on:click={() => addElement(element)}>Add</button></div>
+	<div>
+		<sup>{element.mass}</sup>{element.symbol}
+		{element.name} <button on:click={() => addElement(element)}>Add</button>
+	</div>
+{:else}
+	NONE!
 {/each}
