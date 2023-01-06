@@ -2,6 +2,7 @@
 	import { pb } from '$lib/pocketbase';
 	import type { ReferenceMaterialsResponse } from '$lib/pocketbase-types';
 	import type { PageData } from './$types';
+	import ReferenceMaterial from './ReferenceMaterial.svelte';
 
 	export let data: PageData;
 	let { referenceMaterials } = data || [];
@@ -52,9 +53,7 @@
 <h2>Reference Materials</h2>
 
 {#each activeMaterials as rm (rm.id)}
-	<div>
-		{rm.name} <button on:click={() => toggleActive(rm)}>Inactivate</button>
-	</div>
+	<ReferenceMaterial {rm} on:toggleActive={(event) => toggleActive(event.detail.method)} />
 {/each}
 
 <h3>Retired Reference Materials</h3>
