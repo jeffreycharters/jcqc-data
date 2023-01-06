@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores';
+	import { currentUser } from '$lib/pocketbase';
 </script>
 
 <svelte:head>
@@ -7,3 +8,11 @@
 </svelte:head>
 
 <slot />
+
+<div>
+	{#if $currentUser}
+		Logged in as {$currentUser.username}.
+	{:else}
+		Not logged in.
+	{/if}
+</div>
