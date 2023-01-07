@@ -5,6 +5,7 @@
 export enum Collections {
 	Elements = "elements",
 	MethodElements = "methodElements",
+	MethodReferenceMaterials = "methodReferenceMaterials",
 	Methods = "methods",
 	ReferenceMaterials = "referenceMaterials",
 	Users = "users",
@@ -45,6 +46,14 @@ export type MethodElementsRecord = {
 	element: RecordIdString
 }
 
+export type MethodReferenceMaterialsRecord = {
+	methodId: RecordIdString
+	referenceMaterialId: RecordIdString
+	elementId: RecordIdString
+	upperBound?: number
+	lowerBound?: number
+}
+
 export type MethodsRecord = {
 	name: string
 	rpdLimit?: number
@@ -64,6 +73,7 @@ export type UsersRecord = {
 // Response types include system fields and match responses from the PocketBase API
 export type ElementsResponse = ElementsRecord & BaseSystemFields
 export type MethodElementsResponse = MethodElementsRecord & BaseSystemFields
+export type MethodReferenceMaterialsResponse = MethodReferenceMaterialsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
 export type ReferenceMaterialsResponse = ReferenceMaterialsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
@@ -71,6 +81,7 @@ export type UsersResponse = UsersRecord & AuthSystemFields
 export type CollectionRecords = {
 	elements: ElementsRecord
 	methodElements: MethodElementsRecord
+	methodReferenceMaterials: MethodReferenceMaterialsRecord
 	methods: MethodsRecord
 	referenceMaterials: ReferenceMaterialsRecord
 	users: UsersRecord

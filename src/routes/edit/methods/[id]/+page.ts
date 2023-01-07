@@ -19,10 +19,13 @@ export const load = (async ({ params }) => {
 
     const { usedElements, unusedElements, allElementsList } = await getElementsByMethod(method.id);
 
+    const rmList = await pb.collection('referenceMaterials').getFullList(200, { sort: "name" });
+
 
     return {
         title: `Editing ${method.name}`,
         method,
+        rmList,
         usedElements,
         unusedElements,
         methodElements: allElementsList

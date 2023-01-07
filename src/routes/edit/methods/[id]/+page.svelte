@@ -112,3 +112,11 @@
 {:else}
 	NONE!
 {/each}
+
+<h2>Reference Materials</h2>
+
+{#each data.rmList as rm (rm.id)}
+	<div>
+		{rm.name} <a href="/edit/methods/{method.id}/{rm.id}">Use for this method</a>
+	</div>
+{/each}
