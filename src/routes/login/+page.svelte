@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { currentUser, pb } from '$lib/pocketbase';
 
 	let username: string;
@@ -8,7 +10,10 @@
 	let loggingIn = true;
 
 	function redirectLoggedInUser() {
-		if ($currentUser) goto('/edit', { invalidateAll: true });
+		if ($currentUser && browser) {
+			const next = $page.url.searchParams.get('next') || '/edit';
+			goto(next, { invalidateAll: true });
+		}
 	}
 
 	redirectLoggedInUser();
