@@ -28,7 +28,7 @@
 			const newElement: ElementsResponse = await pb.collection('elements').create(data);
 			elements.update((n) => {
 				const newList = [...n, newElement];
-				newList.sort((a, b) => (a.mass < b.mass ? 1 : -1));
+				newList.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 				return newList;
 			});
 			name = '';
