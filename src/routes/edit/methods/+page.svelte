@@ -5,10 +5,11 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
 	methods.set(data.methodList);
 
 	let name: string;
-	let rpdLimit: number;
+	let rpdLimit: number | undefined;
 
 	let formError: string;
 
@@ -19,6 +20,7 @@
 		if (!name) formError = 'Missing something';
 		const data = JSON.stringify({
 			name,
+			rpdLimit,
 			active: true
 		});
 		try {
@@ -26,6 +28,8 @@
 			methods.update((n) => {
 				const newList = [...n, newMethod];
 				newList.sort((a, b) => (a.name < b.name ? 1 : -1));
+				name = '';
+				rpdLimit = undefined;
 				return newList;
 			});
 		} catch (err) {
@@ -85,6 +89,8 @@
 		>
 		<a href="/edit/methods/{method.id}">Edit this method</a>
 	</div>
+{:else}
+	<div>NONE!</div>
 {/each}
 
 <h2>Inactive Methods</h2>
@@ -95,4 +101,6 @@
 			>{method.active ? 'Inactivate' : 'Activate'}</button
 		>
 	</div>
+{:else}
+	NONE!
 {/each}

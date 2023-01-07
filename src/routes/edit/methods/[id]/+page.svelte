@@ -7,6 +7,7 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
 	let { method, usedElements, unusedElements, methodElements } = data;
 	if (!method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 

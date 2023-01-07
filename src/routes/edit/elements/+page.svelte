@@ -10,7 +10,7 @@
 
 	let name: string;
 	let symbol: string;
-	let mass: number;
+	let mass: number | undefined;
 
 	let formError: string;
 
@@ -31,6 +31,9 @@
 				newList.sort((a, b) => (a.mass < b.mass ? 1 : -1));
 				return newList;
 			});
+			name = '';
+			symbol = '';
+			mass = undefined;
 		} catch (err) {
 			const error = err as Error;
 			console.log(error);
