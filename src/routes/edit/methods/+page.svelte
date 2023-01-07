@@ -18,13 +18,13 @@
 
 	const addMethod = async () => {
 		if (!name) formError = 'Missing something';
-		const data = JSON.stringify({
+		const methodData = JSON.stringify({
 			name,
 			rpdLimit,
 			active: true
 		});
 		try {
-			const newMethod: MethodsResponse = await pb.collection('methods').create(data);
+			const newMethod: MethodsResponse = await pb.collection('methods').create(methodData);
 			methods.update((n) => {
 				const newList = [...n, newMethod];
 				newList.sort((a, b) => (a.name < b.name ? 1 : -1));
