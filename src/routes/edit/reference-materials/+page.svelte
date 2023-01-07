@@ -40,6 +40,12 @@
 
 <h1>Reference Materials</h1>
 
+<p>
+	To edit the expected values for a reference material, do it from the <a href="/edit/methods"
+		>edit method page</a
+	>.
+</p>
+
 <h2>Add a Reference Material</h2>
 
 <form on:submit|preventDefault={addRM}>
