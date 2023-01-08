@@ -3,6 +3,7 @@ import { pb } from '$lib/pocketbase';
 import type { MethodsResponse } from '$lib/pocketbase-types';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
+import { getMaterialsByMethod } from '$lib/referenceMaterials';
 
 export const load = (async ({ params }) => {
     const methodId = params.id;
@@ -18,16 +19,17 @@ export const load = (async ({ params }) => {
     }
 
     const { usedElements, unusedElements, allElementsList } = await getElementsByMethod(method.id);
+    const { usedReferenceMaterials, unusedReferenceMaterials } = await getMaterialsByMethod(method.id);
 
-    const rmList = await pb.collection('referenceMaterials').getFullList(200, { sort: "name" });
 
 
     return {
         title: `Editing ${method.name}`,
         method,
-        rmList,
         usedElements,
         unusedElements,
+        usedReferenceMaterials,
+        unusedReferenceMaterials,
         methodElements: allElementsList
     };
 }) satisfies PageLoad;

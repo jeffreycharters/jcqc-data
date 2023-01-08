@@ -50,6 +50,7 @@ export type MethodElementsRecord = {
 export type MethodReferenceMaterialsRecord = {
 	method: RecordIdString
 	referenceMaterial: RecordIdString
+	active?: boolean
 }
 
 export type MethodsRecord = {

@@ -55,6 +55,8 @@ export const load = (async ({ params }) => {
   let methodReferenceMaterial = await getreferenceMaterial(id, rmId);
   if (!methodReferenceMaterial) methodReferenceMaterial = await addReferenceToMethod(id, rmId);
 
+  if (!methodReferenceMaterial.active) await pb.collection('methodReferenceMaterials').update(methodReferenceMaterial.id, { "active": true })
+
   const method: MethodsResponse = methodReferenceMaterial?.expand?.method;
   const referenceMaterial: ReferenceMaterialsResponse = methodReferenceMaterial?.expand?.referenceMaterial;
   if (!method || !referenceMaterial) throw redirect(302, '/edit/methods');

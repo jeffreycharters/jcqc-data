@@ -2,7 +2,11 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { pb } from '$lib/pocketbase';
-	import type { ElementsResponse, MethodsResponse } from '$lib/pocketbase-types';
+	import type {
+		ElementsResponse,
+		MethodReferenceMaterialsResponse,
+		MethodsResponse
+	} from '$lib/pocketbase-types';
 	import { methods } from '$lib/stores';
 	import type { PageData } from './$types';
 
@@ -62,6 +66,27 @@
 		unusedElements = unusedElements;
 		usedElements = usedElements.filter((e) => e.id != element.id);
 	}
+
+	async function removeRM(referenceMaterialId: string) {
+		const methodReferenceMaterial: MethodReferenceMaterialsResponse = await pb
+			.collection('methodReferenceMaterials')
+			.getFirstListItem(`method = "${method.id}" && referenceMaterial = "${referenceMaterialId}"`, {
+				expand: 'referenceMaterial'
+			});
+		await pb
+			.collection('methodReferenceMaterials')
+			.update(methodReferenceMaterial.id, JSON.stringify({ active: false }));
+		const deletedRM = data.usedReferenceMaterials.find(
+			(rm) => rm.id === methodReferenceMaterial.referenceMaterial
+		);
+		data.unusedReferenceMaterials = [
+			...data.unusedReferenceMaterials,
+			methodReferenceMaterial.expand?.referenceMaterial
+		];
+		data.usedReferenceMaterials = data.usedReferenceMaterials.filter(
+			(rm) => rm.id != methodReferenceMaterial.expand?.referenceMaterial.id
+		);
+	}
 </script>
 
 <h1>Editing Method: {method.name}</h1>
@@ -115,8 +140,19 @@
 
 <h2>Reference Materials</h2>
 
-{#each data.rmList as rm (rm.id)}
+<h3>Active Materials</h3>
+{#each data.usedReferenceMaterials as rm (rm.id)}
 	<div>
-		{rm.name} <a href="/edit/methods/{method.id}/{rm.id}">Use for this method</a>
+		{rm.name} <a href="/edit/methods/{method.id}/{rm.id}">Edit Limits</a>
+		<button on:click={() => removeRM(rm.id)}>Remove</button>
 	</div>
 {/each}
+
+<h3>Available Materials</h3>
+<div data-sveltekit-preload-data="off">
+	{#each data.unusedReferenceMaterials as rm (rm.id)}
+		<div>
+			{rm.name} <a href="/edit/methods/{method.id}/{rm.id}">Use for this method</a>
+		</div>
+	{/each}
+</div>
