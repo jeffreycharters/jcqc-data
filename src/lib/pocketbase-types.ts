@@ -7,6 +7,7 @@ export enum Collections {
 	MethodElements = "methodElements",
 	MethodReferenceMaterials = "methodReferenceMaterials",
 	Methods = "methods",
+	ReferenceMaterialElements = "referenceMaterialElements",
 	ReferenceMaterials = "referenceMaterials",
 	Users = "users",
 }
@@ -47,17 +48,21 @@ export type MethodElementsRecord = {
 }
 
 export type MethodReferenceMaterialsRecord = {
-	methodId: RecordIdString
-	referenceMaterialId: RecordIdString
-	elementId: RecordIdString
-	upperBound?: number
-	lowerBound?: number
+	method: RecordIdString
+	referenceMaterial: RecordIdString
 }
 
 export type MethodsRecord = {
 	name: string
 	rpdLimit?: number
 	active?: boolean
+}
+
+export type ReferenceMaterialElementsRecord = {
+	methodReferenceMaterial: RecordIdString
+	elementId: RecordIdString
+	upperBound?: number
+	lowerBound?: number
 }
 
 export type ReferenceMaterialsRecord = {
@@ -75,6 +80,7 @@ export type ElementsResponse = ElementsRecord & BaseSystemFields
 export type MethodElementsResponse = MethodElementsRecord & BaseSystemFields
 export type MethodReferenceMaterialsResponse = MethodReferenceMaterialsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
+export type ReferenceMaterialElementsResponse = ReferenceMaterialElementsRecord & BaseSystemFields
 export type ReferenceMaterialsResponse = ReferenceMaterialsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 
@@ -83,6 +89,7 @@ export type CollectionRecords = {
 	methodElements: MethodElementsRecord
 	methodReferenceMaterials: MethodReferenceMaterialsRecord
 	methods: MethodsRecord
+	referenceMaterialElements: ReferenceMaterialElementsRecord
 	referenceMaterials: ReferenceMaterialsRecord
 	users: UsersRecord
 }
