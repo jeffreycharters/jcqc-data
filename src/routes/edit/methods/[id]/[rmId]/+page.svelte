@@ -19,15 +19,11 @@
 				lowerBound: limitsArray[i].lowerBound
 			};
 			try {
-				console.log('trying update');
-				console.log(elementData);
-
 				await pb
 					.collection('referenceMaterialElements')
 					.update(limitsArray[i].referenceMaterialElementsId || '', JSON.stringify(elementData));
 				formMessage = 'Saved!';
 			} catch (_) {
-				console.log('trying save');
 				await pb.collection('referenceMaterialElements').create(JSON.stringify(elementData));
 			}
 		}
