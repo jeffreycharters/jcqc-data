@@ -37,7 +37,7 @@ export const load = (async ({ params }) => {
 
   const limitsArray: ElementLimits[] = [];
   methodElements.forEach(async e => {
-    const currentValues = currentReferenceMaterialElements?.find(c => c.elementId === e.id);
+    const currentValues = currentReferenceMaterialElements?.find(c => c.element === e.id);
 
     limitsArray.push({
       element: e,
