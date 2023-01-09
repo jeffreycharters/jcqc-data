@@ -1,16 +1,21 @@
 <script lang="ts">
 	import { pb } from '$lib/pocketbase';
+	import { createMethodReferenceMaterial } from '$lib/referenceMaterials';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	let { limitsArray } = data;
+	let { limitsArray, methodReferenceMaterialId } = data;
 
 	let formMessage = '';
 
-	const { method, referenceMaterial, methodReferenceMaterialId } = data;
+	const { method, referenceMaterial } = data;
 
 	const saveData = async () => {
-		if (!limitsArray) return;
+		if (!limitsArray || !method || !referenceMaterial) return;
+		if (!methodReferenceMaterialId) {
+			const newMaterial = await createMethodReferenceMaterial(method.id, referenceMaterial.id);
+			methodReferenceMaterialId = newMaterial.id;
+		}
 		for (let i = 0; i < limitsArray.length; ++i) {
 			const elementData = {
 				methodReferenceMaterial: methodReferenceMaterialId,
@@ -18,14 +23,17 @@
 				upperBound: limitsArray[i].upperBound,
 				lowerBound: limitsArray[i].lowerBound
 			};
-			try {
+			if (limitsArray[i].referenceMaterialElementsId) {
 				await pb
 					.collection('referenceMaterialElements')
 					.update(limitsArray[i].referenceMaterialElementsId || '', JSON.stringify(elementData));
-				formMessage = 'Saved!';
-			} catch (_) {
-				await pb.collection('referenceMaterialElements').create(JSON.stringify(elementData));
+			} else {
+				const newReferenceElement = await pb
+					.collection('referenceMaterialElements')
+					.create(JSON.stringify(elementData));
+				limitsArray[i].referenceMaterialElementsId = newReferenceElement.id;
 			}
+			formMessage = 'Saved!';
 		}
 	};
 </script>

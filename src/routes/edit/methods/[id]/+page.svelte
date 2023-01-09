@@ -76,9 +76,6 @@
 		await pb
 			.collection('methodReferenceMaterials')
 			.update(methodReferenceMaterial.id, JSON.stringify({ active: false }));
-		const deletedRM = data.usedReferenceMaterials.find(
-			(rm) => rm.id === methodReferenceMaterial.referenceMaterial
-		);
 		data.unusedReferenceMaterials = [
 			...data.unusedReferenceMaterials,
 			methodReferenceMaterial.expand?.referenceMaterial
