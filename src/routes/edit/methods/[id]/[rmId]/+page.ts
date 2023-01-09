@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { getMethodById } from '$lib/methods';
+import { getElementsByMethod, getMethodById } from '$lib/methods';
 import { pb } from '$lib/pocketbase';
 import type { ElementsResponse, MethodElementsResponse, MethodReferenceMaterialsResponse, MethodsResponse, ReferenceMaterialElementsResponse, ReferenceMaterialsResponse, } from '$lib/pocketbase-types';
 import { activateMethodReferenceMaterial, getCurrentReferenceElements, getMethodReferenceMaterialByMethodAndMaterial, getReferenceMaterialById } from '$lib/referenceMaterials';
@@ -10,13 +10,6 @@ interface ElementLimits {
   referenceMaterialElementsId: string | undefined;
   lowerBound: number | undefined;
   upperBound: number | undefined;
-}
-
-
-const getMethodElements = async (methodId: string) => {
-  const methodElements: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(200, { filter: `method = "${methodId}"`, sort: 'element.mass', expand: 'element' })
-  const elements = methodElements.map(e => e?.expand?.element);
-  return elements;
 }
 
 export const load = (async ({ params }) => {
@@ -32,7 +25,6 @@ export const load = (async ({ params }) => {
     methodReferenceMaterial = await activateMethodReferenceMaterial(methodReferenceMaterial.id);
   }
 
-  const limitsArray: ElementLimits[] = [];
 
 
   let currentReferenceMaterialElements: ReferenceMaterialElementsResponse[];
@@ -40,7 +32,10 @@ export const load = (async ({ params }) => {
   else currentReferenceMaterialElements = []
 
 
-  const methodElements: ElementsResponse[] = await getMethodElements(method.id);
+  const { usedElements } = await getElementsByMethod(method.id);
+  const methodElements = usedElements;
+
+  const limitsArray: ElementLimits[] = [];
   methodElements.forEach(async e => {
     const currentValues = currentReferenceMaterialElements?.find(c => c.elementId === e.id);
 
