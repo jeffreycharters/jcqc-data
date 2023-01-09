@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { currentUser } from '$lib/pocketbase';
+	import { currentUser, logout } from '$lib/pocketbase';
 
 	function logoutAndRedirect() {
 		logout();

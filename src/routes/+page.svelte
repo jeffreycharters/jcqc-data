@@ -1,7 +1,3 @@
-<script lang="ts">
-	import { currentUser, logout } from '$lib/pocketbase';
-</script>
-
 <h1>JCQC Data Processor</h1>
 <p>Please seat yourself and somebody will be with you shortly.</p>
 
