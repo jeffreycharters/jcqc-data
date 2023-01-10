@@ -4,3 +4,24 @@ import type { ElementsResponse, MethodsResponse } from "./pocketbase-types";
 export const elements: Writable<ElementsResponse[]> = writable([])
 
 export const methods: Writable<MethodsResponse[]> = writable([])
+
+interface LOQItem {
+    value: number | string | undefined;
+    existsInDb: boolean;
+}
+
+export interface LOQDict {
+    [key: string]: LOQItem;
+}
+
+export const loqs: Writable<LOQDict> = writable({});
+
+export const addLoq = (elementId: string, value: number | undefined, existsInDb: boolean) => {
+    loqs.update(n => {
+        n[elementId] = {
+            value,
+            existsInDb
+        }
+        return n;
+    });
+}

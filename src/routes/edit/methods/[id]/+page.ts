@@ -21,14 +21,14 @@ export const load = (async ({ params }) => {
     const { usedElements, unusedElements, allElementsList } = await getElementsByMethod(method.id);
     const { usedReferenceMaterials, unusedReferenceMaterials } = await getMaterialsByMethod(method.id);
 
-    const loqs = await getLoqsByMethodId(method.id);
+    const loqList = await getLoqsByMethodId(method.id);
 
     return {
         title: `Editing ${method.name}`,
         method,
         usedElements,
         unusedElements,
-        loqs,
+        loqList,
         usedReferenceMaterials,
         unusedReferenceMaterials,
         methodElements: allElementsList

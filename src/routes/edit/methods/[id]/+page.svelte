@@ -1,19 +1,26 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import { getOrCreateMethodElement, inactivateMethodElement } from '$lib/methods';
 	import { pb } from '$lib/pocketbase';
 	import type {
 		ElementsResponse,
 		MethodReferenceMaterialsResponse,
 		MethodsResponse
 	} from '$lib/pocketbase-types';
-	import { methods } from '$lib/stores';
+	import { addLoq, methods } from '$lib/stores';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
 
 	export let data: PageData;
 
-	let { method, usedElements, unusedElements, methodElements, loqs } = data;
+	let { method, usedElements, unusedElements, methodElements, loqList } = data;
+
+	usedElements.forEach((e) => {
+		const loq = loqList.find((loq) => loq.element === e.id);
+		addLoq(e.id, loq?.value ?? undefined, !!loq);
+	});
+
 	if (!method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
 	let { name, rpdLimit, calibrationCount } = data.method || undefined;
@@ -48,19 +55,23 @@
 	};
 
 	async function addElement(element: ElementsResponse) {
-		await pb.collection('methodElements').create({
-			method: method.id,
-			element: element.id
-		});
-		usedElements = [...usedElements, element];
-		usedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
-		unusedElements = unusedElements.filter((e) => e.id != element.id);
+		const methodElement = await getOrCreateMethodElement(method.id, element.id);
+		if (!methodElement) return;
+
+		try {
+			usedElements = [...usedElements, element];
+			usedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
+			unusedElements = unusedElements.filter((e) => e.id != element.id);
+		} catch (e) {
+			console.log(element.id);
+		}
 	}
 
 	async function removeElement(element: ElementsResponse) {
 		const methodElementToRemove = methodElements.find((e) => e.element === element.id);
 		if (!methodElementToRemove) return;
-		await pb.collection('methodElements').delete(methodElementToRemove.id);
+
+		await inactivateMethodElement(methodElementToRemove.id);
 		unusedElements = [...unusedElements, element];
 		unusedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 		unusedElements = unusedElements;
@@ -125,7 +136,7 @@
 
 <p>{method.name} is currently set up with the following elements.</p>
 
-{#each usedElements as element}
+{#each usedElements as element (element.id)}
 	<div>
 		<sup>{element.mass}</sup>{element.symbol}
 		{element.name}
@@ -137,7 +148,7 @@
 
 <h3>Available unused elements:</h3>
 
-{#each unusedElements as element}
+{#each unusedElements as element (element.id)}
 	<div>
 		<sup>{element.mass}</sup>{element.symbol}
 		{element.name} <button on:click={() => addElement(element)}>Add</button>
@@ -146,7 +157,7 @@
 	NONE!
 {/each}
 
-<LOQs {usedElements} {method} {loqs} />
+<LOQs {usedElements} {method} />
 
 <h2>Reference Materials</h2>
 

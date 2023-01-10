@@ -1,34 +1,17 @@
 <script lang="ts">
 	import { createLoq, updateLoqByMethodAndElement } from '$lib/methods';
 	import type { ElementsResponse, LoqsResponse, MethodsResponse } from '$lib/pocketbase-types';
+	import type { LOQDict } from '$lib/stores';
+	import { loqs } from '$lib/stores';
 
 	export let method: MethodsResponse;
 	export let usedElements: ElementsResponse[];
-	export let loqs: LoqsResponse[];
 
 	let loqMessage = '';
 
-	interface LOQItem {
-		value: number | string | undefined;
-		existsInDb: boolean;
-	}
-
-	interface LOQArray {
-		[key: string]: LOQItem;
-	}
-
-	let loqArray: LOQArray = {};
-	usedElements.forEach((e) => {
-		const loq = loqs.find((loq) => loq.element === e.id);
-		loqArray[e.id] = {
-			value: loq?.value ?? undefined,
-			existsInDb: !!loq
-		};
-	});
-
 	const saveLoqs = async () => {
 		usedElements.forEach(async (e) => {
-			const loqItem = loqArray[e.id];
+			const loqItem = $loqs[e.id];
 			if (loqItem.existsInDb)
 				await updateLoqByMethodAndElement(method.id, e.id, Number(loqItem.value));
 			else {
@@ -47,7 +30,7 @@
 			<label for="{element.symbol}-{element.mass}-loq">
 				<sup>{element.mass}</sup>{element.symbol}
 			</label>
-			<input type="text" bind:value={loqArray[element.id].value} />
+			<input type="text" bind:value={$loqs[element.id].value} />
 		</div>
 	{/each}
 

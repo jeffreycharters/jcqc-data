@@ -52,6 +52,7 @@ export type LoqsRecord = {
 export type MethodElementsRecord = {
 	method: RecordIdString
 	element: RecordIdString
+	active?: boolean
 }
 
 export type MethodReferenceMaterialsRecord = {

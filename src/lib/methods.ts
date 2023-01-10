@@ -11,7 +11,7 @@ export const getElementsByMethod = async (methodId: string) => {
     const elements: ElementsResponse[] = await pb.collection('elements').getFullList(200, { sort: 'mass', filter: 'retired = false' });
 
     // create a list of element IDs used by the method
-    const allElementsList: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(200, { filter: `method = "${methodId}"` });
+    const allElementsList: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(200, { filter: `method = "${methodId}" && active = true` });
     const elementIds = allElementsList.map(e => e.element)
 
     // Check and see if each element is in that list or not.
@@ -53,4 +53,31 @@ export const updateLoqByMethodAndElement = async (methodId: string, elementId: s
     });
     const updatedRecord: LoqsResponse = await pb.collection('loqs').update(loq.id, updateData);
     return updatedRecord;
+}
+export const getOrCreateMethodElement = async (methodId: string, elementId: string) => {
+    let existing: MethodElementsResponse | null = null;
+    try {
+        existing = await pb.collection('methodElements').getFirstListItem(`method = "${methodId}" && element = "${elementId}"`);
+    } catch (e) {
+        const err = e as Error;
+        console.log(err.message);
+    }
+
+    if (existing) {
+        if (!existing.active) await pb.collection('methodElements').update(existing.id, JSON.stringify({ active: true }))
+        return existing;
+    }
+    const newData = JSON.stringify({
+        method: methodId,
+        element: elementId,
+        active: true,
+    })
+    const newMethodElement: MethodElementsResponse = await pb.collection('methodElements').create(newData);
+    return newMethodElement;
+}
+
+export const inactivateMethodElement = async (methodElementId: string) => {
+    const data = JSON.stringify({ active: false });
+    const updatedMethodelement = await pb.collection('methodElements').update(methodElementId, data);
+    return updatedMethodelement;
 }
