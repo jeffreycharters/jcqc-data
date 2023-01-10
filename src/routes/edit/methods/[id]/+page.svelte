@@ -15,7 +15,7 @@
 	let { method, usedElements, unusedElements, methodElements } = data;
 	if (!method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
-	let { name, rpdLimit } = data.method || undefined;
+	let { name, rpdLimit, calibrationCount } = data.method || undefined;
 	let formMessage = '';
 
 	const addFormMessage = (message: string, timeout: number = 3000) => {
@@ -27,6 +27,7 @@
 		if (!name) formMessage = 'Missing something';
 		const updateData = JSON.stringify({
 			name,
+			calibrationCount,
 			rpdLimit: rpdLimit && rpdLimit > 0 ? rpdLimit : undefined
 		});
 		try {
@@ -92,6 +93,17 @@
 	<div>
 		<label for="name">Method Name</label>
 		<input type="text" name="name" placeholder="e.g. TOXI-064 or Serum Iodine" bind:value={name} />
+	</div>
+	<div>
+		<label for="cal-count">Number of non-blank calibration standards:</label>
+		<input
+			type="number"
+			name="cal-count"
+			placeholder="e.g. 5"
+			min="1"
+			max="25"
+			bind:value={calibrationCount}
+		/>
 	</div>
 	<div>
 		<label for="mass">RPD warning limit</label>

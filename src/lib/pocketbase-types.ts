@@ -5,7 +5,6 @@
 export enum Collections {
 	Elements = "elements",
 	Loq = "loq",
-	MethodCalibrations = "methodCalibrations",
 	MethodElements = "methodElements",
 	MethodReferenceMaterials = "methodReferenceMaterials",
 	Methods = "methods",
@@ -50,12 +49,6 @@ export type LoqRecord = {
 	value?: number
 }
 
-export type MethodCalibrationsRecord = {
-	method: RecordIdString
-	level: number
-	name?: string
-}
-
 export type MethodElementsRecord = {
 	method: RecordIdString
 	element: RecordIdString
@@ -71,6 +64,7 @@ export type MethodsRecord = {
 	name: string
 	rpdLimit?: number
 	active?: boolean
+	calibrationCount: number
 }
 
 export type ReferenceMaterialElementsRecord = {
@@ -93,7 +87,6 @@ export type UsersRecord = {
 // Response types include system fields and match responses from the PocketBase API
 export type ElementsResponse = ElementsRecord & BaseSystemFields
 export type LoqResponse = LoqRecord & BaseSystemFields
-export type MethodCalibrationsResponse = MethodCalibrationsRecord & BaseSystemFields
 export type MethodElementsResponse = MethodElementsRecord & BaseSystemFields
 export type MethodReferenceMaterialsResponse = MethodReferenceMaterialsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
@@ -104,7 +97,6 @@ export type UsersResponse = UsersRecord & AuthSystemFields
 export type CollectionRecords = {
 	elements: ElementsRecord
 	loq: LoqRecord
-	methodCalibrations: MethodCalibrationsRecord
 	methodElements: MethodElementsRecord
 	methodReferenceMaterials: MethodReferenceMaterialsRecord
 	methods: MethodsRecord
