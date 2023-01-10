@@ -19,7 +19,7 @@
 		for (let i = 0; i < limitsArray.length; ++i) {
 			const elementData = {
 				methodReferenceMaterial: methodReferenceMaterialId,
-				elementId: limitsArray[i].element.id,
+				element: limitsArray[i].element.id,
 				upperBound: limitsArray[i].upperBound,
 				lowerBound: limitsArray[i].lowerBound
 			};
