@@ -1,4 +1,4 @@
-import { getElementsByMethod } from '$lib/methods';
+import { getElementsByMethod, getLoqsByMethodId } from '$lib/methods';
 import { pb } from '$lib/pocketbase';
 import type { MethodsResponse } from '$lib/pocketbase-types';
 import { redirect } from '@sveltejs/kit';
@@ -21,13 +21,14 @@ export const load = (async ({ params }) => {
     const { usedElements, unusedElements, allElementsList } = await getElementsByMethod(method.id);
     const { usedReferenceMaterials, unusedReferenceMaterials } = await getMaterialsByMethod(method.id);
 
-
+    const loqs = await getLoqsByMethodId(method.id);
 
     return {
         title: `Editing ${method.name}`,
         method,
         usedElements,
         unusedElements,
+        loqs,
         usedReferenceMaterials,
         unusedReferenceMaterials,
         methodElements: allElementsList

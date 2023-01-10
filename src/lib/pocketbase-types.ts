@@ -4,7 +4,7 @@
 
 export enum Collections {
 	Elements = "elements",
-	Loq = "loq",
+	Loqs = "loqs",
 	MethodElements = "methodElements",
 	MethodReferenceMaterials = "methodReferenceMaterials",
 	Methods = "methods",
@@ -43,10 +43,10 @@ export type ElementsRecord = {
 	retired?: boolean
 }
 
-export type LoqRecord = {
+export type LoqsRecord = {
 	method: RecordIdString
-	element: RecordIdString
 	value?: number
+	element: RecordIdString
 }
 
 export type MethodElementsRecord = {
@@ -86,7 +86,7 @@ export type UsersRecord = {
 
 // Response types include system fields and match responses from the PocketBase API
 export type ElementsResponse = ElementsRecord & BaseSystemFields
-export type LoqResponse = LoqRecord & BaseSystemFields
+export type LoqsResponse = LoqsRecord & BaseSystemFields
 export type MethodElementsResponse = MethodElementsRecord & BaseSystemFields
 export type MethodReferenceMaterialsResponse = MethodReferenceMaterialsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
@@ -96,7 +96,7 @@ export type UsersResponse = UsersRecord & AuthSystemFields
 
 export type CollectionRecords = {
 	elements: ElementsRecord
-	loq: LoqRecord
+	loqs: LoqsRecord
 	methodElements: MethodElementsRecord
 	methodReferenceMaterials: MethodReferenceMaterialsRecord
 	methods: MethodsRecord

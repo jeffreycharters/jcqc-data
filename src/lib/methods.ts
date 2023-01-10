@@ -1,5 +1,5 @@
 import { pb } from './pocketbase';
-import type { ElementsResponse, MethodElementsResponse, MethodsResponse } from './pocketbase-types';
+import type { ElementsResponse, LoqsResponse, MethodElementsResponse, MethodsResponse } from './pocketbase-types';
 
 
 export const getMethodById = async (methodId: string) => {
@@ -23,4 +23,34 @@ export const getElementsByMethod = async (methodId: string) => {
         unusedElements,
         allElementsList
     }
+}
+
+export const getLoqsByMethodId = async (methodId: string) => {
+    const loqs: LoqsResponse[] = await pb.collection('loqs').getFullList(200, { filter: `method = "${methodId}"`, expand: "element" });
+    return loqs;
+}
+
+export const createLoq = async (methodId: string, elementId: string, value: number) => {
+    if (isNaN(value)) return;
+    const newData = JSON.stringify({
+        method: methodId,
+        element: elementId,
+        value
+    })
+    const newLoq = await pb.collection('loqs').create(newData);
+    return newLoq;
+}
+
+export const getLoqByMethodAndElement = async (methodId: string, elementId: string) => {
+    const loq: LoqsResponse = await pb.collection('methodElements').getFirstListItem(`method = "${methodId}" && element = "${elementId}"`);
+    return loq;
+}
+
+export const updateLoqByMethodAndElement = async (methodId: string, elementId: string, value: string | number | undefined) => {
+    const loq = await getLoqByMethodAndElement(methodId, elementId);
+    const updateData = JSON.stringify({
+        value
+    });
+    const updatedRecord: LoqsResponse = await pb.collection('loqs').update(loq.id, updateData);
+    return updatedRecord;
 }

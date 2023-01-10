@@ -9,10 +9,11 @@
 	} from '$lib/pocketbase-types';
 	import { methods } from '$lib/stores';
 	import type { PageData } from './$types';
+	import LOQs from './LOQs.svelte';
 
 	export let data: PageData;
 
-	let { method, usedElements, unusedElements, methodElements } = data;
+	let { method, usedElements, unusedElements, methodElements, loqs } = data;
 	if (!method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
 	let { name, rpdLimit, calibrationCount } = data.method || undefined;
@@ -57,9 +58,7 @@
 	}
 
 	async function removeElement(element: ElementsResponse) {
-		const methodElementToRemove = methodElements.find(
-			(e) => e.element === element.id && e.method === method.id
-		);
+		const methodElementToRemove = methodElements.find((e) => e.element === element.id);
 		if (!methodElementToRemove) return;
 		await pb.collection('methodElements').delete(methodElementToRemove.id);
 		unusedElements = [...unusedElements, element];
@@ -136,7 +135,7 @@
 	NONE!
 {/each}
 
-<p>Available unused elements:</p>
+<h3>Available unused elements:</h3>
 
 {#each unusedElements as element}
 	<div>
@@ -146,6 +145,8 @@
 {:else}
 	NONE!
 {/each}
+
+<LOQs {usedElements} {method} {loqs} />
 
 <h2>Reference Materials</h2>
 
