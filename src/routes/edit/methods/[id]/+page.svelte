@@ -8,7 +8,7 @@
 		MethodReferenceMaterialsResponse,
 		MethodsResponse
 	} from '$lib/pocketbase-types';
-	import { addLoq, methods, removeLoq } from '$lib/stores';
+	import { loqs, methods, removeLoq } from '$lib/stores';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
 
@@ -18,7 +18,10 @@
 
 	usedElements.forEach((e) => {
 		const loq = loqList.find((loq) => loq.element === e.id);
-		addLoq(e.id, loq?.value ?? undefined, !!loq);
+		$loqs[e.id] = {
+			value: loq?.value ?? undefined,
+			existsInDb: !!loq
+		};
 	});
 
 	if (!method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
@@ -58,14 +61,11 @@
 		const methodElement = await getOrCreateMethodElement(method.id, element.id);
 		if (!methodElement) return;
 
-		try {
-			usedElements = [...usedElements, element];
-			usedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
-			unusedElements = unusedElements.filter((e) => e.id != element.id);
-			addLoq(methodElement.element, undefined, true);
-		} catch (e) {
-			console.log(element.id);
-		}
+		usedElements = [...usedElements, element];
+		usedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
+		unusedElements = unusedElements.filter((e) => e.id != element.id);
+		const existingLoq = loqList.find((loq) => loq.element === element.id);
+		$loqs[element.id] = { value: existingLoq?.value ?? undefined, existsInDb: true };
 	}
 
 	async function removeElement(element: ElementsResponse) {

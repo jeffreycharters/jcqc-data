@@ -16,16 +16,6 @@ export interface LOQDict {
 
 export const loqs: Writable<LOQDict> = writable({});
 
-export const addLoq = (elementId: string, value: number | undefined, existsInDb: boolean) => {
-    loqs.update(n => {
-        n[elementId] = {
-            value,
-            existsInDb
-        }
-        return n;
-    });
-}
-
 export const removeLoq = (elementId: string) => {
     loqs.update(n => {
         if (n[elementId]) delete n[elementId];

@@ -11,6 +11,8 @@
 	const saveLoqs = async () => {
 		usedElements.forEach(async (e) => {
 			const loqItem = $loqs[e.id];
+			console.log(loqItem.existsInDb);
+
 			if (loqItem.existsInDb)
 				await updateLoqByMethodAndElement(method.id, e.id, Number(loqItem.value));
 			else {

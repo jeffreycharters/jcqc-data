@@ -42,7 +42,7 @@ export const createLoq = async (methodId: string, elementId: string, value: numb
 }
 
 export const getLoqByMethodAndElement = async (methodId: string, elementId: string) => {
-    const loq: LoqsResponse = await pb.collection('methodElements').getFirstListItem(`method = "${methodId}" && element = "${elementId}"`);
+    const loq: LoqsResponse = await pb.collection('loqs').getFirstListItem(`method = "${methodId}" && element = "${elementId}"`);
     return loq;
 }
 
