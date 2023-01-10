@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { createLoq, updateLoqByMethodAndElement } from '$lib/methods';
 	import type { ElementsResponse, LoqsResponse, MethodsResponse } from '$lib/pocketbase-types';
-	import type { LOQDict } from '$lib/stores';
 	import { loqs } from '$lib/stores';
 
 	export let method: MethodsResponse;

@@ -8,7 +8,7 @@
 		MethodReferenceMaterialsResponse,
 		MethodsResponse
 	} from '$lib/pocketbase-types';
-	import { addLoq, methods } from '$lib/stores';
+	import { addLoq, methods, removeLoq } from '$lib/stores';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
 
@@ -62,6 +62,7 @@
 			usedElements = [...usedElements, element];
 			usedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 			unusedElements = unusedElements.filter((e) => e.id != element.id);
+			addLoq(methodElement.element, undefined, true);
 		} catch (e) {
 			console.log(element.id);
 		}
@@ -76,6 +77,7 @@
 		unusedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 		unusedElements = unusedElements;
 		usedElements = usedElements.filter((e) => e.id != element.id);
+		removeLoq(methodElementToRemove.element);
 	}
 
 	async function removeRM(referenceMaterialId: string) {

@@ -25,3 +25,10 @@ export const addLoq = (elementId: string, value: number | undefined, existsInDb:
         return n;
     });
 }
+
+export const removeLoq = (elementId: string) => {
+    loqs.update(n => {
+        if (n[elementId]) delete n[elementId];
+        return n;
+    });
+}
