@@ -60,8 +60,12 @@
 					bind:value={limitsArray[index].upperBound}
 				/>
 			</div>
+		{:else}
+			<div>Add some elements to the method, please.</div>
 		{/each}
-		<input type="submit" value="Save Changes" />
+		{#if limitsArray.length > 0}
+			<input type="submit" value="Save Changes" />
+		{/if}
 		{formMessage}
 	{/if}
 </form>

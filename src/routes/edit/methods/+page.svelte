@@ -10,6 +10,7 @@
 
 	let name: string;
 	let rpdLimit: number | undefined;
+	let calibrationCount = 1;
 
 	let formError: string;
 
@@ -17,9 +18,10 @@
 	$: inactiveMethods = $methods.filter((e) => !e.active);
 
 	const addMethod = async () => {
-		if (!name) formError = 'Missing something';
+		if (!name || !calibrationCount) formError = 'Missing something';
 		const methodData = JSON.stringify({
 			name,
+			calibrationCount,
 			rpdLimit,
 			active: true
 		});
@@ -62,6 +64,17 @@
 	<div>
 		<label for="name">Method Name</label>
 		<input type="text" name="name" placeholder="e.g. TOXI-064 or Serum Iodine" bind:value={name} />
+	</div>
+	<div>
+		<label for="cal-count">Number of non-blank calibration standards:</label>
+		<input
+			type="number"
+			name="cal-count"
+			placeholder="e.g. 5"
+			min="1"
+			max="25"
+			bind:value={calibrationCount}
+		/>
 	</div>
 	<div>
 		<label for="mass">RPD warning limit</label>
