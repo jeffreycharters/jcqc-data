@@ -1,6 +1,11 @@
 import { pb } from './pocketbase';
 import type { ElementsResponse, LoqsResponse, MethodElementsResponse, MethodsResponse } from './pocketbase-types';
 
+export const getMethodList = async (sort = "name") => {
+    const methodList: MethodsResponse[] = await pb.collection('methods').getFullList(200, { sort });
+    return methodList;
+}
+
 
 export const getMethodById = async (methodId: string) => {
     const method: MethodsResponse = await pb.collection('methods').getOne(methodId);

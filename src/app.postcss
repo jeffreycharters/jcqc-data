@@ -2,3 +2,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+a {
+    @apply underline decoration-dotted underline-offset-2 decoration-teal-600 decoration-2
+}
+
+h1 {
+    @apply text-2xl font-bold tracking-wide;
+}
+
+h2 {
+    @apply text-lg font-bold tracking-wide;
+}
+
+h3 {
+    @apply text-lg font-bold
+}
+
+input[type=text], input[type=number] {
+    @apply border border-gray-600 py-1 px-2 rounded max-w-xs shadow-inner;
+}
+
+input[type=number] {
+    @apply w-24
+}
+
+.btn {
+    @apply border border-gray-900 rounded px-2 pb-1 bg-gray-100 shadow hover:bg-gray-200;
+}

@@ -66,6 +66,7 @@ export type MethodsRecord = {
 	rpdLimit?: number
 	active?: boolean
 	calibrationCount: number
+	description?: string
 }
 
 export type ReferenceMaterialElementsRecord = {

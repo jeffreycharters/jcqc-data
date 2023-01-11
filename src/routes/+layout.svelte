@@ -16,10 +16,10 @@
 
 <slot />
 
-<div style="margin-top: 10px;">
+<div class="fixed bottom-4 right-4">
 	{#if $currentUser}
-		<button on:click={logoutAndRedirect}>Log out</button>
-		Logged in as {$currentUser.username}. <a href="/">Home</a> | <a href="/edit">Edit</a>
+		Logged in as {$currentUser.username}.
+		<button class="btn" on:click={logoutAndRedirect}>Log out</button>
 	{:else}
 		Not logged in.
 	{/if}
