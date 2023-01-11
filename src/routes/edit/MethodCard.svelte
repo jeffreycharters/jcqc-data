@@ -1,12 +1,28 @@
 <script lang="ts">
+	import { pb } from '$lib/pocketbase';
 	import type { MethodsResponse } from '$lib/pocketbase-types';
-	import { createEventDispatcher } from 'svelte';
+	import { methods } from '$lib/stores';
 	export let method: MethodsResponse;
 	const { active } = method;
 
 	const accentColour = active ? 'gray-900' : 'gray-300';
 
-	const dispatch = createEventDispatcher();
+	const toggleMethodActive = async () => {
+		const methodData = {
+			active: !method.active
+		};
+		const updatedMethod: MethodsResponse = await pb
+			.collection('methods')
+			.update(method.id, methodData);
+
+		methods.update((n) => {
+			const selectedMethod = n.find((e) => e.id === updatedMethod.id);
+			if (selectedMethod) {
+				selectedMethod.active = updatedMethod.active;
+			}
+			return n;
+		});
+	};
 </script>
 
 <div
@@ -18,8 +34,7 @@
 		</h3>
 		<button
 			class="text-sm border border-gray-400 text-gray-400 px-1 rounded-sm border-dotted"
-			on:click|stopPropagation={() => dispatch('toggleActive')}
-			>{active ? 'Inactivate' : 'Activate'}</button
+			on:click={toggleMethodActive}>{active ? 'Inactivate' : 'Activate'}</button
 		>
 	</div>
 	<div>
