@@ -1,4 +1,5 @@
 <script>
+	import '../app.postcss';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { currentUser, logout } from '$lib/pocketbase';
