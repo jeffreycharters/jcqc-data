@@ -26,7 +26,7 @@
 
 <h1 class="my-8">Select Method</h1>
 
-<div class="grid grid-cols-4 gap-4 mb-8">
+<div class="list-grid-container">
 	{#each activeMethods as method (method.id)}
 		<MethodCard {method} />
 	{/each}
