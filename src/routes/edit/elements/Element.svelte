@@ -1,14 +1,17 @@
 <script lang="ts">
+	import NumberInput from '$lib/components/NumberInput.svelte';
+	import TextInput from '$lib/components/TextInput.svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { ElementsResponse } from '$lib/pocketbase-types';
 	import { elements } from '$lib/stores';
+	import { fade } from 'svelte/transition';
 
 	export let element: ElementsResponse;
 	let { name, symbol, mass } = element;
 
 	let formMessage: string;
 
-	const addFormMessage = (message: string, timeout: number = 3000) => {
+	const addFormMessage = (message: string, timeout: number = 2000) => {
 		formMessage = message;
 		setTimeout(() => (formMessage = ''), timeout);
 	};
@@ -24,6 +27,10 @@
 	let divClass = element.retired ? 'inactive-element' : 'active-element';
 
 	async function saveChanges() {
+		if (!name || !symbol || !mass) {
+			addFormMessage('Input missing data');
+			return;
+		}
 		const updatedElement: ElementsResponse = await pb
 			.collection('elements')
 			.update(element.id, JSON.stringify(data));
@@ -54,20 +61,23 @@
 	};
 </script>
 
-<div class={divClass}>
+<div class="{divClass} {editing ? 'row-span-2' : ''} relative">
 	{#if editing}
-		<div>
-			<form>
-				<label for="name">Name:</label>
-				<input type="text" name="name" bind:value={name} />
-				<label for="name">Symbol:</label>
-				<input type="text" name="symbol" bind:value={symbol} />
-				<label for="name">Mass:</label>
-				<input type="number" name="mass" bind:value={mass} />
-				<button type="submit" on:click|preventDefault={saveChanges}>Save Changes</button>
-				<button on:click={toggleElementRetired}>Cancel</button>
-			</form>
-		</div>
+		<form on:submit|preventDefault={saveChanges}>
+			<TextInput name="name" label="Element Name" bind:value={name} />
+			<TextInput name="symbol" label="Chemical Symbol" bind:value={symbol} />
+			<NumberInput name="mass" label="Isotope Mass" bind:value={mass} />
+
+			<div class="flex justify-between items-center">
+				<button class="btn text-sm" type="submit">Save Changes</button>
+				<button type="button" class="text-sm ml-2" on:click={() => (editing = false)}>Cancel</button
+				>
+			</div>
+
+			<div class="ml-1 text-sm text-red-600">
+				{formMessage ?? ''}
+			</div>
+		</form>
 	{:else}
 		<div class="flex flex-col">
 			<div>
@@ -80,8 +90,17 @@
 		{#if element.retired}
 			<div class="w-12" />
 		{:else}
-			<button class="btn" on:click={() => (editing = true)}>Edit</button>
+			<div>
+				<button class="btn" on:click={() => (editing = true)}>Edit</button>
+				{#if formMessage}
+					<div
+						transition:fade|local={{ duration: 100 }}
+						class="text-sm text-green-700 absolute -bottom-2 right-2 bg-white rounded border-gray-600 py-1 px-2 border"
+					>
+						{formMessage}
+					</div>
+				{/if}
+			</div>
 		{/if}
 	{/if}
-	{formMessage ?? ''}
 </div>

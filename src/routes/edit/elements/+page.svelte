@@ -18,7 +18,7 @@
 	the element from <a href="/edit">one method</a>?
 </p>
 
-<div class="list-grid-container">
+<div class="list-grid-elements">
 	{#each unretiredElements as element (element.id)}
 		<Element {element} />
 	{/each}

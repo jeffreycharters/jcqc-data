@@ -35,7 +35,7 @@
 </script>
 
 <div class="border border-gray-800 rounded shadow w-fit p-4">
-	<h2 class="-mt-2">Add new</h2>
+	<h2 class="-mt-2">Add Element</h2>
 
 	<form on:submit|preventDefault={addElement}>
 		<TextInput name="name" label="Element Name" bind:value={name} placeholder="e.g. Iron" />
