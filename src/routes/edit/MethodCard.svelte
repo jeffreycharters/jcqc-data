@@ -2,7 +2,12 @@
 	import { pb } from '$lib/pocketbase';
 	import type { MethodsResponse } from '$lib/pocketbase-types';
 	import { methods } from '$lib/stores';
+	import { crossfade } from 'svelte/transition';
 	export let method: MethodsResponse;
+
+	const [send, receive] = crossfade({
+		duration: (d) => Math.sqrt(d * 200)
+	});
 	const { active } = method;
 
 	const accentColour = active ? 'gray-900' : 'gray-300';
@@ -27,6 +32,8 @@
 
 <div
 	class="border border-{accentColour} w-full p-4 rounded shadow-lg flex items-center justify-around"
+	in:receive={{ key: method.id }}
+	out:send={{ key: method.id }}
 >
 	<div class="text-{accentColour}">
 		<h3>
@@ -34,8 +41,10 @@
 		</h3>
 		<button
 			class="text-sm border border-gray-400 text-gray-400 px-1 rounded-sm border-dotted"
-			on:click={toggleMethodActive}>{active ? 'Inactivate' : 'Activate'}</button
+			on:click={toggleMethodActive}
 		>
+			{active ? 'Inactivate' : 'Activate'}
+		</button>
 	</div>
 	<div>
 		{#if active}

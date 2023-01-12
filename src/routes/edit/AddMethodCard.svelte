@@ -5,7 +5,7 @@
 </script>
 
 <button
-	on:click={() => dispatch('showAddForm')}
+	on:click={() => dispatch('toggleAddForm')}
 	class="border border-gray-500 w-full p-4 rounded shadow-lg flex gap-2 items-center justify-center font-bold"
 >
 	<svg

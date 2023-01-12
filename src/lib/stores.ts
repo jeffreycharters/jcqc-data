@@ -22,3 +22,5 @@ export const removeLoq = (elementId: string) => {
         return n;
     });
 }
+
+export const showAddForm: Writable<boolean> = writable(false);
