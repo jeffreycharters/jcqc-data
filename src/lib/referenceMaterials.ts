@@ -23,6 +23,12 @@ export const getMaterialsByMethod = async (methodId: string) => {
     }
 }
 
+export const getMethodReferenceMaterialsByMethodId = async (methodId: string) => {
+    const methodReferenceMaterials: MethodReferenceMaterialsResponse[] = await pb.collection('methodReferenceMaterials')
+        .getFullList(200, { filter: `method = "${methodId}"`, expand: 'method, referenceMaterial' });
+    return methodReferenceMaterials;
+}
+
 export const getMethodReferenceMaterialByMethodAndMaterial = async (methodId: string, referenceMaterialId: string) => {
     try {
         const methodReferenceMaterial: MethodReferenceMaterialsResponse = await pb.collection('methodReferenceMaterials')

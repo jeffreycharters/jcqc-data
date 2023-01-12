@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
+	import NumberInput from '$lib/components/NumberInput.svelte';
+	import TextInput from '$lib/components/TextInput.svelte';
 	import { getOrCreateMethodElement, inactivateMethodElement } from '$lib/methods';
 	import { pb } from '$lib/pocketbase';
 	import type {
@@ -8,13 +10,32 @@
 		MethodReferenceMaterialsResponse,
 		MethodsResponse
 	} from '$lib/pocketbase-types';
-	import { loqs, methods, removeLoq } from '$lib/stores';
+	import { loqs, method, methods, removeLoq } from '$lib/stores';
+	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
+	import MethodElement from './MethodElement.svelte';
+	import { getMethodReferenceMaterialsByMethodId } from '$lib/referenceMaterials';
 
 	export let data: PageData;
 
-	let { method, usedElements, unusedElements, methodElements, loqList } = data;
+	let {
+		usedElements,
+		unusedElements,
+		methodElements,
+		loqList,
+		methodReferenceMaterials,
+		unusedReferenceMaterials
+	} = data;
+
+	let usedReferenceMaterials: MethodReferenceMaterialsResponse[] = (function () {
+		const activeMaterials: MethodReferenceMaterialsResponse[] = methodReferenceMaterials.filter(
+			(rm) => rm.active
+		);
+		return activeMaterials.map((rm) => rm?.expand?.referenceMaterial);
+	})();
+
+	$method = data.method;
 
 	usedElements.forEach((e) => {
 		const loq = loqList.find((loq) => loq.element === e.id);
@@ -24,9 +45,9 @@
 		};
 	});
 
-	if (!method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
+	if (!$method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
-	let { name, rpdLimit, calibrationCount } = data.method || undefined;
+	let { name, description, calibrationCount, rpdLimit } = data.method || undefined;
 	let formMessage = '';
 
 	const addFormMessage = (message: string, timeout: number = 3000) => {
@@ -35,21 +56,26 @@
 	};
 
 	const editMethod = async () => {
-		if (!name) formMessage = 'Missing something';
+		if (!name || !calibrationCount) {
+			formMessage = 'Missing something';
+			return;
+		}
 		const updateData = JSON.stringify({
 			name,
 			calibrationCount,
-			rpdLimit: rpdLimit && rpdLimit > 0 ? rpdLimit : undefined
+			description,
+			rpdLimit: rpdLimit ?? 0
 		});
 		try {
 			const newMethod: MethodsResponse = await pb
 				.collection('methods')
-				.update(method.id, updateData);
+				.update($method.id, updateData);
 			methods.update((n) => {
 				const newList = [...n, newMethod];
 				newList.sort((a, b) => (a.name < b.name ? 1 : -1));
 				return newList;
 			});
+			$method = newMethod;
 			addFormMessage('Saved!');
 		} catch (err) {
 			const error = err as Error;
@@ -58,7 +84,7 @@
 	};
 
 	async function addElement(element: ElementsResponse) {
-		const methodElement = await getOrCreateMethodElement(method.id, element.id);
+		const methodElement = await getOrCreateMethodElement($method.id, element.id);
 		if (!methodElement) return;
 
 		usedElements = [...usedElements, element];
@@ -83,99 +109,101 @@
 	async function removeRM(referenceMaterialId: string) {
 		const methodReferenceMaterial: MethodReferenceMaterialsResponse = await pb
 			.collection('methodReferenceMaterials')
-			.getFirstListItem(`method = "${method.id}" && referenceMaterial = "${referenceMaterialId}"`, {
-				expand: 'referenceMaterial'
-			});
+			.getFirstListItem(
+				`method = "${$method.id}" && referenceMaterial = "${referenceMaterialId}"`,
+				{
+					expand: 'referenceMaterial'
+				}
+			);
 		await pb
 			.collection('methodReferenceMaterials')
 			.update(methodReferenceMaterial.id, JSON.stringify({ active: false }));
-		data.unusedReferenceMaterials = [
+		unusedReferenceMaterials = [
 			...data.unusedReferenceMaterials,
 			methodReferenceMaterial.expand?.referenceMaterial
 		];
-		data.usedReferenceMaterials = data.usedReferenceMaterials.filter(
-			(rm) => rm.id != methodReferenceMaterial.expand?.referenceMaterial.id
-		);
+		methodReferenceMaterials = await getMethodReferenceMaterialsByMethodId($method.id);
 	}
 </script>
 
-<h1>Editing Method: {method.name}</h1>
+<h1>
+	{$method.name}{#if $method.description}: {$method.description}{/if}
+</h1>
 
-<form on:submit|preventDefault={editMethod}>
+<div class="flex items-start gap-8 max-w-screen-lg">
 	<div>
-		<label for="name">Method Name</label>
-		<input type="text" name="name" placeholder="e.g. TOXI-064 or Serum Iodine" bind:value={name} />
-	</div>
-	<div>
-		<label for="cal-count">Number of non-blank calibration standards:</label>
-		<input
-			type="number"
-			name="cal-count"
-			placeholder="e.g. 5"
-			min="1"
-			max="25"
-			bind:value={calibrationCount}
-		/>
-	</div>
-	<div>
-		<label for="mass">RPD warning limit</label>
-		<input
-			type="number"
-			name="mass"
-			placeholder="e.g. 15"
-			min="0"
-			max="225"
-			bind:value={rpdLimit}
-		/>
-	</div>
-	<input type="submit" value="Save Changes" />
-	{#if formMessage}
-		<div style="color: #cc0000">{formMessage}</div>
-	{/if}
-</form>
-
-<h2>Method Elements</h2>
-
-<p>{method.name} is currently set up with the following elements.</p>
-
-{#each usedElements as element (element.id)}
-	<div>
-		<sup>{element.mass}</sup>{element.symbol}
-		{element.name}
-		<button on:click={() => removeElement(element)}>Remove</button>
-	</div>
-{:else}
-	NONE!
-{/each}
-
-<h3>Available unused elements:</h3>
-
-{#each unusedElements as element (element.id)}
-	<div>
-		<sup>{element.mass}</sup>{element.symbol}
-		{element.name} <button on:click={() => addElement(element)}>Add</button>
-	</div>
-{:else}
-	NONE!
-{/each}
-
-<LOQs {usedElements} {method} />
-
-<h2>Reference Materials</h2>
-
-<h3>Active Materials</h3>
-{#each data.usedReferenceMaterials as rm (rm.id)}
-	<div>
-		{rm.name} <a href="/edit/methods/{method.id}/{rm.id}">Edit Limits</a>
-		<button on:click={() => removeRM(rm.id)}>Remove</button>
-	</div>
-{/each}
-
-<h3>Available Materials</h3>
-<div data-sveltekit-preload-data="off">
-	{#each data.unusedReferenceMaterials as rm (rm.id)}
-		<div>
-			{rm.name} <a href="/edit/methods/{method.id}/{rm.id}">Use for this method</a>
+		<div class="basic-border mt-8 px-8 py-4 w-fit">
+			<h2>Edit Method</h2>
+			<form on:submit|preventDefault={editMethod}>
+				<TextInput
+					name="name"
+					placeholder="e.g. TOXI-064 or Serum Iodine"
+					bind:value={name}
+					label="Method Name"
+				/>
+				<TextInput
+					name="description"
+					placeholder="e.g. Metals in serum"
+					bind:value={description}
+					label="Method Name"
+				/>
+				<NumberInput
+					name="cal-count"
+					label="Number of non-blank calibration standards"
+					bind:value={calibrationCount}
+					placeholder="e.g. 6"
+				/>
+				<NumberInput
+					name="rpd-limit"
+					label="RPD Warning limit"
+					bind:value={rpdLimit}
+					placeholder="e.g. 15"
+				/>
+				<div>
+					<input class="btn my-4" type="submit" value="Save Changes" />
+				</div>
+				{#if formMessage}
+					<div class="text-sm text-green-600 lm-2">{formMessage}</div>
+				{/if}
+			</form>
 		</div>
-	{/each}
+		<LOQs {usedElements} method={$method} />
+	</div>
+
+	<div class="mt-8">
+		<div class="basic-border py-4 px-6">
+			<h2 class="mb-4">Elements used by this method</h2>
+
+			<div class="list-grid-container">
+				{#each usedElements as element (element.id)}
+					<MethodElement {element} on:toggleElement={(event) => removeElement(event.detail)} />
+				{/each}
+				{#each unusedElements as element (element.id)}
+					<MethodElement {element} on:toggleElement={(event) => addElement(event.detail)} />
+				{/each}
+			</div>
+		</div>
+
+		<!-- TODO: Get reference material add/remove workgin. -->
+		<div class="basic-border my-4 py-4 px-6">
+			<h2>Reference Materials</h2>
+
+			{#each usedReferenceMaterials as mrm (mrm.id)}
+				<ReferenceMaterial {mrm} />
+				<div>
+					{mrm.id} <a href="/edit/methods/{$method.id}/{mrm.id}">Edit Limits</a>
+					<button on:click={() => removeRM(mrm.id)}>Remove</button>
+				</div>
+			{/each}
+
+			<h3>Available Materials</h3>
+			<div>
+				{#each data.unusedReferenceMaterials as rm (rm.id)}
+					<div>
+						{rm.name} <a href="/edit/methods/{$method.id}/{rm.id}">Use for this method</a>
+					</div>
+				{/each}
+			</div>
+		</div>
+	</div>
 </div>

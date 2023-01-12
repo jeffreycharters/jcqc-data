@@ -10,6 +10,7 @@
 	let name: string;
 	let rpdLimit: number;
 	let calibrationCount = 1;
+	let description: string;
 
 	let addFormDiv: HTMLElement;
 
@@ -26,6 +27,7 @@
 			name,
 			calibrationCount,
 			rpdLimit,
+			description,
 			active: true
 		});
 		try {
@@ -70,14 +72,25 @@
 			</button>
 		</div>
 		<form on:submit|preventDefault={addMethod}>
-			<TextInput name="name" label="Method Name" bind:value={name} />
+			<TextInput name="name" label="Method Name" placeholder="e.g. TOXI-064" bind:value={name} />
+			<TextInput
+				name="name"
+				label="Method Description"
+				placeholder="e.g. Metals in sewage"
+				bind:value={description}
+			/>
 			<div class="flex gap-8">
 				<NumberInput
 					name="cal-count"
 					label="Number of non-blank calibration standards"
 					bind:value={calibrationCount}
 				/>
-				<NumberInput name="rpd-limit" label="RPD warning limit" bind:value={rpdLimit} />
+				<NumberInput
+					name="rpd-limit"
+					label="RPD warning limit"
+					bind:value={rpdLimit}
+					placeholder="e.g. 20"
+				/>
 			</div>
 
 			<div class="w-fit ml-auto mr-0 mt-4">
