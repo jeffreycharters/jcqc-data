@@ -6,4 +6,22 @@ declare namespace App {
 	// interface Locals {}
 	// interface PageData {}
 	// interface Platform {}
+
+}
+
+interface DetectionLimit {
+	id?: string;
+	symbol: string;
+	mass: number;
+	value?: number;
+	inDb: boolean;
+}
+
+interface MethodElement {
+	id?: string;
+	symbol: string;
+	mass: number;
+	active: boolean;
+	inDb: boolean;
+	elementId: string;
 }

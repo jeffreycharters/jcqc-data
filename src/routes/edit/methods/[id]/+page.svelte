@@ -3,14 +3,10 @@
 	import { goto } from '$app/navigation';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
-	import { getOrCreateMethodElement, inactivateMethodElement } from '$lib/methods';
+	import { createMethodElement, toggleMethodElementActive } from '$lib/methods';
 	import { pb } from '$lib/pocketbase';
-	import type {
-		ElementsResponse,
-		MethodReferenceMaterialsResponse,
-		MethodsResponse
-	} from '$lib/pocketbase-types';
-	import { loqs, method, methods, removeLoq } from '$lib/stores';
+	import type { MethodReferenceMaterialsResponse, MethodsResponse } from '$lib/pocketbase-types';
+	import { loqs, method, methods } from '$lib/stores';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
@@ -21,11 +17,10 @@
 
 	let {
 		usedElements,
-		unusedElements,
 		methodElements,
 		loqList,
-		methodReferenceMaterials,
-		unusedReferenceMaterials
+		unusedReferenceMaterials,
+		methodReferenceMaterials
 	} = data;
 
 	let usedReferenceMaterials: MethodReferenceMaterialsResponse[] = (function () {
@@ -83,28 +78,21 @@
 		}
 	};
 
-	async function addElement(element: ElementsResponse) {
-		const methodElement = await getOrCreateMethodElement($method.id, element.id);
-		if (!methodElement) return;
-
-		usedElements = [...usedElements, element];
-		usedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
-		unusedElements = unusedElements.filter((e) => e.id != element.id);
-		const existingLoq = loqList.find((loq) => loq.element === element.id);
-		$loqs[element.id] = { value: existingLoq?.value ?? undefined, existsInDb: true };
-	}
-
-	async function removeElement(element: ElementsResponse) {
-		const methodElementToRemove = methodElements.find((e) => e.element === element.id);
-		if (!methodElementToRemove) return;
-
-		await inactivateMethodElement(methodElementToRemove.id);
-		unusedElements = [...unusedElements, element];
-		unusedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
-		unusedElements = unusedElements;
-		usedElements = usedElements.filter((e) => e.id != element.id);
-		removeLoq(methodElementToRemove.element);
-	}
+	const toggleElementActive = async (element: MethodElement) => {
+		const thisElement = methodElements.find((e) => e.id === element.id);
+		if (!thisElement || !thisElement.id) {
+			return;
+		}
+		if (thisElement.inDb) await toggleMethodElementActive(thisElement.id, !thisElement.active);
+		else {
+			const newMethodElement = await createMethodElement(thisElement.elementId, $method.id);
+			thisElement.inDb = true;
+			thisElement.id = newMethodElement.id;
+		}
+		if (thisElement) thisElement.active = !thisElement?.active;
+		methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
+		methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
+	};
 
 	async function removeRM(referenceMaterialId: string) {
 		const methodReferenceMaterial: MethodReferenceMaterialsResponse = await pb
@@ -175,11 +163,11 @@
 			<h2 class="mb-4">Elements used by this method</h2>
 
 			<div class="list-grid-container">
-				{#each usedElements as element (element.id)}
-					<MethodElement {element} on:toggleElement={(event) => removeElement(event.detail)} />
-				{/each}
-				{#each unusedElements as element (element.id)}
-					<MethodElement {element} on:toggleElement={(event) => addElement(event.detail)} />
+				{#each methodElements as element (element.id)}
+					<MethodElement
+						{element}
+						on:toggleElement={(event) => toggleElementActive(event.detail)}
+					/>
 				{/each}
 			</div>
 		</div>

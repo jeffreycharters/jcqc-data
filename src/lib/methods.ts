@@ -6,6 +6,12 @@ export const getMethodList = async (sort = "name") => {
     return methodList;
 }
 
+export const getElementList = async () => {
+    const elementList: ElementsResponse[] = await pb.collection('elements').getFullList(200, { sort: 'mass', filter: `retired = false` });
+    elementList.sort((a, b) => a.mass < b.mass ? -1 : 1);
+    return elementList;
+}
+
 
 export const getMethodById = async (methodId: string) => {
     const method: MethodsResponse = await pb.collection('methods').getOne(methodId);
@@ -16,7 +22,7 @@ export const getElementsByMethod = async (methodId: string) => {
     const elements: ElementsResponse[] = await pb.collection('elements').getFullList(200, { sort: 'mass', filter: 'retired = false' });
 
     // create a list of element IDs used by the method
-    const allElementsList: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(200, { filter: `method = "${methodId}" && active = true` });
+    const allElementsList: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(200, { filter: `method = "${methodId}"` });
     const elementIds = allElementsList.map(e => e.element)
 
     // Check and see if each element is in that list or not.
@@ -79,6 +85,20 @@ export const getOrCreateMethodElement = async (methodId: string, elementId: stri
     })
     const newMethodElement: MethodElementsResponse = await pb.collection('methodElements').create(newData);
     return newMethodElement;
+}
+
+export const toggleMethodElementActive = async (methodElementId: string, newActiveState: boolean) => {
+    const data = JSON.stringify({ active: newActiveState });
+    const updatedElement: MethodElementsResponse = await pb.collection('methodElements').update(methodElementId, data)
+    return updatedElement;
+}
+
+export const createMethodElement = async (elementId: string, methodId: string) => {
+    const data = JSON.stringify({ method: methodId, element: elementId, active: true });
+    console.log(data);
+
+    const newElement: MethodElementsResponse = await pb.collection('methodElements').create(data);
+    return newElement
 }
 
 export const inactivateMethodElement = async (methodElementId: string) => {
