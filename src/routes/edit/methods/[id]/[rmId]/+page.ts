@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { getActiveElementsByMethodId, getElementsByMethod, getMethodById } from '$lib/methods';
+import { getElementsByMethod, getMethodById } from '$lib/methods';
 import type { ElementsResponse, ReferenceMaterialElementsResponse } from '$lib/pocketbase-types';
 import { activateMethodReferenceMaterial, getCurrentReferenceElements, getMethodReferenceMaterialByMethodAndMaterial, getReferenceMaterialById } from '$lib/referenceMaterials';
 import type { PageLoad } from './$types';
