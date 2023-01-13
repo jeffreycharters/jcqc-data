@@ -5,16 +5,37 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { createMethodElement, toggleMethodElementActive } from '$lib/methods';
 	import { pb } from '$lib/pocketbase';
-	import type { MethodReferenceMaterialsResponse, MethodsResponse } from '$lib/pocketbase-types';
+	import type { MethodsResponse } from '$lib/pocketbase-types';
 	import { loqs, method, methods } from '$lib/stores';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
 	import MethodElement from './MethodElement.svelte';
+	import { quintOut } from 'svelte/easing';
+	import { crossfade } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
 
 	export let data: PageData;
 
 	let { methodElements, unusedReferenceMaterials } = data;
+
+	const [send, receive] = crossfade({
+		duration: (d) => Math.sqrt(d * 200),
+
+		fallback(node, params) {
+			const style = getComputedStyle(node);
+			const transform = style.transform === 'none' ? '' : style.transform;
+
+			return {
+				duration: 600,
+				easing: quintOut,
+				css: (t) => `
+					transform: ${transform} scale(${t});
+					opacity: ${t}
+				`
+			};
+		}
+	});
 
 	$loqs = data.loqArray;
 	$method = data.method;
@@ -127,12 +148,31 @@
 			<h2 class="mb-4">Elements used by this method</h2>
 
 			<div class="list-grid-container">
-				{#each methodElements as element (element.id)}
-					<MethodElement
-						{element}
-						on:toggleElement={(event) =>
-							toggleElementActive(event.detail.element, event.detail.loqIndex)}
-					/>
+				{#each methodElements.filter((me) => me.active) as element (element.id)}
+					<div
+						in:receive|local={{ key: element.id }}
+						out:send|local={{ key: element.id }}
+						animate:flip={{ duration: 150 }}
+					>
+						<MethodElement
+							{element}
+							on:toggleElement={(event) =>
+								toggleElementActive(event.detail.element, event.detail.loqIndex)}
+						/>
+					</div>
+				{/each}
+				{#each methodElements.filter((me) => !me.active) as element (element.id)}
+					<div
+						in:receive|local={{ key: element.id }}
+						out:send|local={{ key: element.id }}
+						animate:flip={{ duration: 150 }}
+					>
+						<MethodElement
+							{element}
+							on:toggleElement={(event) =>
+								toggleElementActive(event.detail.element, event.detail.loqIndex)}
+						/>
+					</div>
 				{/each}
 			</div>
 		</div>

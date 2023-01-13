@@ -2,6 +2,8 @@
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import { createElementLoq, updateElementLoq } from '$lib/methods';
 	import { loqs, method } from '$lib/stores';
+	import { flip } from 'svelte/animate';
+	import { fade, fly } from 'svelte/transition';
 
 	let loqMessage = '';
 
@@ -26,23 +28,33 @@
 	};
 </script>
 
-<div class="basic-border py-4 px-8 mt-4">
-	<h2 class="my-4">Detection Limits</h2>
-	<form on:submit|preventDefault={saveLoqs}>
-		<div class="grid grid-cols-2 grid-flow-row gap-x-4">
-			{#each loqsToShow as element, index (element.id)}
-				<div class="max-w-[8rem] bg-gray-100 rounded my-1 p-1">
-					<NumberInput
-						name="{element.symbol}-{element.mass}-loq"
-						bind:value={loqsToShow[index].value}
-						label="<sup>{element.mass}</sup>{element.symbol}"
-					/>
-				</div>
-			{/each}
-		</div>
-		<div class="flex justify-between items-center mt-2">
-			<div class="text-sm text-green-600">{loqMessage}</div>
-			<button class="btn w-fit h-fit self-center justify-self-center">Save LOQs</button>
-		</div>
-	</form>
-</div>
+{#if loqsToShow.length > 0}
+	<div
+		class="basic-border py-4 px-8 mt-4"
+		in:fly|local={{ y: 50, duration: 150 }}
+		out:fade|local={{ duration: 100 }}
+	>
+		<h2 class="my-4">Detection Limits</h2>
+		<form on:submit|preventDefault={saveLoqs}>
+			<div class="grid grid-cols-2 grid-flow-row gap-x-4">
+				{#each loqsToShow as element, index (`${element.id}-${element.mass}`)}
+					<div
+						class="max-w-[8rem] bg-gray-100 rounded my-1 p-1"
+						transition:fade|local={{ duration: 150 }}
+						animate:flip={{ duration: 150 }}
+					>
+						<NumberInput
+							name="{element.symbol}-{element.mass}-loq"
+							bind:value={loqsToShow[index].value}
+							label="<sup>{element.mass}</sup>{element.symbol}"
+						/>
+					</div>
+				{/each}
+			</div>
+			<div class="flex justify-between items-center mt-2">
+				<div class="text-sm text-green-600">{loqMessage}</div>
+				<button class="btn w-fit h-fit self-center justify-self-center">Save LOQs</button>
+			</div>
+		</form>
+	</div>
+{/if}
