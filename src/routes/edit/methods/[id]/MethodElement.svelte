@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { loqs, method } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
 
 	export let element: MethodElement;
@@ -7,7 +8,11 @@
 	const dispatch = createEventDispatcher();
 
 	const dispatchElement = () => {
-		dispatch('toggleElement', element);
+		const loqIndex = $loqs.findIndex(
+			(loq) => loq.elementId === element.elementId && loq.methodId === $method.id
+		);
+
+		dispatch('toggleElement', { element, loqIndex });
 	};
 </script>
 

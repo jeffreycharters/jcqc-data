@@ -23,6 +23,7 @@ export const load = (async ({ params }) => {
     const { unusedReferenceMaterials } = await getMaterialsByMethod(method.id);
 
     const loqList = await getLoqsByMethodId(method.id);
+
     const elementList = await getElementList();
 
     const methodElements: MethodElement[] = elementList.map(e => {
@@ -41,16 +42,24 @@ export const load = (async ({ params }) => {
     })
     methodElements.sort((a, b) => a.active < b.active ? 1 : -1);
 
-    const loqs: DetectionLimit[] = elementList.map(e => {
+    const loqArray: DetectionLimit[] = elementList.map(e => {
         const loq = loqList.find(loq => loq.element === e.id);
+
+        const activeElements = methodElements.filter(me => me.active);
+        const visible = !!activeElements.find(me => me.elementId === e.id);
+
         return {
-            id: loq?.id,
+            id: loq?.id ?? Math.random().toString(),
             symbol: e.symbol,
             mass: e.mass,
             inDb: !!loq,
-            value: loq?.value
+            value: loq && loq?.value && loq.value > 0 ? loq?.value : undefined,
+            visible,
+            elementId: e.id,
+            methodId: method?.id ?? Math.random().toString()
         }
     })
+
 
     const methodReferenceMaterials = await getMethodReferenceMaterialsByMethodId(method.id);
 
@@ -59,7 +68,7 @@ export const load = (async ({ params }) => {
         method,
         usedElements,
         unusedElements,
-        loqs,
+        loqArray,
         loqList,
         methodElements,
         unusedReferenceMaterials,

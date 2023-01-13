@@ -106,3 +106,17 @@ export const inactivateMethodElement = async (methodElementId: string) => {
     const updatedMethodelement = await pb.collection('methodElements').update(methodElementId, data);
     return updatedMethodelement;
 }
+
+export const updateElementLoq = async (loqId: string, value: number) => {
+    const data = JSON.stringify({ value });
+    const updatedLoq = await pb.collection('loqs').update(loqId, data);
+    return updatedLoq;
+}
+
+export const createElementLoq = async (methodId: string, elementId: string, value: number | undefined) => {
+    const data = JSON.stringify({ method: methodId, element: elementId, value: value ?? undefined });
+    console.log(data);
+
+    const newLoq: LoqsResponse = await pb.collection('loqs').create(data);
+    return newLoq;
+}

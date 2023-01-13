@@ -11,35 +11,13 @@
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
 	import MethodElement from './MethodElement.svelte';
-	import { getMethodReferenceMaterialsByMethodId } from '$lib/referenceMaterials';
 
 	export let data: PageData;
 
-	let {
-		usedElements,
-		methodElements,
-		loqList,
-		unusedReferenceMaterials,
-		methodReferenceMaterials
-	} = data;
+	let { methodElements, unusedReferenceMaterials } = data;
 
-	let usedReferenceMaterials: MethodReferenceMaterialsResponse[] = (function () {
-		const activeMaterials: MethodReferenceMaterialsResponse[] = methodReferenceMaterials.filter(
-			(rm) => rm.active
-		);
-		return activeMaterials.map((rm) => rm?.expand?.referenceMaterial);
-	})();
-
+	$loqs = data.loqArray;
 	$method = data.method;
-
-	usedElements.forEach((e) => {
-		const loq = loqList.find((loq) => loq.element === e.id);
-		$loqs[e.id] = {
-			value: loq?.value ?? undefined,
-			existsInDb: !!loq
-		};
-	});
-
 	if (!$method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
 	let { name, description, calibrationCount, rpdLimit } = data.method || undefined;
@@ -78,7 +56,7 @@
 		}
 	};
 
-	const toggleElementActive = async (element: MethodElement) => {
+	const toggleElementActive = async (element: MethodElement, loqIndex: number) => {
 		const thisElement = methodElements.find((e) => e.id === element.id);
 		if (!thisElement || !thisElement.id) {
 			return;
@@ -89,28 +67,14 @@
 			thisElement.inDb = true;
 			thisElement.id = newMethodElement.id;
 		}
-		if (thisElement) thisElement.active = !thisElement?.active;
+		thisElement.active = !thisElement?.active;
+		$loqs[loqIndex].visible = thisElement.active;
 		methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 		methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
 	};
 
 	async function removeRM(referenceMaterialId: string) {
-		const methodReferenceMaterial: MethodReferenceMaterialsResponse = await pb
-			.collection('methodReferenceMaterials')
-			.getFirstListItem(
-				`method = "${$method.id}" && referenceMaterial = "${referenceMaterialId}"`,
-				{
-					expand: 'referenceMaterial'
-				}
-			);
-		await pb
-			.collection('methodReferenceMaterials')
-			.update(methodReferenceMaterial.id, JSON.stringify({ active: false }));
-		unusedReferenceMaterials = [
-			...data.unusedReferenceMaterials,
-			methodReferenceMaterial.expand?.referenceMaterial
-		];
-		methodReferenceMaterials = await getMethodReferenceMaterialsByMethodId($method.id);
+		console.log('removing!');
 	}
 </script>
 
@@ -155,7 +119,7 @@
 				{/if}
 			</form>
 		</div>
-		<LOQs {usedElements} method={$method} />
+		<LOQs />
 	</div>
 
 	<div class="mt-8">
@@ -166,7 +130,8 @@
 				{#each methodElements as element (element.id)}
 					<MethodElement
 						{element}
-						on:toggleElement={(event) => toggleElementActive(event.detail)}
+						on:toggleElement={(event) =>
+							toggleElementActive(event.detail.element, event.detail.loqIndex)}
 					/>
 				{/each}
 			</div>
@@ -176,13 +141,13 @@
 		<div class="basic-border my-4 py-4 px-6">
 			<h2>Reference Materials</h2>
 
-			{#each usedReferenceMaterials as mrm (mrm.id)}
+			<!-- {#each usedReferenceMaterials as mrm (mrm.id)}
 				<ReferenceMaterial {mrm} />
 				<div>
 					{mrm.id} <a href="/edit/methods/{$method.id}/{mrm.id}">Edit Limits</a>
 					<button on:click={() => removeRM(mrm.id)}>Remove</button>
 				</div>
-			{/each}
+			{/each} -->
 
 			<h3>Available Materials</h3>
 			<div>

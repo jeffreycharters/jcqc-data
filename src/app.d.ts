@@ -15,6 +15,9 @@ interface DetectionLimit {
 	mass: number;
 	value?: number;
 	inDb: boolean;
+	visible: boolean;
+	elementId: string;
+	methodId: string;
 }
 
 interface MethodElement {

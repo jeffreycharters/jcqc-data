@@ -12,19 +12,13 @@ export const referenceMaterials: Writable<ReferenceMaterialsResponse[]> = writab
 interface LOQItem {
     value: number | undefined;
     existsInDb: boolean;
+    visible: boolean;
 }
 
-export interface LOQDict {
-    [key: string]: LOQItem;
-}
+// export interface LOQDict {
+//     [key: string]: LOQItem;
+// }
 
-export const loqs: Writable<LOQDict> = writable({});
-
-export const removeLoq = (elementId: string) => {
-    loqs.update(n => {
-        if (n[elementId]) delete n[elementId];
-        return n;
-    });
-}
+export const loqs: Writable<DetectionLimit[]> = writable([]);
 
 export const showAddForm: Writable<boolean> = writable(false);
