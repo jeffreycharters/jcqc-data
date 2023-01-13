@@ -28,3 +28,9 @@ interface MethodElement {
 	inDb: boolean;
 	elementId: string;
 }
+
+interface ReferenceMaterial {
+	id: string;
+	name: string;
+	active: boolean;
+}

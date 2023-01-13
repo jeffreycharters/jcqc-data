@@ -6,7 +6,7 @@
 	import { createMethodElement, toggleMethodElementActive } from '$lib/methods';
 	import { pb } from '$lib/pocketbase';
 	import type { MethodsResponse } from '$lib/pocketbase-types';
-	import { loqs, method, methods } from '$lib/stores';
+	import { loqs, method, methodReferenceMaterials, methods } from '$lib/stores';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
@@ -17,7 +17,7 @@
 
 	export let data: PageData;
 
-	let { methodElements, unusedReferenceMaterials } = data;
+	let { methodElements } = data;
 
 	const [send, receive] = crossfade({
 		duration: (d) => Math.sqrt(d * 200),
@@ -39,6 +39,7 @@
 
 	$loqs = data.loqArray;
 	$method = data.method;
+	$methodReferenceMaterials = data.methodReferenceMaterialsList;
 	if (!$method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
 	let { name, description, calibrationCount, rpdLimit } = data.method || undefined;
@@ -93,10 +94,6 @@
 		methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 		methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
 	};
-
-	async function removeRM(referenceMaterialId: string) {
-		console.log('removing!');
-	}
 </script>
 
 <h1>
@@ -177,26 +174,16 @@
 			</div>
 		</div>
 
-		<!-- TODO: Get reference material add/remove workgin. -->
 		<div class="basic-border my-4 py-4 px-6">
 			<h2>Reference Materials</h2>
 
-			<!-- {#each usedReferenceMaterials as mrm (mrm.id)}
-				<ReferenceMaterial {mrm} />
-				<div>
-					{mrm.id} <a href="/edit/methods/{$method.id}/{mrm.id}">Edit Limits</a>
-					<button on:click={() => removeRM(mrm.id)}>Remove</button>
-				</div>
-			{/each} -->
+			{#each $methodReferenceMaterials.filter((rm) => rm.active) as rm (rm.id)}
+				<ReferenceMaterial {rm} />
+			{/each}
 
-			<h3>Available Materials</h3>
-			<div>
-				{#each data.unusedReferenceMaterials as rm (rm.id)}
-					<div>
-						{rm.name} <a href="/edit/methods/{$method.id}/{rm.id}">Use for this method</a>
-					</div>
-				{/each}
-			</div>
+			{#each $methodReferenceMaterials.filter((rm) => !rm.active) as rm (rm.id)}
+				<ReferenceMaterial {rm} />
+			{/each}
 		</div>
 	</div>
 </div>

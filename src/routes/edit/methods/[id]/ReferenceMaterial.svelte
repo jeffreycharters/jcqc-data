@@ -1,50 +1,53 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { pb } from '$lib/pocketbase';
-	import type { MethodReferenceMaterialsResponse } from '$lib/pocketbase-types';
-	import { referenceMaterials, method } from '$lib/stores';
+	import {
+		getMethodReferenceMaterialByMethodAndMaterial,
+		inactivateMethodReferenceMaterialById
+	} from '$lib/referenceMaterials';
+	import { method, methodReferenceMaterials } from '$lib/stores';
 	import { fade } from 'svelte/transition';
 
-	export let mrm: MethodReferenceMaterialsResponse;
+	export let rm: { id: string; name: string; active: boolean };
 
 	let formMessage: string;
 
-	let divClass = mrm.active ? 'active-element' : 'inactive-element';
+	let divClass = rm.active ? 'active-element' : 'inactive-element';
 
-	const toggleMaterialActive = async () => {
-		const data = JSON.stringify({
-			active: !mrm.active
-		});
-		const thisMaterial = await pb
-			.collection('methodReferenceMaterials')
-			.getFirstListItem(`referenceMaterial = "${mrm.id}" && method = "${$method.id}"`);
-		const updatedMaterial = await pb
-			.collection('methodReferenceMaterials')
-			.update(thisMaterial.id, data);
-		referenceMaterials.update((n) => {
-			const selectedMaterial = n.find((m) => m.id === updatedMaterial.id);
-			if (selectedMaterial) {
-				selectedMaterial.active = updatedMaterial.active;
-			}
-			return n;
-		});
+	const inactiveReferenceMaterial = async () => {
+		const thisMaterial = await getMethodReferenceMaterialByMethodAndMaterial($method.id, rm.id);
+		if (!thisMaterial?.id) return;
+		const inactivatedMaterial = await inactivateMethodReferenceMaterialById(thisMaterial.id);
+		if (!!inactivatedMaterial) {
+			const materialIndex = $methodReferenceMaterials.findIndex(
+				(rm) => rm.id === inactivatedMaterial.referenceMaterial
+			);
+			if (materialIndex && $methodReferenceMaterials[materialIndex].active != undefined)
+				$methodReferenceMaterials[materialIndex].active =
+					!$methodReferenceMaterials[materialIndex].active;
+		}
 	};
 </script>
 
-<div class="{divClass} relative">
-	<div class="flex flex-col">
+<div class="{divClass} relative my-2">
+	<div class="flex gap-4 my-1">
 		<div>
-			{mrm?.id}
+			{rm?.name}
 		</div>
-		<button class="inactivate-button" on:click={toggleMaterialActive}
-			>{mrm.active ? 'Inactivate' : 'Activate'}</button
-		>
+		{#if rm.active}
+			<button class="inactivate-button" on:click={inactiveReferenceMaterial}
+				>{rm.active ? 'Inactivate' : 'Activate'}</button
+			>
+		{:else}
+			<a href="/edit/methods/{$method.id}/{rm.id}" class="inactivate-button no-underline"
+				>Activate</a
+			>
+		{/if}
 	</div>
-	{#if !mrm.active}
+	{#if !rm.active}
 		<div class="w-12" />
 	{:else}
 		<div>
-			<a href="{$page.url.pathname}/{mrm.id}" class="btn no-underline">Edit</a>
+			<a href="{$page.url.pathname}/{rm.id}" class="btn no-underline">Edit Limits</a>
 			{#if formMessage}
 				<div
 					transition:fade|local={{ duration: 100 }}

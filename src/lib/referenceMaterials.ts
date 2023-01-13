@@ -1,6 +1,11 @@
 import { pb } from './pocketbase';
 import type { MethodReferenceMaterialsResponse, ReferenceMaterialElementsResponse, ReferenceMaterialsResponse } from './pocketbase-types';
 
+export const getallReferenceMaterials = async () => {
+    const allReferenceMaterials = await pb.collection('referenceMaterials').getFullList(200, { sort: 'name' });
+    return allReferenceMaterials;
+}
+
 export const getReferenceMaterialById = async (materialId: string) => {
     const referenceMaterial: ReferenceMaterialsResponse = await pb.collection('referenceMaterials').getOne(materialId);
     return referenceMaterial;
@@ -62,4 +67,9 @@ export const createMethodReferenceMaterial = async (methodId: string, referenceM
 export const activateMethodReferenceMaterial = async (id: string) => {
     const activatedMaterial: MethodReferenceMaterialsResponse = await pb.collection('methodReferenceMaterials').update(id, JSON.stringify({ active: true }));
     return activatedMaterial
+}
+
+export const inactivateMethodReferenceMaterialById = async (id: string) => {
+    const inactivatedMaterial: MethodReferenceMaterialsResponse = await pb.collection('methodReferenceMaterials').update(id, { "active": false });
+    return inactivatedMaterial;
 }

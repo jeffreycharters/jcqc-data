@@ -2,7 +2,7 @@ import { getElementList, getElementsByMethod, getLoqsByMethodId, getMethodById }
 import type { MethodsResponse } from '$lib/pocketbase-types';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
-import { getMaterialsByMethod, getMethodReferenceMaterialsByMethodId } from '$lib/referenceMaterials';
+import { getallReferenceMaterials, getMaterialsByMethod, getMethodReferenceMaterialsByMethodId } from '$lib/referenceMaterials';
 
 
 export const load = (async ({ params }) => {
@@ -19,8 +19,20 @@ export const load = (async ({ params }) => {
     }
 
 
-    const { usedElements, unusedElements, allElementsList } = await getElementsByMethod(method.id);
-    const { unusedReferenceMaterials } = await getMaterialsByMethod(method.id);
+    const { allElementsList } = await getElementsByMethod(method.id);
+
+    const allReferenceMaterials = await getallReferenceMaterials();
+    const methodReferenceMaterials = await getMethodReferenceMaterialsByMethodId(method.id);
+
+    const methodReferenceMaterialsList: ReferenceMaterial[] = allReferenceMaterials.map(rm => {
+        const thisReferenceMaterial = methodReferenceMaterials.find(mrm => mrm.referenceMaterial === rm.id);
+        return {
+            id: rm.id,
+            name: rm.name,
+            active: !!thisReferenceMaterial?.active,
+        };
+    });
+
 
     const loqList = await getLoqsByMethodId(method.id);
 
@@ -61,17 +73,13 @@ export const load = (async ({ params }) => {
     })
 
 
-    const methodReferenceMaterials = await getMethodReferenceMaterialsByMethodId(method.id);
 
     return {
         title: `${method.name}${method.description ? `: ${method.description}` : ''}`,
         method,
-        usedElements,
-        unusedElements,
         loqArray,
         loqList,
         methodElements,
-        unusedReferenceMaterials,
-        methodReferenceMaterials,
+        methodReferenceMaterialsList
     };
 }) satisfies PageLoad;

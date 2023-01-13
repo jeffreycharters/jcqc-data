@@ -9,16 +9,8 @@ export const method: Writable<MethodsResponse> = writable()
 
 export const referenceMaterials: Writable<ReferenceMaterialsResponse[]> = writable([]);
 
-interface LOQItem {
-    value: number | undefined;
-    existsInDb: boolean;
-    visible: boolean;
-}
-
-// export interface LOQDict {
-//     [key: string]: LOQItem;
-// }
-
 export const loqs: Writable<DetectionLimit[]> = writable([]);
 
 export const showAddForm: Writable<boolean> = writable(false);
+
+export const methodReferenceMaterials: Writable<ReferenceMaterial[]> = writable([]);
