@@ -1,7 +1,6 @@
 import { browser } from '$app/environment';
-import { getElementsByMethod, getMethodById } from '$lib/methods';
-import { pb } from '$lib/pocketbase';
-import type { ElementsResponse, MethodElementsResponse, MethodReferenceMaterialsResponse, MethodsResponse, ReferenceMaterialElementsResponse, ReferenceMaterialsResponse, } from '$lib/pocketbase-types';
+import { getActiveElementsByMethodId, getElementsByMethod, getMethodById } from '$lib/methods';
+import type { ElementsResponse, ReferenceMaterialElementsResponse } from '$lib/pocketbase-types';
 import { activateMethodReferenceMaterial, getCurrentReferenceElements, getMethodReferenceMaterialByMethodAndMaterial, getReferenceMaterialById } from '$lib/referenceMaterials';
 import type { PageLoad } from './$types';
 
@@ -34,6 +33,7 @@ export const load = (async ({ params }) => {
 
   const { usedElements } = await getElementsByMethod(method.id);
   const methodElements = usedElements;
+
 
   const limitsArray: ElementLimits[] = [];
   methodElements.forEach(async e => {

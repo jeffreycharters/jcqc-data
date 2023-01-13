@@ -23,10 +23,12 @@ export const getElementsByMethod = async (methodId: string) => {
 
     // create a list of element IDs used by the method
     const allElementsList: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(200, { filter: `method = "${methodId}"` });
-    const elementIds = allElementsList.map(e => e.element)
+    const activeElementsList = allElementsList.filter(e => e.active);
+    const elementIds = allElementsList.map(e => e.element);
+    const activeElementIds = activeElementsList.map(e => e.element);
 
     // Check and see if each element is in that list or not.
-    const usedElements = elements.filter(e => elementIds.includes(e.id));
+    const usedElements = elements.filter(e => activeElementIds.includes(e.id));
     const unusedElements = elements.filter(e => !elementIds.includes(e.id));
 
     return {
@@ -34,6 +36,11 @@ export const getElementsByMethod = async (methodId: string) => {
         unusedElements,
         allElementsList
     }
+}
+
+export const getActiveElementsByMethodId = async (methodId: string) => {
+    const activeElements: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(200, { filter: `method = "${methodId}" && active = true` });
+    return activeElements;
 }
 
 export const getLoqsByMethodId = async (methodId: string) => {
