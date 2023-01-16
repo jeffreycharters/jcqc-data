@@ -18,7 +18,7 @@
 	the element from <a href="/edit">one method</a>?
 </p>
 
-<div class="list-grid-elements">
+<div class="grid grid-cols-5 gap-4">
 	{#each unretiredElements as element (element.id)}
 		<Element {element} />
 	{/each}
@@ -26,8 +26,7 @@
 	{#each retiredElements as element (element.id)}
 		<Element {element} />
 	{/each}
-</div>
-
-<div class="mt-6">
-	<AddElementForm />
+	<div class="col-span-3 row-span-2">
+		<AddElementForm />
+	</div>
 </div>

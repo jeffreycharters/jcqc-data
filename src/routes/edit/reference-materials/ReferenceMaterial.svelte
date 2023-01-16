@@ -74,3 +74,12 @@
 		{/if}
 	{/if}
 </div>
+
+<style lang="postcss">
+	.active-element {
+		@apply border border-gray-800 rounded shadow py-2 px-4 flex items-center justify-around;
+	}
+	.inactive-element {
+		@apply border border-gray-300 rounded shadow py-2 px-4 flex items-center justify-around text-gray-400;
+	}
+</style>

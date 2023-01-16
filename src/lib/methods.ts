@@ -134,3 +134,8 @@ export const setMethodElementUnitsById = async (methodElementId: string, newUnit
     const updatedMethodelement: MethodElementsResponse = await pb.collection('methodElements').update(methodElementId, data);
     return updatedMethodelement;
 }
+
+export const setCalCheckValueByMethodelementId = async (methodElementId: string, checkStandard: number) => {
+    const updatedMethodElement: MethodElementsResponse = await pb.collection('methodElements').update(methodElementId, JSON.stringify({ checkStandard }));
+    return updatedMethodElement;
+}

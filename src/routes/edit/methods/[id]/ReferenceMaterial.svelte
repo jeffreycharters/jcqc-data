@@ -11,8 +11,6 @@
 
 	let formMessage: string;
 
-	let divClass = rm.active ? 'active-element' : 'inactive-element';
-
 	const inactiveReferenceMaterial = async () => {
 		const thisMaterial = await getMethodReferenceMaterialByMethodAndMaterial($method.id, rm.id);
 		if (!thisMaterial?.id) return;
@@ -28,7 +26,7 @@
 	};
 </script>
 
-<div class="{divClass} relative my-2">
+<div class="basic-border relative {rm.active ? 'active-element' : 'inactive-element'}">
 	<div class="flex gap-4 my-1">
 		<div>
 			{rm?.name}
@@ -59,3 +57,12 @@
 		</div>
 	{/if}
 </div>
+
+<style lang="postcss">
+	.active-element {
+		@apply border border-black rounded shadow py-2 px-4 flex items-center justify-around;
+	}
+	.inactive-element {
+		@apply border border-gray-300 rounded shadow py-2 px-4 flex items-center justify-start text-gray-400;
+	}
+</style>

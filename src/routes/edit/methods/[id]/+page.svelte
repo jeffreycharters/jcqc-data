@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
-	import { createMethodElement, toggleMethodElementActive } from '$lib/methods';
 	import { pb } from '$lib/pocketbase';
 	import type { MethodsResponse } from '$lib/pocketbase-types';
 	import { loqs, method, methodReferenceMaterials, methods } from '$lib/stores';
@@ -37,13 +36,14 @@
 		}
 	});
 
+	let formMessage = '';
+
 	$loqs = data.loqArray;
 	$method = data.method;
 	$methodReferenceMaterials = data.methodReferenceMaterialsList;
 	if (!$method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
 	let { name, description, calibrationCount, rpdLimit } = data.method || undefined;
-	let formMessage = '';
 
 	const addFormMessage = (message: string, timeout: number = 3000) => {
 		formMessage = message;
@@ -52,7 +52,7 @@
 
 	const editMethod = async () => {
 		if (!name || !calibrationCount) {
-			formMessage = 'Missing something';
+			addFormMessage('Missing something');
 			return;
 		}
 		const updateData = JSON.stringify({
@@ -71,7 +71,7 @@
 				return newList;
 			});
 			$method = newMethod;
-			addFormMessage('Saved!');
+			addFormMessage('Saved');
 		} catch (err) {
 			const error = err as Error;
 			addFormMessage(error.message);
@@ -131,11 +131,7 @@
 				<div class="flex items-baseline justify-between">
 					<div>
 						{#if formMessage}
-							<div
-								class="text-sm text-green-600 lm-2"
-								in:fade={{ duration: 200 }}
-								out:fade={{ duration: 100 }}
-							>
+							<div class="text-sm lm-2" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
 								{formMessage}
 							</div>
 						{/if}
@@ -151,7 +147,10 @@
 
 	<div class="mt-8 w-full">
 		<div class="basic-border py-4 px-6">
-			<h2 class="mb-4">Elements used by this method</h2>
+			<div class="flex justify-between">
+				<h2 class="mb-4">Elements used by this method</h2>
+				<div class="text-gray-500">Changes in this box are saved as soon as they are made.</div>
+			</div>
 
 			<div class="grid grid-cols-6 gap-4">
 				{#each methodElements.filter((me) => me.active) as element (element.id)}
@@ -182,16 +181,18 @@
 			</div>
 		</div>
 
-		<div class="basic-border my-4 py-4 px-6 w-full max-w-md">
-			<h2>Reference Materials</h2>
+		<div class="basic-border my-4 py-4 px-6 w-full max-w-screen-xl">
+			<h2 class="mb-4">Reference Materials</h2>
 
-			{#each $methodReferenceMaterials.filter((rm) => rm.active) as rm (rm.id)}
-				<ReferenceMaterial {rm} />
-			{/each}
+			<div class="grid grid-cols-2 gap-4">
+				{#each $methodReferenceMaterials.filter((rm) => rm.active) as rm (rm.id)}
+					<ReferenceMaterial {rm} />
+				{/each}
 
-			{#each $methodReferenceMaterials.filter((rm) => !rm.active) as rm (rm.id)}
-				<ReferenceMaterial {rm} />
-			{/each}
+				{#each $methodReferenceMaterials.filter((rm) => !rm.active) as rm (rm.id)}
+					<ReferenceMaterial {rm} />
+				{/each}
+			</div>
 		</div>
 	</div>
 </div>

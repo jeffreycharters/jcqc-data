@@ -68,7 +68,7 @@
 			<TextInput name="symbol" label="Chemical Symbol" bind:value={symbol} />
 			<NumberInput name="mass" label="Isotope Mass" bind:value={mass} />
 
-			<div class="flex justify-between items-center">
+			<div class="flex justify-between items-center mt-4">
 				<button class="btn text-sm" type="submit">Save Changes</button>
 				<button type="button" class="text-sm ml-2" on:click={() => (editing = false)}>Cancel</button
 				>
@@ -95,7 +95,7 @@
 				{#if formMessage}
 					<div
 						transition:fade|local={{ duration: 100 }}
-						class="text-sm text-green-700 absolute -bottom-2 right-2 bg-white rounded border-gray-600 py-1 px-2 border"
+						class="text-sm text-green-700 absolute -bottom-2 right-2 bg-white rounded border-gray-600 px-2 border"
 					>
 						{formMessage}
 					</div>
@@ -104,3 +104,12 @@
 		{/if}
 	{/if}
 </div>
+
+<style lang="postcss">
+	.active-element {
+		@apply border border-gray-800 rounded shadow py-2 px-4 flex items-center justify-around;
+	}
+	.inactive-element {
+		@apply border border-gray-300 rounded shadow py-2 px-4 flex items-center justify-around text-gray-400;
+	}
+</style>

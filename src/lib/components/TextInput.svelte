@@ -7,5 +7,5 @@
 
 <div class="flex flex-col text-sm my-2">
 	<label for={name}>{label}</label>
-	<input type="text" bind:value {placeholder} />
+	<input type="text" class="text-input" bind:value {placeholder} />
 </div>
