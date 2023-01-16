@@ -44,7 +44,7 @@
 </script>
 
 <div
-	class="w-full h-screen flex justify-center items-center border border-red-500"
+	class="w-full h-screen flex justify-center items-center -mt-24"
 	transition:fade|local={{ duration: 200 }}
 >
 	<div>
@@ -67,9 +67,16 @@
 						<tbody>
 							{#each limitsArray as limits, index (limits?.element?.id)}
 								<tr class={index % 2 === 0 ? 'bg-gray-200' : ''}>
-									<td class="pl-8 px-4">
-										<strong><sup>{limits.element.mass}</sup>{limits.element?.symbol}</strong>
-									</td>
+									<th class="pl-8 px-4">
+										<div class="flex gap-2 items-baseline">
+											<div>
+												<sup>{limits.element.mass}</sup>{limits.element?.symbol}
+											</div>
+											<div class="text-gray-500 text-sm">
+												{limits.units}
+											</div>
+										</div>
+									</th>
 
 									<td class="py-2 px-4">
 										<NumberInput

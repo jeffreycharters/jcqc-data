@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { getElementsByMethod, getMethodById } from '$lib/methods';
+import { getElementsByMethod, getMethodById, getMethodElementsByMethodId } from '$lib/methods';
 import type { ElementsResponse, ReferenceMaterialElementsResponse } from '$lib/pocketbase-types';
 import { activateMethodReferenceMaterial, getCurrentReferenceElements, getMethodReferenceMaterialByMethodAndMaterial, getReferenceMaterialById } from '$lib/referenceMaterials';
 import type { PageLoad } from './$types';
@@ -9,6 +9,7 @@ interface ElementLimits {
   referenceMaterialElementsId: string | undefined;
   lowerBound: number | undefined;
   upperBound: number | undefined;
+  units: string;
 }
 
 export const load = (async ({ params }) => {
@@ -30,6 +31,7 @@ export const load = (async ({ params }) => {
   if (methodReferenceMaterial) currentReferenceMaterialElements = await getCurrentReferenceElements(methodReferenceMaterial.id);
   else currentReferenceMaterialElements = []
 
+  const currentMethodElements = await getMethodElementsByMethodId(method.id);
 
   const { usedElements } = await getElementsByMethod(method.id);
   const methodElements = usedElements;
@@ -38,12 +40,14 @@ export const load = (async ({ params }) => {
   const limitsArray: ElementLimits[] = [];
   methodElements.forEach(async e => {
     const currentValues = currentReferenceMaterialElements?.find(c => c.element === e.id);
+    const currentMethodElement = currentMethodElements.find(me => me.element === e.id);
 
     limitsArray.push({
       element: e,
       referenceMaterialElementsId: currentValues?.id ?? undefined,
       lowerBound: currentValues?.lowerBound === 0 ? undefined : currentValues?.lowerBound,
       upperBound: currentValues?.upperBound === 0 ? undefined : currentValues?.upperBound,
+      units: currentMethodElement?.units ?? '??'
     });
   });
 

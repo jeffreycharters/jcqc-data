@@ -147,7 +147,7 @@
 
 	<div class="mt-8 w-full">
 		<div class="basic-border py-4 px-6">
-			<div class="flex justify-between">
+			<div class="flex justify-between items-baseline">
 				<h2 class="mb-4">Elements used by this method</h2>
 				<div class="text-gray-500">Changes in this box are saved as soon as they are made.</div>
 			</div>

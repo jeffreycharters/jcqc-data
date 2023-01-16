@@ -8,8 +8,13 @@ export const getMethodList = async (sort = "name") => {
 
 export const getElementList = async () => {
     const elementList: ElementsResponse[] = await pb.collection('elements').getFullList(200, { sort: 'mass', filter: `retired = false` });
-    elementList.sort((a, b) => a.mass < b.mass ? -1 : 1);
+    elementList.sort((a, b) => a.mass < b.mass ? 1 : -1);
     return elementList;
+}
+
+export const getMethodElementsByMethodId = async (methodId: string) => {
+    const methodElements: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(200, { filter: `method = "${methodId}"` });
+    return methodElements;
 }
 
 
