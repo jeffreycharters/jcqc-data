@@ -34,7 +34,7 @@
 		in:fly|local={{ y: 50, duration: 150 }}
 		out:fade|local={{ duration: 100 }}
 	>
-		<h2 class="my-4">Detection Limits</h2>
+		<h2 class="my-2">Detection Limits</h2>
 		<form on:submit|preventDefault={saveLoqs}>
 			<div class="grid grid-cols-2 grid-flow-row gap-x-4">
 				{#each loqsToShow as element, index (`${element.id}-${element.mass}`)}

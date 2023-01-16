@@ -12,7 +12,7 @@
 	import LOQs from './LOQs.svelte';
 	import MethodElement from './MethodElement.svelte';
 	import { quintOut } from 'svelte/easing';
-	import { crossfade } from 'svelte/transition';
+	import { crossfade, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
 
 	export let data: PageData;
@@ -78,18 +78,17 @@
 		}
 	};
 
-	const toggleElementActive = async (element: MethodElement, loqIndex: number) => {
+	const getLoqIndexByElementId = (elementId: string) => {
+		return $loqs.findIndex((loq) => loq.elementId === elementId && loq.methodId === $method.id);
+	};
+
+	const toggleElementActive = async (element: MethodElement) => {
 		const thisElement = methodElements.find((e) => e.id === element.id);
 		if (!thisElement || !thisElement.id) {
 			return;
 		}
-		if (thisElement.inDb) await toggleMethodElementActive(thisElement.id, !thisElement.active);
-		else {
-			const newMethodElement = await createMethodElement(thisElement.elementId, $method.id);
-			thisElement.inDb = true;
-			thisElement.id = newMethodElement.id;
-		}
-		thisElement.active = !thisElement?.active;
+
+		const loqIndex = getLoqIndexByElementId(thisElement.elementId);
 		$loqs[loqIndex].visible = thisElement.active;
 		methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 		methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
@@ -100,7 +99,7 @@
 	{$method.name}{#if $method.description}: {$method.description}{/if}
 </h1>
 
-<div class="flex items-start gap-8 max-w-screen-lg">
+<div class="flex items-start gap-8 max-w-screen-xl">
 	<div>
 		<div class="basic-border mt-8 px-8 py-4 w-fit">
 			<h2>Edit Method</h2>
@@ -129,32 +128,42 @@
 					bind:value={rpdLimit}
 					placeholder="e.g. 15"
 				/>
-				<div>
-					<input class="btn my-4" type="submit" value="Save Changes" />
+				<div class="flex items-baseline justify-between">
+					<div>
+						{#if formMessage}
+							<div
+								class="text-sm text-green-600 lm-2"
+								in:fade={{ duration: 200 }}
+								out:fade={{ duration: 100 }}
+							>
+								{formMessage}
+							</div>
+						{/if}
+					</div>
+					<div>
+						<input class="btn my-4" type="submit" value="Save Changes" />
+					</div>
 				</div>
-				{#if formMessage}
-					<div class="text-sm text-green-600 lm-2">{formMessage}</div>
-				{/if}
 			</form>
 		</div>
 		<LOQs />
 	</div>
 
-	<div class="mt-8">
+	<div class="mt-8 w-full">
 		<div class="basic-border py-4 px-6">
 			<h2 class="mb-4">Elements used by this method</h2>
 
-			<div class="list-grid-container">
+			<div class="grid grid-cols-6 gap-4">
 				{#each methodElements.filter((me) => me.active) as element (element.id)}
 					<div
+						class={element.active ? 'col-span-2' : ''}
 						in:receive|local={{ key: element.id }}
 						out:send|local={{ key: element.id }}
 						animate:flip={{ duration: 150 }}
 					>
 						<MethodElement
 							{element}
-							on:toggleElement={(event) =>
-								toggleElementActive(event.detail.element, event.detail.loqIndex)}
+							on:toggleElement={(event) => toggleElementActive(event.detail)}
 						/>
 					</div>
 				{/each}
@@ -166,15 +175,14 @@
 					>
 						<MethodElement
 							{element}
-							on:toggleElement={(event) =>
-								toggleElementActive(event.detail.element, event.detail.loqIndex)}
+							on:toggleElement={(event) => toggleElementActive(event.detail)}
 						/>
 					</div>
 				{/each}
 			</div>
 		</div>
 
-		<div class="basic-border my-4 py-4 px-6">
+		<div class="basic-border my-4 py-4 px-6 w-full max-w-md">
 			<h2>Reference Materials</h2>
 
 			{#each $methodReferenceMaterials.filter((rm) => rm.active) as rm (rm.id)}

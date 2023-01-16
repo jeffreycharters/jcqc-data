@@ -89,20 +89,20 @@ export const getOrCreateMethodElement = async (methodId: string, elementId: stri
         method: methodId,
         element: elementId,
         active: true,
+        units: 'ppb',
     })
     const newMethodElement: MethodElementsResponse = await pb.collection('methodElements').create(newData);
     return newMethodElement;
 }
 
 export const toggleMethodElementActive = async (methodElementId: string, newActiveState: boolean) => {
-    const data = JSON.stringify({ active: newActiveState });
+    const data = JSON.stringify({ active: newActiveState, units: 'ppb' });
     const updatedElement: MethodElementsResponse = await pb.collection('methodElements').update(methodElementId, data)
     return updatedElement;
 }
 
 export const createMethodElement = async (elementId: string, methodId: string) => {
-    const data = JSON.stringify({ method: methodId, element: elementId, active: true });
-    console.log(data);
+    const data = JSON.stringify({ method: methodId, element: elementId, active: true, units: 'ppb' });
 
     const newElement: MethodElementsResponse = await pb.collection('methodElements').create(data);
     return newElement
@@ -122,8 +122,15 @@ export const updateElementLoq = async (loqId: string, value: number) => {
 
 export const createElementLoq = async (methodId: string, elementId: string, value: number | undefined) => {
     const data = JSON.stringify({ method: methodId, element: elementId, value: value ?? undefined });
-    console.log(data);
 
     const newLoq: LoqsResponse = await pb.collection('loqs').create(data);
     return newLoq;
+}
+
+export const setMethodElementUnitsById = async (methodElementId: string, newUnits: Units) => {
+    const data = JSON.stringify({
+        units: newUnits,
+    })
+    const updatedMethodelement: MethodElementsResponse = await pb.collection('methodElements').update(methodElementId, data);
+    return updatedMethodelement;
 }

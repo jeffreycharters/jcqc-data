@@ -2,7 +2,7 @@ import { getElementList, getElementsByMethod, getLoqsByMethodId, getMethodById }
 import type { MethodsResponse } from '$lib/pocketbase-types';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
-import { getallReferenceMaterials, getMaterialsByMethod, getMethodReferenceMaterialsByMethodId } from '$lib/referenceMaterials';
+import { getallReferenceMaterials, getMethodReferenceMaterialsByMethodId } from '$lib/referenceMaterials';
 
 
 export const load = (async ({ params }) => {
@@ -49,7 +49,9 @@ export const load = (async ({ params }) => {
             mass: e.mass,
             active: !!activeElement?.active,
             inDb: !!inDbElement,
-            elementId: e.id
+            elementId: e.id,
+            units: inDbElement?.units ?? 'ppb',
+            checkStd: inDbElement?.checkStandard
         }
     })
     methodElements.sort((a, b) => a.active < b.active ? 1 : -1);

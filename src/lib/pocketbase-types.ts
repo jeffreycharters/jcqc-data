@@ -53,6 +53,8 @@ export type MethodElementsRecord = {
 	method: RecordIdString
 	element: RecordIdString
 	active?: boolean
+	units: string
+	checkStandard?: number
 }
 
 export type MethodReferenceMaterialsRecord = {

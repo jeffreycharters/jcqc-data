@@ -21,12 +21,14 @@ interface DetectionLimit {
 }
 
 interface MethodElement {
-	id?: string;
+	id: string;
 	symbol: string;
 	mass: number;
 	active: boolean;
 	inDb: boolean;
 	elementId: string;
+	units: string;
+	checkStd?: number;
 }
 
 interface ReferenceMaterial {
@@ -34,3 +36,5 @@ interface ReferenceMaterial {
 	name: string;
 	active: boolean;
 }
+
+type Units = "ppb" | "ppm"
