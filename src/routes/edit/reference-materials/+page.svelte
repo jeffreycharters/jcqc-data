@@ -17,7 +17,7 @@
 <h1>Reference Materials</h1>
 
 <p class="my-4">
-	To edit the expected values for a reference material, do it from the <a href="/edit/methods"
+	To edit the expected values for a reference material, do it from the <a href="/edit"
 		>edit method page</a
 	>.
 </p>
