@@ -39,11 +39,10 @@
 	const setUnits = async (newUnits: Units) => {
 		const updatedElement = await setMethodElementUnitsById(element.id, newUnits);
 		if (!updatedElement) return; // error?
-		element.units = updatedElement.units;
+		element.units = updatedElement.units ?? 'unknown';
 	};
 
 	function debounce(callback: () => void, timeout = 300) {
-		console.log('debouncing');
 		let timer: NodeJS.Timer;
 		return (...args: any) => {
 			clearTimeout(timer);

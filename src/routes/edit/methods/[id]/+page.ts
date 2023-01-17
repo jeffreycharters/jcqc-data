@@ -54,6 +54,8 @@ export const load = (async ({ params }) => {
             checkStd: inDbElement?.checkStandard
         }
     })
+
+    methodElements.sort((a, b) => a.mass < b.mass ? 1 : -1);
     methodElements.sort((a, b) => a.active < b.active ? -1 : 1);
 
     const loqArray: DetectionLimit[] = elementList.map(e => {
