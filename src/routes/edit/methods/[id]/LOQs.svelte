@@ -43,11 +43,22 @@
 						transition:fade|local={{ duration: 150 }}
 						animate:flip={{ duration: 150 }}
 					>
-						<NumberInput
-							name="{element.symbol}-{element.mass}-loq"
-							bind:value={loqsToShow[index].value}
-							label="<sup>{element.mass}</sup>{element.symbol}"
-						/>
+						<div class="flex flex-col text-sm">
+							<div class="flex  items-baseline justify-between mx-2">
+								<label for="{element.symbol}-{element.mass}-loq}">
+									<sup>{element.mass}</sup>{element.symbol}
+								</label>
+								<div class="text-xs text-gray-400 mr-2 font-bold">
+									{element.units}
+								</div>
+							</div>
+							<input
+								type="text"
+								class="number-input"
+								bind:value={loqsToShow[index].value}
+								name="{element.symbol}-{element.mass}-loq"
+							/>
+						</div>
 					</div>
 				{/each}
 			</div>

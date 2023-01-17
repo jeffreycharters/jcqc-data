@@ -14,6 +14,7 @@ interface DetectionLimit {
 	symbol: string;
 	mass: number;
 	value?: number;
+	units: string;
 	inDb: boolean;
 	visible: boolean;
 	elementId: string;

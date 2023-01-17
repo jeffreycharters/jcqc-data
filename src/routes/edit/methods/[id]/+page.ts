@@ -54,13 +54,13 @@ export const load = (async ({ params }) => {
             checkStd: inDbElement?.checkStandard
         }
     })
-    methodElements.sort((a, b) => a.active < b.active ? 1 : -1);
+    methodElements.sort((a, b) => a.active < b.active ? -1 : 1);
 
     const loqArray: DetectionLimit[] = elementList.map(e => {
         const loq = loqList.find(loq => loq.element === e.id);
 
         const activeElements = methodElements.filter(me => me.active);
-        const visible = !!activeElements.find(me => me.elementId === e.id);
+        const currentMethodElement = activeElements.find(me => me.elementId === e.id);
 
         return {
             id: loq?.id ?? Math.random().toString(),
@@ -68,7 +68,8 @@ export const load = (async ({ params }) => {
             mass: e.mass,
             inDb: !!loq,
             value: loq && loq?.value && loq.value > 0 ? loq?.value : undefined,
-            visible,
+            units: currentMethodElement?.units ?? 'unknown',
+            visible: !!currentMethodElement,
             elementId: e.id,
             methodId: method?.id ?? Math.random().toString()
         }

@@ -7,5 +7,5 @@
 
 <div class="flex flex-col text-sm">
 	<label for={name}>{@html label}</label>
-	<input type="text" class="number-input" bind:value {placeholder} />
+	<input type="text" {name} class="number-input" bind:value {placeholder} />
 </div>
