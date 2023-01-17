@@ -44,7 +44,10 @@
 </script>
 
 <div
-	class="w-full h-screen flex justify-center items-center -mt-24"
+	class="w-full min-h-screen flex justify-center items-center {limitsArray &&
+	limitsArray.length < 10
+		? '-mt-24'
+		: ''}"
 	transition:fade|local={{ duration: 200 }}
 >
 	<div>
