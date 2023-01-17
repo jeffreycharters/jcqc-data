@@ -6,6 +6,11 @@ export const getMethodList = async (sort = "name") => {
     return methodList;
 }
 
+export const getActiveMethods = async () => {
+    const activeMethods: MethodsResponse[] = await pb.collection('methods').getFullList(200, { filter: 'active = true' });
+    return activeMethods;
+}
+
 export const getElementList = async () => {
     const elementList: ElementsResponse[] = await pb.collection('elements').getFullList(200, { sort: 'mass', filter: `retired = false` });
     return elementList;

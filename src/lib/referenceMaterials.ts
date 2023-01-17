@@ -73,3 +73,10 @@ export const inactivateMethodReferenceMaterialById = async (id: string) => {
     const inactivatedMaterial: MethodReferenceMaterialsResponse = await pb.collection('methodReferenceMaterials').update(id, { "active": false });
     return inactivatedMaterial;
 }
+
+export const getExpandedReferenceMaterialElementsByMethodId = async (methodId: string) => {
+    const rmElements: ReferenceMaterialElementsResponse[] = await pb.collection('referenceMaterialElements')
+        .getFullList(undefined, { filter: `methodReferenceMaterial.method = "${methodId}"`, expand: 'element, methodReferenceMaterial.referenceMaterial' });
+    return rmElements;
+
+}
