@@ -125,8 +125,7 @@ export const updateElementLoq = async (loqId: string, value: number) => {
 }
 
 export const createElementLoq = async (methodId: string, elementId: string, value: number | undefined) => {
-    const data = JSON.stringify({ method: methodId, element: elementId, value: value ?? undefined });
-
+    const data = JSON.stringify({ method: methodId, element: elementId, value });
     const newLoq: LoqsResponse = await pb.collection('loqs').create(data);
     return newLoq;
 }

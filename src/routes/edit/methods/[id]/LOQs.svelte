@@ -44,7 +44,7 @@
 						animate:flip={{ duration: 150 }}
 					>
 						<div class="flex flex-col text-sm">
-							<div class="flex  items-baseline justify-between mx-2">
+							<div class="flex  items-baseline justify-between mx-1">
 								<label for="{element.symbol}-{element.mass}-loq}">
 									<sup>{element.mass}</sup>{element.symbol}
 								</label>
