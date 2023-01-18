@@ -53,7 +53,7 @@ export const getActiveElementsByMethodId = async (methodId: string) => {
 }
 
 export const getLoqsByMethodId = async (methodId: string) => {
-    const loqs: LoqsResponse[] = await pb.collection('loqs').getFullList(200, { filter: `method = "${methodId}"`, expand: "element" });
+    const loqs: LoqsResponse[] = await pb.collection('loqs').getFullList(undefined, { filter: `method = "${methodId}"`, expand: "element" });
     return loqs;
 }
 
