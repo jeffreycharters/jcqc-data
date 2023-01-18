@@ -1,4 +1,4 @@
-import { getLoqsByMethodId } from "./methods";
+import { getLoqsByMethodId, getMethodById } from "./methods";
 import { pb } from "./pocketbase"
 import type { MethodElementsResponse } from "./pocketbase-types"
 import { getExpandedReferenceMaterialElementsByMethodId } from "./referenceMaterials";
@@ -13,6 +13,7 @@ interface MethodElements {
 }
 
 export const generateMethodParams = async (methodId: string) => {
+    const method = await getMethodById(methodId);
     const elementList: MethodElements[] = await getMethodElements(methodId);
     const loqList = await getMethodLoqs(methodId);
     const referenceMaterials = await getMethodReferenceMaterials(methodId);
@@ -20,6 +21,7 @@ export const generateMethodParams = async (methodId: string) => {
     const referenceMaterialNames = Object.keys(referenceMaterials).sort();
 
     const methodParams = {
+        method,
         elements: elementList,
         loqs: loqList,
         referenceMaterials,

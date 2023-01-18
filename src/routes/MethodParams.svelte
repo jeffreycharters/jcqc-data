@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { generateMethodParams } from '$lib/methodParams';
-	import { referenceMaterials } from '$lib/stores';
 	import { fade } from 'svelte/transition';
 
 	export let methodId: string;
@@ -8,19 +7,61 @@
 	let getMethodParams = generateMethodParams(methodId);
 </script>
 
-<div class="w-fit mx-auto" transition:fade|local={{ duration: 200 }}>
+<div class="w-fit mx-auto" in:fade|local={{ duration: 200 }}>
 	{#await getMethodParams}
 		<div />
 	{:then methodParams}
+		{@const method = methodParams.method}
+
+		<div class="flex items-end justify-between my-8 gap-8">
+			<h2 class="text-2xl flex-grow border-b">
+				{method.name}{#if method.description}: {method.description}{/if}
+			</h2>
+
+			<div class="flex items-stretch gap-4">
+				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
+					<div class="text-xl font-bold text-gray-500">
+						{#if method.rpdLimit}
+							{method.rpdLimit}%
+						{:else}
+							- -
+						{/if}
+					</div>
+					<div class="text-sm text-center text-gray-400 font-semibold">Duplicate RPD</div>
+				</div>
+
+				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
+					<div class="text-xl font-bold text-gray-500">
+						{#if method.calibrationCount}
+							{method.calibrationCount}
+						{:else}
+							- -
+						{/if}
+					</div>
+					<div class="text-sm text-center text-gray-400 font-semibold">Non-blank Standards</div>
+				</div>
+
+				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
+					<div class="text-xl font-bold text-gray-500">
+						{#if method}
+							3
+						{:else}
+							??
+						{/if}
+					</div>
+					<div class="text-sm text-center text-gray-400 font-semibold">Sig figs on Report</div>
+				</div>
+			</div>
+		</div>
+
 		{@const elements = methodParams.elements}
 		{@const loqs = methodParams.loqs}
 		{@const referenceMaterials = methodParams.referenceMaterials}
 		{@const referenceMaterialNames = methodParams.referenceMaterialNames}
-
-		<table class="text-sm">
+		<table class="text-sm my-2">
 			<thead>
-				<tr>
-					<th class="w-36 text-sm font-semibold text-left">Elements</th>
+				<tr class="border-b border-gray-400">
+					<th class="max-w-xs text-sm first-column">Elements</th>
 					{#each elements as element}
 						<th class="text-sm font-semibold px-2 text-center">
 							<sup>{element.mass}</sup>{element.symbol}
@@ -30,45 +71,47 @@
 			</thead>
 
 			<tbody>
-				<tr class="bg-gray-100">
-					<td>Units</td>
+				<tr class="bg-gray-200 border-b border-gray-400">
+					<td class="first-column">Units</td>
 					{#each elements as element}
 						<td class="text-center">
 							{element.units}
 						</td>
 					{/each}
 				</tr>
-				<tr class="">
-					<td>Method Blank LOQs</td>
+				<tr class="border-b border-gray-400">
+					<td class="first-column">Method Blank LOQs</td>
 					{#each elements as element}
 						<td class="text-center">
-							{loqs[element.symbol]}
+							{loqs[element.symbol] ?? '- -'}
 						</td>
 					{/each}
 				</tr>
-				<tr class="bg-gray-100">
-					<td>Calibration Check</td>
+				<tr class="bg-gray-200 border-b border-gray-400">
+					<td class="first-column">Calibration Check</td>
 					{#each elements as element}
 						<td class="text-center">
-							{element.checkStandard}
+							{element.checkStandard ?? '- -'}
 						</td>
 					{/each}
 				</tr>
 
 				{#each referenceMaterialNames as rmName, index}
-					<tr>
-						<td>{rmName} Low</td>
+					{@const bgColour = index % 2 === 1 ? 'bg-gray-200' : ''}
+					<tr class={bgColour}>
+						<td rowspan="2" class="first-column">{rmName}</td>
 						{#each elements as element}
+							{@const thisElement = referenceMaterials[rmName][element.symbol]}
 							<td class="text-center">
-								{referenceMaterials[rmName][element.symbol].low}
+								{thisElement.low === 0 ? '- -' : thisElement.low}
 							</td>
 						{/each}
 					</tr>
-					<tr class="bg-gray-100">
-						<td>{rmName} High</td>
+					<tr class="border-b border-gray-400 {bgColour}">
 						{#each elements as element}
+							{@const thisElement = referenceMaterials[rmName][element.symbol]}
 							<td class="text-center">
-								{referenceMaterials[rmName][element.symbol].high}
+								{thisElement.high === 0 ? '- -' : thisElement.high}
 							</td>
 						{/each}
 					</tr>
@@ -77,3 +120,12 @@
 		</table>
 	{/await}
 </div>
+
+<style lang="postcss">
+	td {
+		@apply py-[6px] px-[10px];
+	}
+	td.first-column {
+		@apply font-semibold text-gray-800 text-left;
+	}
+</style>

@@ -67,7 +67,7 @@
 		</div>
 
 		{#if selectedMethod != undefined}
-			<div class="my-4" transition:fade={{ duration: 200 }}>
+			<div class="my-8" in:fade={{ duration: 200 }}>
 				<FilePicker />
 			</div>
 
