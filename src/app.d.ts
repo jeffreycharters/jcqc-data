@@ -32,10 +32,10 @@ interface MethodElement {
 	checkStd?: number;
 }
 
-interface ReferenceMaterial {
-	id: string;
-	name: string;
-	active: boolean;
-}
+// interface ReferenceMaterial {
+// 	id: string;
+// 	name: string;
+// 	active: boolean;
+// }
 
 type Units = "ppb" | "ppm"

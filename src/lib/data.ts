@@ -1,4 +1,4 @@
-import { methodData } from "./stores";
+import { reportData } from "./stores";
 
 const csvParse = (input: string) => {
     const fileData = input;
@@ -154,6 +154,6 @@ export const parseCsvToMap = (inputFile: File) => {
         if (!reader.result || typeof reader.result != 'string') return;
         const jsonData = csvParse(reader.result);
         parsedData = parseJsonData(jsonData);
-        methodData.set(parsedData)
+        reportData.set(parsedData)
     }
 }

@@ -1,14 +1,20 @@
 <script lang="ts">
 	import { generateMethodParams } from '$lib/methodParams';
+	import { methodParams } from '$lib/stores';
+	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	export let methodId: string;
 
-	let getMethodParams = generateMethodParams(methodId);
+	let currentMethodParams = generateMethodParams(methodId);
+
+	onMount(async () => {
+		$methodParams = await currentMethodParams;
+	});
 </script>
 
 <div class="w-fit mx-auto" in:fade|local={{ duration: 200 }}>
-	{#await getMethodParams}
+	{#await currentMethodParams}
 		<div />
 	{:then methodParams}
 		{@const method = methodParams.method}
@@ -101,17 +107,19 @@
 					<tr class={bgColour}>
 						<td rowspan="2" class="first-column">{rmName}</td>
 						{#each elements as element}
-							{@const thisElement = referenceMaterials[rmName][element.symbol]}
+							{@const elementToken = element.mass + element.symbol}
+							{@const thisElement = referenceMaterials.get(rmName)?.get(elementToken)}
 							<td class="text-center">
-								{thisElement.low === 0 ? '- -' : thisElement.low}
+								{thisElement?.low === 0 ? '- -' : thisElement?.low}
 							</td>
 						{/each}
 					</tr>
 					<tr class="border-b border-gray-400 {bgColour}">
 						{#each elements as element}
-							{@const thisElement = referenceMaterials[rmName][element.symbol]}
+							{@const elementToken = element.mass + element.symbol}
+							{@const thisElement = referenceMaterials.get(rmName)?.get(elementToken)}
 							<td class="text-center">
-								{thisElement.high === 0 ? '- -' : thisElement.high}
+								{thisElement?.high === 0 ? '- -' : thisElement?.high}
 							</td>
 						{/each}
 					</tr>

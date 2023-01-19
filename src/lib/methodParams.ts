@@ -1,3 +1,12 @@
+
+interface ReferenceLimits {
+    low?: number;
+    high?: number;
+}
+
+type ElementLimits = Map<string, ReferenceLimits>; // eg. Mn: { low..}
+
+type ReferenceMaterial = Map<string, ElementLimits>; //  eg. Bovine Liver: { Mn ..}
 import { getLoqsByMethodId, getMethodById } from "./methods";
 import { pb } from "./pocketbase"
 import type { MethodElementsResponse } from "./pocketbase-types"
@@ -18,7 +27,12 @@ export const generateMethodParams = async (methodId: string) => {
     const loqList = await getMethodLoqs(methodId);
     const referenceMaterials = await getMethodReferenceMaterials(methodId);
 
-    const referenceMaterialNames = Object.keys(referenceMaterials).sort();
+    const referenceMaterialNames = function () {
+        const names: string[] = [];
+        referenceMaterials.forEach((_, k) => names.push(k))
+        return names;
+    }()
+
 
     const methodParams = {
         method,
@@ -60,30 +74,21 @@ const getMethodLoqs = async (methodId: string) => {
 }
 
 
-interface ReferenceLimits {
-    low?: number;
-    high?: number;
-}
-
-type ElementLimits = Record<string, ReferenceLimits>; // eg. Mn: { low..}
-
-type ReferenceMaterial = Record<string, ElementLimits>; //  eg. Bovine Liver: { Mn ..}
-
 const getMethodReferenceMaterials = async (methodId: string) => {
     const rmElements = await getExpandedReferenceMaterialElementsByMethodId(methodId);
-    const referenceMaterials: ReferenceMaterial = {}
+    const rmMap: ReferenceMaterial = new Map();
 
     rmElements.forEach(rm => {
         const name = rm.expand?.methodReferenceMaterial.expand?.referenceMaterial.name;
-        const element: string = rm.expand?.element.symbol;
+        const element = `${rm.expand?.element.mass}${rm.expand?.element.symbol}`;
 
-        if (!referenceMaterials[name]) referenceMaterials[name] = {};
-        if (!referenceMaterials[name][element]) referenceMaterials[name][element] = {};
-
-        referenceMaterials[name][element] = {
+        if (!rmMap.has(name)) rmMap.set(name, new Map());
+        const currentRm = rmMap.get(name);
+        if (currentRm && !currentRm.has(element)) currentRm.set(element, {
             low: rm.lowerBound,
             high: rm.upperBound
-        }
+        });
+
     });
-    return referenceMaterials;
+    return rmMap;
 }

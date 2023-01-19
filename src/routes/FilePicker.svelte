@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { parseCsvToMap } from '$lib/data';
-	import { methodData } from '$lib/stores';
 
 	let files: HTMLInputElement['files'];
 	let errorMessage: string = '';
