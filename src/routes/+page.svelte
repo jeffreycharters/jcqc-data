@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { fade, fly } from 'svelte/transition';
+	import { selectedMethodId } from '$lib/stores';
+	import { fade } from 'svelte/transition';
 	import type { PageData } from './$types';
 	import FilePicker from './FilePicker.svelte';
 	import MethodParams from './MethodParams.svelte';
@@ -9,7 +10,7 @@
 
 	const instruments = [
 		{ name: 'Agilent 7900-1', serial: 'JP20174833' },
-		{ name: 'Agilent 7900-2', serial: 'SG20174833' }
+		{ name: 'Agilent 7900-2', serial: 'SG20174834' }
 	];
 
 	const saveInstrument = (index: number) => {
@@ -19,6 +20,12 @@
 
 	let selectedInstrument = 0;
 	let selectedMethod: number | undefined = 0;
+
+	const setMethod = (index: number | undefined) => {
+		if (index != undefined) $selectedMethodId = methods[index].id ?? '';
+		else $selectedMethodId = '';
+		selectedMethod = index;
+	};
 </script>
 
 <div class="absolute bottom-4 left-4">
@@ -54,13 +61,12 @@
 				<div class="flex flex-wrap justify-center mx-auto gap-3">
 					{#each methods as method, index (method.id)}
 						<button
-							on:click={() => (selectedMethod = index)}
+							on:click={() => setMethod(index)}
 							class="btn my-2 {selectedMethod === index ? 'selected-button' : 'method-button'}"
 							>{method.name}</button
 						>
 					{/each}
-					<button class="btn my-2 method-button" on:click={() => (selectedMethod = undefined)}
-						>Clear</button
+					<button class="btn my-2 method-button" on:click={() => setMethod(undefined)}>Clear</button
 					>
 				</div>
 			</div>
