@@ -1,33 +1,87 @@
 import { reportData } from "./stores";
 
-const csvParse = (input: string) => {
-    const fileData = input;
+enum Columns {
+    SampleName,
+    DilutionFactor,
+    SampleWeight,
+    Analyte,
+    Mass,
+    Concentration,
+    Units
+}
 
-    const splitFileData = fileData.split("\n");
+const getElementCount = (data: string[][]) => {
+    const elementMap = new Map();
 
-    const fieldNamesWithSpaces = splitFileData[0].trim().split(",");
-
-    // modify field names to not allow spaces -> replace with underscore
-    const fieldNames = fieldNamesWithSpaces.map(fn =>
-        fn.trim().toLowerCase().replaceAll(' ', '_'))
-
-    const parsedData = [];
-
-    for (let i = 1; i < splitFileData.length; i++) {
-        const currentLine = splitFileData[i];
-        const lineItems = currentLine.split(",");
-        const currentLineObject: Record<string, string> = {};
-
-        for (let j = 0; j < lineItems.length; j++) {
-            currentLineObject[fieldNames[j]] = lineItems[j].replace('\r', '');
-        }
-
-        if (currentLineObject[fieldNames[0]].length > 0) {
-            parsedData.push(currentLineObject);
-        }
+    for (let i = 0; i < data.length; i++) {
+        const currentElement = data[i][Columns.Mass];
+        if (!elementMap.has(currentElement)) elementMap.set(currentElement, true);
+        else return i;
     }
-    return parsedData;
-};
+    return -1;
+}
+
+const csvParse = (input: string) => {
+    const fileLines = input.replace('\r', '').split('\n')
+    const fileData = fileLines.map(line => line.split(',')).slice(1);
+
+
+    const elementCount = getElementCount(fileData);
+    console.log(elementCount);
+
+    const outputData: { name: string, results: Map<string, string | number> }[] = [];
+    fileData.forEach((sample, index) => {
+        if (index % elementCount === 0) {
+            console.log('creating new item');
+            const sampleItem = {
+                name: sample[Columns.SampleName],
+                results: new Map()
+            }
+            const rowMap = sampleItem.results;
+            const concentration = parseToNumber(sample[Columns.Concentration])
+            rowMap.set(sample[Columns.Analyte], concentration)
+            outputData.push(sampleItem);
+        } else {
+            const rowMap = outputData[outputData.length - 1].results;
+            const concentration = parseToNumber(sample[Columns.Concentration])
+            rowMap.set(sample[Columns.Analyte], concentration)
+        }
+    });
+
+    console.log(outputData);
+    return outputData;
+
+    // TODO: keep working on this, the current function is about done
+}
+
+// const csvParse = (input: string) => {
+//     const fileData = input;
+
+//     const splitFileData = fileData.split("\n");
+
+//     const fieldNamesWithSpaces = splitFileData[0].trim().split(",");
+
+//     // modify field names to not allow spaces -> replace with underscore
+//     const fieldNames = fieldNamesWithSpaces.map(fn =>
+//         fn.trim().toLowerCase().replaceAll(' ', '_'))
+
+//     const parsedData = [];
+
+//     for (let i = 1; i < splitFileData.length; i++) {
+//         const currentLine = splitFileData[i];
+//         const lineItems = currentLine.split(",");
+//         const currentLineObject: Record<string, string> = {};
+
+//         for (let j = 0; j < lineItems.length; j++) {
+//             currentLineObject[fieldNames[j]] = lineItems[j].replace('\r', '');
+//         }
+
+//         if (currentLineObject[fieldNames[0]].length > 0) {
+//             parsedData.push(currentLineObject);
+//         }
+//     }
+//     return parsedData;
+// };
 
 interface ElementResult {
     value: number;
@@ -64,14 +118,12 @@ const parseToNumber = (datum: string | number) => {
 const parseJsonData = (rawInput: Record<string, string>[]) => {
     const input = rawInput as unknown as InputLine[];
 
-    const runMap: Map<string, SubmissionResult> = new Map();
+    const runList: { name: string, results: SubmissionResult }[] = [];
 
     const sampleDupRegex = /\d{2}-\d{6}-\d{4}d|dup/i;
     const otherDupRegex = /^.* d+u?p?\s?$/i;
 
-
-
-    input.forEach(line => {
+    input.forEach((line, index) => {
         let isDup = false;
         let sampleName = line.sample_name;
 
@@ -80,28 +132,53 @@ const parseJsonData = (rawInput: Record<string, string>[]) => {
             const nameMatch = sampleName.match(/(.*) [dup]+/i)
             if (nameMatch && nameMatch[0] && typeof nameMatch[1] === 'string') sampleName = nameMatch[1];
             else return;
-
         }
 
-        if (!runMap.has(sampleName)) {
-            runMap.set(sampleName, {
+        let resultsMap: SubmissionResult | undefined = undefined;
+        if (!isDup) {
+            resultsMap = {
                 meta: { hasDup: isDup },
                 results: new Map()
-            })
+            }
+        } else {
+            for (let i = runList.length - 1; i >= 0; --i) {
+                if (runList[i].name === sampleName) {
+                    resultsMap = runList[i].results;
+                    break;
+                }
+            }
+            // console.log('No first part of dup?');
+            if (!resultsMap) return;
         }
-        const currentResults = runMap.get(sampleName)?.results;
+
+        const currentResults = resultsMap.results;
         const currentElement = `${line.mass}${line.analyte}`;
-        if (isDup && currentResults?.has(currentElement)) {
-            const currentElementResults = currentResults.get(currentElement);
-            if (currentElementResults && currentElementResults.value) currentElementResults.dupValue = parseToNumber(line.concentration);
-            const currentSample = runMap.get(sampleName);
-            if (currentSample) currentSample.meta.hasDup = true;
+
+        const currentResultsMap = currentResults?.get(currentElement);
+        if (isDup && currentResultsMap) {
+            const value = currentResultsMap.value
+            currentResults?.set(currentElement, { value, dupValue: parseToNumber(line.concentration) });
         }
-        else currentResults?.set(currentElement, { value: parseToNumber(line.concentration) })
+        if (!isDup) currentResults?.set(currentElement, { value: parseToNumber(line.concentration) })
     })
 
-    return runMap
+    return runList
 };
+
+
+
+export const convertFileToSampleList = (inputFile: File) => {
+    const reader = new FileReader();
+    // let parsedData;
+    reader.readAsText(inputFile);
+    reader.onloadend = () => {
+        if (!reader.result || typeof reader.result != 'string') return;
+        const jsonData = csvParse(reader.result);
+        // parsedData = parseJsonData(jsonData);
+        reportData.set([])
+    }
+}
+
 
 const roundToSigFigs = (number: number, sigFigs: number) => {
     let oom = 0;
@@ -144,16 +221,3 @@ const roundToSigFigs = (number: number, sigFigs: number) => {
         return number.toPrecision(sigFigs);
     }
 };
-
-
-export const parseCsvToMap = (inputFile: File) => {
-    const reader = new FileReader();
-    let parsedData: Map<string, SubmissionResult> = new Map();
-    reader.readAsText(inputFile);
-    reader.onloadend = () => {
-        if (!reader.result || typeof reader.result != 'string') return;
-        const jsonData = csvParse(reader.result);
-        parsedData = parseJsonData(jsonData);
-        reportData.set(parsedData)
-    }
-}

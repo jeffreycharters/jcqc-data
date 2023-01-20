@@ -8,8 +8,13 @@ export const methods: Writable<MethodsResponse[]> = writable([]);
 
 export const method: Writable<MethodsResponse> = writable()
 
-export const reportData: Writable<Map<string, SubmissionResult>> = writable();
+export const instrument: Writable<Instrument> = writable();
+
 export const methodParams: Writable<MethodParams> = writable();
+export const reportData: Writable<{
+    name: string;
+    results: SubmissionResult;
+}[]> = writable();
 
 export const selectedMethodId: Writable<string> = writable('');
 

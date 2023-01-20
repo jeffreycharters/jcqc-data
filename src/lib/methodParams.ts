@@ -1,12 +1,3 @@
-
-interface ReferenceLimits {
-    low?: number;
-    high?: number;
-}
-
-type ElementLimits = Map<string, ReferenceLimits>; // eg. Mn: { low..}
-
-type ReferenceMaterial = Map<string, ElementLimits>; //  eg. Bovine Liver: { Mn ..}
 import { getLoqsByMethodId, getMethodById } from "./methods";
 import { pb } from "./pocketbase"
 import type { MethodElementsResponse } from "./pocketbase-types"

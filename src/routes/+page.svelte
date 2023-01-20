@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { selectedMethodId } from '$lib/stores';
+	import { instrument, selectedMethodId } from '$lib/stores';
 	import { fade } from 'svelte/transition';
 	import type { PageData } from './$types';
 	import FilePicker from './FilePicker.svelte';
@@ -8,13 +8,14 @@
 	export let data: PageData;
 	const { methods } = data;
 
-	const instruments = [
+	const instruments: Instrument[] = [
 		{ name: 'Agilent 7900-1', serial: 'JP20174833' },
 		{ name: 'Agilent 7900-2', serial: 'SG20174834' }
 	];
 
-	const saveInstrument = (index: number) => {
+	const saveInstrument = async (index: number) => {
 		console.log('saving instrument as', index);
+		$instrument = instruments[index];
 		selectedInstrument = index;
 	};
 

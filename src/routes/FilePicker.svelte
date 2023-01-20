@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { parseCsvToMap } from '$lib/data';
+	import { convertFileToSampleList } from '$lib/data';
+	import { methodParams } from '$lib/stores';
 
 	let files: HTMLInputElement['files'];
 	let errorMessage: string = '';
@@ -14,8 +15,8 @@
 			return;
 		}
 
-		parseCsvToMap(inputFile);
-		goto('/report', { invalidateAll: true });
+		convertFileToSampleList(inputFile);
+		goto('/report');
 	};
 
 	$: parseInput(files);

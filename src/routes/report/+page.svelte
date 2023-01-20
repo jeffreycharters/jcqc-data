@@ -1,19 +1,23 @@
 <script lang="ts">
 	import { methodParams, reportData } from '$lib/stores';
+	import HeaderInfo from './HeaderInfo.svelte';
 
-	$: data = Array.from($reportData);
+	// $: console.log($reportData);
 </script>
 
-{#if $methodParams.elements.length != data[0][1]?.results?.size}
+<!-- 
+{#if $methodParams.elements.length != $reportData[0]?.results.results.size}
 	<div class="text-red-500 text-sm w-fit mx-auto">
 		Warning: expected {$methodParams.elements.length} element{$methodParams.elements.length === 1
 			? ''
-			: 's'}, found {data[0][1]?.results?.size}. Possible method mismatch.
+			: 's'}, found {$reportData[0][1]?.results?.size}. Possible method mismatch.
 	</div>
-{/if}
+{/if} -->
 
-{#each data as [key, value], sample (sample)}
+<!-- <HeaderInfo /> -->
+
+<!-- {#each $reportData as sample (sample)}
 	<div>
-		{key}
+		{sample.name}
 	</div>
-{/each}
+{/each} -->

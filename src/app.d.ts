@@ -32,10 +32,31 @@ interface MethodElement {
 	checkStd?: number;
 }
 
-// interface ReferenceMaterial {
-// 	id: string;
-// 	name: string;
-// 	active: boolean;
-// }
+interface ReferenceLimits {
+	low?: number;
+	high?: number;
+}
+
+type ElementLimits = Map<string, ReferenceLimits>; // eg. Mn: { low..}
+
+type ReferenceMaterial = Map<string, ElementLimits>; //  eg. Bovine Liver: { Mn ..}
 
 type Units = "ppb" | "ppm"
+
+interface Instrument {
+	serial: string;
+	name: string;
+	softwareName?: string;
+	softwareVersion?: string;
+	softwareBuild?: string;
+	autosamplerModel?: string;
+	autosamplerSerial?: string;
+}
+
+interface MethodParams {
+	method: MethodsResponse;
+	elements: MethodElements[];
+	loqs: Record<string, number | undefined>;
+	referenceMaterials: ReferenceMaterial;
+	referenceMaterialNames: string[];
+}
