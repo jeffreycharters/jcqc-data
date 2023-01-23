@@ -60,3 +60,32 @@ interface MethodParams {
 	referenceMaterials: ReferenceMaterial;
 	referenceMaterialNames: string[];
 }
+
+interface ElementResult {
+	value: number;
+	dupValue?: number;
+}
+
+interface SubmissionMeta {
+	hasDup: boolean;
+}
+
+interface SubmissionResult {
+	results: Map<string, ElementResult>;
+	meta: SubmissionMeta
+}
+
+interface InputLine {
+	name: string;
+	results: Map<number, number>
+}
+
+interface RunListEntry {
+	name: string;
+	id: string;
+	isDup: boolean;
+	results: {
+		values: Map<number, number>,
+		dupValues?: Map<number, number>
+	};
+}

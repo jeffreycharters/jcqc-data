@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { convertFileToSampleList } from '$lib/data';
+	import { parseFileAndUpdateStore } from '$lib/data';
 	import { methodParams } from '$lib/stores';
 
 	let files: HTMLInputElement['files'];
@@ -15,7 +15,7 @@
 			return;
 		}
 
-		convertFileToSampleList(inputFile);
+		parseFileAndUpdateStore(inputFile);
 		goto('/report');
 	};
 

@@ -1,4 +1,9 @@
+import cuid from "cuid";
 import { reportData } from "./stores";
+
+export const sortedArrayFromMap = (map: Map<number, number>) => {
+    return Array.from(map).sort((a, b) => (a[0] < b[0] ? -1 : 1));
+}
 
 enum Columns {
     SampleName,
@@ -27,167 +32,107 @@ const csvParse = (input: string) => {
 
 
     const elementCount = getElementCount(fileData);
-    console.log(elementCount);
 
-    const outputData: { name: string, results: Map<string, string | number> }[] = [];
+    const outputData: { name: string, results: Map<number, number> }[] = [];
     fileData.forEach((sample, index) => {
+        const rowName = parseInt(sample[Columns.Mass]);
         if (index % elementCount === 0) {
-            console.log('creating new item');
             const sampleItem = {
-                name: sample[Columns.SampleName],
+                name: sample[Columns.SampleName].trim(),
                 results: new Map()
             }
             const rowMap = sampleItem.results;
-            const concentration = parseToNumber(sample[Columns.Concentration])
-            rowMap.set(sample[Columns.Analyte], concentration)
+            const concentration = parseFloat(sample[Columns.Concentration])
+            rowMap.set(rowName, concentration)
             outputData.push(sampleItem);
         } else {
             const rowMap = outputData[outputData.length - 1].results;
-            const concentration = parseToNumber(sample[Columns.Concentration])
-            rowMap.set(sample[Columns.Analyte], concentration)
+            const concentration = parseFloat(sample[Columns.Concentration])
+            rowMap.set(rowName, concentration)
         }
     });
 
-    console.log(outputData);
     return outputData;
-
-    // TODO: keep working on this, the current function is about done
 }
 
-// const csvParse = (input: string) => {
-//     const fileData = input;
 
-//     const splitFileData = fileData.split("\n");
 
-//     const fieldNamesWithSpaces = splitFileData[0].trim().split(",");
-
-//     // modify field names to not allow spaces -> replace with underscore
-//     const fieldNames = fieldNamesWithSpaces.map(fn =>
-//         fn.trim().toLowerCase().replaceAll(' ', '_'))
-
-//     const parsedData = [];
-
-//     for (let i = 1; i < splitFileData.length; i++) {
-//         const currentLine = splitFileData[i];
-//         const lineItems = currentLine.split(",");
-//         const currentLineObject: Record<string, string> = {};
-
-//         for (let j = 0; j < lineItems.length; j++) {
-//             currentLineObject[fieldNames[j]] = lineItems[j].replace('\r', '');
-//         }
-
-//         if (currentLineObject[fieldNames[0]].length > 0) {
-//             parsedData.push(currentLineObject);
-//         }
-//     }
-//     return parsedData;
-// };
-
-interface ElementResult {
-    value: number;
-    dupValue?: number;
-}
-
-interface SubmissionMeta {
-    hasDup: boolean;
-}
-
-export interface SubmissionResult {
-    results: Map<string, ElementResult>;
-    meta: SubmissionMeta
-}
-
-interface InputLine {
-    analyte: string;
-    concentration: string;
-    dilution_factor: string;
-    mass: string;
-    sample_name: string;
-    saple_weight_or_volume: string;
-    units: string;
-}
-
-const parseToNumber = (datum: string | number) => {
-    if (typeof datum === 'number') return datum;
-
-    const castDatum = Number(datum);
-    if (isNaN(castDatum)) throw new Error('Invalid number provided');
-    return castDatum;
-}
-
-const parseJsonData = (rawInput: Record<string, string>[]) => {
+const parseJsonData = (rawInput: { name: string, results: Map<number, number> }[]) => {
     const input = rawInput as unknown as InputLine[];
 
-    const runList: { name: string, results: SubmissionResult }[] = [];
+    const runList: RunListEntry[] = [];
 
     const sampleDupRegex = /\d{2}-\d{6}-\d{4}d|dup/i;
     const otherDupRegex = /^.* d+u?p?\s?$/i;
 
-    input.forEach((line, index) => {
+    input.forEach(line => {
         let isDup = false;
-        let sampleName = line.sample_name;
 
+        // determine if sample is a duplicate, get the non-dup sample name
+        let sampleName = line.name;
         if (sampleDupRegex.test(sampleName) || otherDupRegex.test(sampleName)) {
             isDup = true;
             const nameMatch = sampleName.match(/(.*) [dup]+/i)
-            if (nameMatch && nameMatch[0] && typeof nameMatch[1] === 'string') sampleName = nameMatch[1];
-            else return;
+            if (nameMatch && nameMatch[1] && typeof nameMatch[1] === 'string') sampleName = nameMatch[1].trim();
         }
 
-        let resultsMap: SubmissionResult | undefined = undefined;
         if (!isDup) {
-            resultsMap = {
-                meta: { hasDup: isDup },
-                results: new Map()
-            }
-        } else {
-            for (let i = runList.length - 1; i >= 0; --i) {
-                if (runList[i].name === sampleName) {
-                    resultsMap = runList[i].results;
-                    break;
+            // the results are just the current sample results
+            const sampleObject = {
+                name: sampleName,
+                id: cuid(),
+                isDup: false,
+                results: {
+                    values: line.results
                 }
             }
-            // console.log('No first part of dup?');
-            if (!resultsMap) return;
-        }
+            runList.push(sampleObject);
+        } else {
+            // find the original sample, append the current results
+            let originalSample: RunListEntry | undefined = undefined;
+            for (let i = runList.length - 1; i >= 0; --i) {
+                if (runList[i].name != sampleName) continue;
 
-        const currentResults = resultsMap.results;
-        const currentElement = `${line.mass}${line.analyte}`;
+                originalSample = runList[i];
+            }
 
-        const currentResultsMap = currentResults?.get(currentElement);
-        if (isDup && currentResultsMap) {
-            const value = currentResultsMap.value
-            currentResults?.set(currentElement, { value, dupValue: parseToNumber(line.concentration) });
+            if (!originalSample) {
+                console.log('Uncomment the error handling, please');
+
+                // alert(`Only found duplicate of "${sampleName}" and not the reference.`)
+                return;
+            }
+            originalSample.isDup = true;
+            originalSample.results.dupValues = line.results;
+
         }
-        if (!isDup) currentResults?.set(currentElement, { value: parseToNumber(line.concentration) })
-    })
+    });
 
     return runList
 };
 
 
 
-export const convertFileToSampleList = (inputFile: File) => {
+export const parseFileAndUpdateStore = (inputFile: File) => {
     const reader = new FileReader();
-    // let parsedData;
     reader.readAsText(inputFile);
     reader.onloadend = () => {
         if (!reader.result || typeof reader.result != 'string') return;
         const jsonData = csvParse(reader.result);
-        // parsedData = parseJsonData(jsonData);
-        reportData.set([])
+        const parsedData = parseJsonData(jsonData);
+        reportData.set(parsedData)
     }
 }
 
 
-const roundToSigFigs = (number: number, sigFigs: number) => {
-    let oom = 0;
+export const roundToSigFigs = (number: number, sigFigs: number) => {
+    let orderOfMagnitude = 0;
     let result = Number(number);
 
     if (number > 10) {
         while (result > 10) {
             result /= 10;
-            oom += 1;
+            orderOfMagnitude += 1;
         }
     } else if (number < 0.0001 && number > 0) {
         return "0.00";
@@ -197,14 +142,14 @@ const roundToSigFigs = (number: number, sigFigs: number) => {
                 result = result * -1;
             }
             result = result * 10;
-            oom += 1;
+            orderOfMagnitude += 1;
         }
     }
     if (number > 10) {
-        result = number / Math.pow(10, oom);
+        result = number / Math.pow(10, orderOfMagnitude);
         result = result * Math.pow(10, sigFigs - 1);
         result = Math.round(result);
-        result = result / Math.pow(10, sigFigs - oom - 1);
+        result = result / Math.pow(10, sigFigs - orderOfMagnitude - 1);
         return result.toPrecision(sigFigs);
     } else if (number < 0) {
         result = number * Math.pow(10, sigFigs + 1);
@@ -212,10 +157,10 @@ const roundToSigFigs = (number: number, sigFigs: number) => {
         result = result / Math.pow(10, sigFigs + 1);
         return result.toPrecision(sigFigs);
     } else if (number < 1) {
-        result = number * Math.pow(10, oom);
+        result = number * Math.pow(10, orderOfMagnitude);
         result = result * Math.pow(10, sigFigs - 1);
         result = Math.round(result);
-        result = result / Math.pow(10, sigFigs + oom - 1);
+        result = result / Math.pow(10, sigFigs + orderOfMagnitude - 1);
         return result.toPrecision(sigFigs);
     } else {
         return number.toPrecision(sigFigs);
