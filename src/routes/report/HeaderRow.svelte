@@ -6,7 +6,9 @@
 
 <thead>
 	<tr>
-		<th class="min-w-[175px] border-b-2 border-b-gray-900 p-[3px] w-[105px]">{firstColumnLabel}</th>
+		<th class="min-w-[175px] border-b-2 border-b-gray-900 p-[3px] w-[105px] text-left"
+			>{firstColumnLabel}</th
+		>
 		{#each $methodParams.elements as element (element.id)}
 			<th class="heading">
 				<sup>{element.mass}</sup>{element.symbol}

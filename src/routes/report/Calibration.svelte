@@ -8,7 +8,7 @@
 <div>
 	<h1>Calibration Data</h1>
 
-	<table class="border-collapse mx-2">
+	<table class="results">
 		<HeaderRow firstColumnLabel="Concentration" />
 
 		<tbody>
