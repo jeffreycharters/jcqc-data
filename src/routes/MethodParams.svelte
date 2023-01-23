@@ -89,7 +89,7 @@
 					<td class="first-column">Method Blank LOQs</td>
 					{#each elements as element}
 						<td class="text-center">
-							{loqs[element.symbol] ?? '- -'}
+							{loqs[element.mass] ?? '- -'}
 						</td>
 					{/each}
 				</tr>

@@ -10,11 +10,12 @@
 </script>
 
 <div>
+	<br />
 	<table class="results">
 		<HeaderRow firstColumnLabel="Check Standard" />
 
 		<tbody>
-			<tr>
+			<tr class="border-b border-b-gray-400">
 				<td class="firstCol">{sample.name}</td>
 
 				{#each values as [_, value]}
@@ -41,25 +42,6 @@
 							{passes ? 'Yes' : 'No'}
 						</td>
 					{/each}
-					<!-- {data.values.map((v, i) => {
-            if (v < 1) {
-              v = v * 1000;
-            }
-            const limitLow =
-              expectedValues[i] - expectedValues[i] * tolerance;
-            const limitHigh =
-              expectedValues[i] + expectedValues[i] * tolerance;
-            const withinRange = v > limitLow && v < limitHigh;
-            return (
-              <td
-                class={withinRange ? "samplePass" : "sampleFail"}
-                key={v + i}
-              >
-                {" "}
-                {withinRange ? "Yes" : "No"}
-              </td>
-            );
-          })} -->
 				</tr>
 			{/if}
 		</tbody>

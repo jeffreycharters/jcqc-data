@@ -3,6 +3,7 @@
 	import HeaderInfo from './HeaderInfo.svelte';
 	import Calibration from './Calibration.svelte';
 	import CheckStandard from './CheckStandard.svelte';
+	import MethodBlank from './MethodBlank.svelte';
 
 	const submissionRegex = /\d{2}-\d{6}-\d{4}/;
 	let methodElementCount = $methodParams.elements.length;
@@ -31,12 +32,12 @@
 			{/if}
 
 			{#if ['calibration check', 'cal check'].includes(sampleNameLower)}
-				<!-- <strong>Calibration check</strong> -->
 				<CheckStandard {sample} />
 			{/if}
 
 			{#if sampleNameLower === 'method blank'}
-				<strong>Method Blank</strong>
+				<!-- <strong>Method Blank</strong> -->
+				<MethodBlank {sample} />
 			{/if}
 
 			{#if sample.isDup}
