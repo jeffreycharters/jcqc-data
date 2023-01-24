@@ -15,7 +15,7 @@
 			return;
 		}
 
-		parseFileAndUpdateStore(inputFile, $methodParams.referenceMaterialNames);
+		parseFileAndUpdateStore(inputFile, $methodParams?.referenceMaterialNames);
 		goto('/report');
 	};
 

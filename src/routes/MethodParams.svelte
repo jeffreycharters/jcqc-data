@@ -1,16 +1,11 @@
 <script lang="ts">
 	import { generateMethodParams } from '$lib/methodParams';
-	import { methodParams } from '$lib/stores';
+	import { methodParams, selectedMethodId } from '$lib/stores';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+	// export let methodId: string;
 
-	export let methodId: string;
-
-	let currentMethodParams = generateMethodParams(methodId);
-
-	onMount(async () => {
-		$methodParams = await currentMethodParams;
-	});
+	$: currentMethodParams = generateMethodParams($selectedMethodId);
 </script>
 
 <div class="w-fit mx-auto" in:fade|local={{ duration: 200 }}>

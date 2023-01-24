@@ -119,7 +119,7 @@ const addSampleTypesTo = (input: RunListEntry[], rms: string[]) => {
         const sampleNameLower = sample.name.toLowerCase();
 
         sample.isCalBlank = ['calibration blank', 'cal blank'].includes(sampleNameLower);
-        sample.isCalCheck = ['calibration check', 'cal check'].includes(sampleNameLower);
+        sample.isCalCheck = ['calibration check', 'cal check'].includes(sampleNameLower) || sampleNameLower.endsWith('ppb check');
         sample.isMethodBlank = sampleNameLower === 'method blank';
         sample.isReferenceMaterial = referenceMaterialsLower.includes(sampleNameLower);
         sample.isSample = (submissionRegex.test(sample.name) || sample.name.toLowerCase().startsWith('qc')) && !sample.isDup
@@ -167,19 +167,19 @@ export const roundToSigFigs = (number: number, sigFigs: number) => {
         result = result * Math.pow(10, sigFigs - 1);
         result = Math.round(result);
         result = result / Math.pow(10, sigFigs - orderOfMagnitude - 1);
-        return result.toPrecision(sigFigs);
+        return parseFloat(result.toPrecision(sigFigs));
     } else if (number < 0) {
         result = number * Math.pow(10, sigFigs + 1);
         result = Math.round(result);
         result = result / Math.pow(10, sigFigs + 1);
-        return result.toPrecision(sigFigs);
+        return parseFloat(result.toPrecision(sigFigs));
     } else if (number < 1) {
         result = number * Math.pow(10, orderOfMagnitude);
         result = result * Math.pow(10, sigFigs - 1);
         result = Math.round(result);
         result = result / Math.pow(10, sigFigs + orderOfMagnitude - 1);
-        return result.toPrecision(sigFigs);
+        return parseFloat(result.toPrecision(sigFigs));
     } else {
-        return number.toPrecision(sigFigs);
+        return parseFloat(number.toPrecision(sigFigs));
     }
 };

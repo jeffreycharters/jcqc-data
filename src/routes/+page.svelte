@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { instrument, selectedMethodId } from '$lib/stores';
+	import { generateMethodParams } from '$lib/methodParams';
+	import { instrument, methodParams, selectedMethodId } from '$lib/stores';
 	import { fade } from 'svelte/transition';
 	import type { PageData } from './$types';
 	import FilePicker from './FilePicker.svelte';
@@ -20,12 +21,17 @@
 	};
 
 	let selectedInstrument = 0;
-	let selectedMethod: number | undefined = 0;
+	let selectedMethod: number | undefined = undefined;
 
-	const setMethod = (index: number | undefined) => {
-		if (index != undefined) $selectedMethodId = methods[index].id ?? '';
+	$selectedMethodId = selectedMethod != undefined ? methods[selectedMethod].id : '';
+
+	const setMethod = async (methodId: string | undefined) => {
+		if (methodId != undefined) $selectedMethodId = methodId ?? '';
 		else $selectedMethodId = '';
-		selectedMethod = index;
+		$methodParams = await generateMethodParams(methodId ?? '');
+		const thisMethod = methods.find((method) => method.id === methodId);
+		if (!thisMethod) return;
+		selectedMethod = methods.indexOf(thisMethod);
 	};
 </script>
 
@@ -62,7 +68,7 @@
 				<div class="flex flex-wrap justify-center mx-auto gap-3">
 					{#each methods as method, index (method.id)}
 						<button
-							on:click={() => setMethod(index)}
+							on:click={() => setMethod(method.id)}
 							class="btn my-2 {selectedMethod === index ? 'selected-button' : 'method-button'}"
 							>{method.name}</button
 						>
@@ -78,7 +84,7 @@
 				<FilePicker />
 			</div>
 
-			<MethodParams methodId={methods[selectedMethod].id} />
+			<MethodParams />
 		{/if}
 	</div>
 </div>

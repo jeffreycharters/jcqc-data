@@ -7,9 +7,10 @@
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import SampleBlock from './SampleBlock.svelte';
 	import SampleRow from './SampleRow.svelte';
+	import Duplicate from './Duplicate.svelte';
 
-	let methodElementCount = $methodParams.elements.length;
-	let analysisElementCount = $reportData[0]?.results.values.size;
+	let methodElementCount = $methodParams.elements.length || 0;
+	let analysisElementCount = $reportData[0]?.results.values.size || 0;
 
 	const getSampleBlock = (index: number) => {
 		const samples: RunListEntry[] = [];
@@ -38,8 +39,8 @@
 			{#if index > 0 && sample.isSample && !$reportData[index - 1].isSample}
 				{@const sampleBlockSamples = getSampleBlock(index)}
 				<SampleBlock>
-					{#each sampleBlockSamples as sample}
-						<SampleRow {sample} />
+					{#each sampleBlockSamples as sample, index}
+						<SampleRow {sample} {index} />
 					{/each}
 				</SampleBlock>
 			{:else}
@@ -62,7 +63,7 @@
 				{/if}
 
 				{#if sample.isDup}
-					<strong>Duplicate!</strong>
+					<Duplicate {sample} />
 				{/if}
 			{/if}
 		{/each}

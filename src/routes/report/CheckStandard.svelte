@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
 	import { methodParams } from '$lib/stores';
-	import { element } from 'svelte/internal';
 	import HeaderRow from './HeaderRow.svelte';
 
 	export let sample: RunListEntry;
