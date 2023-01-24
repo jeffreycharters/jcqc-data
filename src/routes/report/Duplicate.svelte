@@ -54,7 +54,7 @@
 					<td>Average</td>
 					{#each values as [_, value], index}
 						<td>
-							{roundToSigFigs(value + dupValues[index][1] / 2, 3)}
+							{roundToSigFigs((value + dupValues[index][1]) / 2, 3)}
 						</td>
 					{/each}
 				</tr>
@@ -64,7 +64,7 @@
 					{#each values as [mass, value], index}
 						{@const rpd = calculateRPD(value, dupValues[index][1])}
 						{@const loq = $methodParams.loqs[mass]}
-						{@const average = value + dupValues[index][1] / 2}
+						{@const average = (value + dupValues[index][1]) / 2}
 						{@const passing = checkIfDupPassing(average, rpd, loq)}
 						<td class={passing}>
 							{#if !rpd || !loq || average < loq * 2}
