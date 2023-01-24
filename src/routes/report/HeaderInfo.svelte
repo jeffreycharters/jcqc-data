@@ -2,7 +2,7 @@
 	import { methodParams, instrument } from '$lib/stores';
 </script>
 
-<div>
+<div class="mb-4">
 	<h1>Sequence Information - {$methodParams?.method?.name}</h1>
 	<div class="headerItem">Analyst: _________________________</div>
 	<div class="headerItem">Analysis Date: _________________________</div>

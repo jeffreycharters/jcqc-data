@@ -59,7 +59,7 @@
 		{@const loqs = methodParams.loqs}
 		{@const referenceMaterials = methodParams.referenceMaterials}
 		{@const referenceMaterialNames = methodParams.referenceMaterialNames}
-		<table class="text-sm my-2">
+		<table class="text-sm my-2 w-fit mx-auto">
 			<thead>
 				<tr class="border-b border-gray-400">
 					<th class="max-w-xs text-sm first-column">Elements</th>
