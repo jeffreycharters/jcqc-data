@@ -5,12 +5,22 @@
 	import CheckStandard from './CheckStandard.svelte';
 	import MethodBlank from './MethodBlank.svelte';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
+	import SampleBlock from './SampleBlock.svelte';
+	import SampleRow from './SampleRow.svelte';
 
-	const submissionRegex = /\d{2}-\d{6}-\d{4}/;
 	let methodElementCount = $methodParams.elements.length;
 	let analysisElementCount = $reportData[0]?.results.values.size;
 
-	let referenceMaterialsLower = $methodParams.referenceMaterialNames.map((rm) => rm.toLowerCase());
+	const getSampleBlock = (index: number) => {
+		const samples: RunListEntry[] = [];
+		while (index < $reportData.length) {
+			const thisSample = $reportData[index];
+			if (thisSample.isSample && !thisSample.isDup) samples.push(thisSample);
+			else break;
+			++index;
+		}
+		return samples;
+	};
 </script>
 
 <div class="report-container">
@@ -23,39 +33,40 @@
 
 	<HeaderInfo />
 
-	{#each $reportData as sample, index (sample.id)}
-		{@const sampleNameLower = sample.name.toLowerCase()}
-		<div>
-			{#if ['calibration blank', 'cal blank'].includes(sampleNameLower)}
-				<Calibration
-					samples={$reportData.slice(index, index + $methodParams.method.calibrationCount + 1)}
-				/>
-			{/if}
+	<div>
+		{#each $reportData as sample, index (sample.id)}
+			{#if index > 0 && sample.isSample && !$reportData[index - 1].isSample}
+				{@const sampleBlockSamples = getSampleBlock(index)}
+				<SampleBlock>
+					{#each sampleBlockSamples as sample}
+						<SampleRow {sample} />
+					{/each}
+				</SampleBlock>
+			{:else}
+				{#if sample.isCalBlank}
+					<Calibration
+						samples={$reportData.slice(index, index + $methodParams.method.calibrationCount + 1)}
+					/>
+				{/if}
 
-			{#if ['calibration check', 'cal check'].includes(sampleNameLower)}
-				<CheckStandard {sample} />
-			{/if}
+				{#if sample.isCalCheck}
+					<CheckStandard {sample} />
+				{/if}
 
-			{#if sampleNameLower === 'method blank'}
-				<MethodBlank {sample} />
-			{/if}
+				{#if sample.isMethodBlank}
+					<MethodBlank {sample} />
+				{/if}
 
-			{#if referenceMaterialsLower.includes(sampleNameLower)}
-				<!-- <strong>Reference Material</strong> -->
-				<ReferenceMaterial {sample} />
-			{/if}
+				{#if sample.isReferenceMaterial}
+					<ReferenceMaterial {sample} />
+				{/if}
 
-			{#if sample.isDup}
-				<strong>Duplicate!</strong>
+				{#if sample.isDup}
+					<strong>Duplicate!</strong>
+				{/if}
 			{/if}
-
-			{#if (submissionRegex.test(sample.name) || sample.name
-					.toLowerCase()
-					.startsWith('qc')) && !sample.isDup}
-				<strong>Normal sample!</strong>
-			{/if}
-		</div>
-	{/each}
+		{/each}
+	</div>
 </div>
 
 <style lang="postcss">

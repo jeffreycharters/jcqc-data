@@ -83,7 +83,12 @@ interface InputLine {
 interface RunListEntry {
 	name: string;
 	id: string;
+	isCalBlank?: boolean;
+	isCalCheck?: boolean;
+	isMethodBlank?: boolean;
+	isReferenceMaterial?: boolean;
 	isDup: boolean;
+	isSample?: boolean;
 	results: {
 		values: Map<number, number>,
 		dupValues?: Map<number, number>

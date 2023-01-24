@@ -1,5 +1,5 @@
 import cuid from "cuid";
-import { reportData } from "./stores";
+import { methodParams, reportData } from "$lib/stores";
 
 export const sortedArrayFromMap = (map: Map<number, number>) => {
     return Array.from(map).sort((a, b) => (a[0] < b[0] ? -1 : 1));
@@ -111,16 +111,33 @@ const parseJsonData = (rawInput: { name: string, results: Map<number, number> }[
     return runList
 };
 
+const addSampleTypesTo = (input: RunListEntry[], rms: string[]) => {
+    const referenceMaterialsLower = rms.map((rm) => rm.toLowerCase());
+    const submissionRegex = /\d{2}-\d{6}-\d{4}/;
+
+    input.forEach(sample => {
+        const sampleNameLower = sample.name.toLowerCase();
+
+        sample.isCalBlank = ['calibration blank', 'cal blank'].includes(sampleNameLower);
+        sample.isCalCheck = ['calibration check', 'cal check'].includes(sampleNameLower);
+        sample.isMethodBlank = sampleNameLower === 'method blank';
+        sample.isReferenceMaterial = referenceMaterialsLower.includes(sampleNameLower);
+        sample.isSample = (submissionRegex.test(sample.name) || sample.name.toLowerCase().startsWith('qc')) && !sample.isDup
+    })
+    return input;
+}
 
 
-export const parseFileAndUpdateStore = (inputFile: File) => {
+
+export const parseFileAndUpdateStore = (inputFile: File, referenceMaterialNames: string[]) => {
     const reader = new FileReader();
     reader.readAsText(inputFile);
     reader.onloadend = () => {
         if (!reader.result || typeof reader.result != 'string') return;
         const jsonData = csvParse(reader.result);
         const parsedData = parseJsonData(jsonData);
-        reportData.set(parsedData)
+        const dataWithSampleTypes = addSampleTypesTo(parsedData, referenceMaterialNames);
+        reportData.set(dataWithSampleTypes)
     }
 }
 
