@@ -41,6 +41,12 @@ type ElementLimits = Map<number, ReferenceLimits>; // eg. 55: { low..}
 
 type ReferenceMaterial = Map<string, ElementLimits>; //  eg. Bovine Liver: { Mn ..}
 
+interface BasicReferenceMaterial {
+	id: string;
+	name: string;
+	active: boolean;
+}
+
 type Units = "ppb" | "ppm"
 
 interface Instrument {

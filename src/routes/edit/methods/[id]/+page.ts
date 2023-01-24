@@ -24,7 +24,7 @@ export const load = (async ({ params }) => {
     const allReferenceMaterials = await getallReferenceMaterials();
     const methodReferenceMaterials = await getMethodReferenceMaterialsByMethodId(method.id);
 
-    const methodReferenceMaterialsList: ReferenceMaterial[] = allReferenceMaterials.map(rm => {
+    const methodReferenceMaterialsList: BasicReferenceMaterial[] = allReferenceMaterials.map(rm => {
         const thisReferenceMaterial = methodReferenceMaterials.find(mrm => mrm.referenceMaterial === rm.id);
         return {
             id: rm.id,

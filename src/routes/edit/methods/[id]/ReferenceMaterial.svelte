@@ -7,7 +7,7 @@
 	import { method, methodReferenceMaterials } from '$lib/stores';
 	import { fade } from 'svelte/transition';
 
-	export let rm: { id: string; name: string; active: boolean };
+	export let rm: BasicReferenceMaterial;
 
 	let formMessage: string;
 

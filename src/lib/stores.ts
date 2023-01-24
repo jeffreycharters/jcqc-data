@@ -20,4 +20,4 @@ export const loqs: Writable<DetectionLimit[]> = writable([]);
 
 export const showAddForm: Writable<boolean> = writable(false);
 
-export const methodReferenceMaterials: Writable<ReferenceMaterial[]> = writable([]);
+export const methodReferenceMaterials: Writable<BasicReferenceMaterial[]> = writable([]);
