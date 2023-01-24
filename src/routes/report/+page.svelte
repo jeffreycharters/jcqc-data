@@ -4,6 +4,7 @@
 	import Calibration from './Calibration.svelte';
 	import CheckStandard from './CheckStandard.svelte';
 	import MethodBlank from './MethodBlank.svelte';
+	import ReferenceMaterial from './ReferenceMaterial.svelte';
 
 	const submissionRegex = /\d{2}-\d{6}-\d{4}/;
 	let methodElementCount = $methodParams.elements.length;
@@ -36,16 +37,16 @@
 			{/if}
 
 			{#if sampleNameLower === 'method blank'}
-				<!-- <strong>Method Blank</strong> -->
 				<MethodBlank {sample} />
+			{/if}
+
+			{#if referenceMaterialsLower.includes(sampleNameLower)}
+				<!-- <strong>Reference Material</strong> -->
+				<ReferenceMaterial {sample} />
 			{/if}
 
 			{#if sample.isDup}
 				<strong>Duplicate!</strong>
-			{/if}
-
-			{#if referenceMaterialsLower.includes(sampleNameLower)}
-				<strong>Reference Material</strong>
 			{/if}
 
 			{#if (submissionRegex.test(sample.name) || sample.name

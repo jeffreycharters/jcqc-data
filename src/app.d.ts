@@ -37,7 +37,7 @@ interface ReferenceLimits {
 	high?: number;
 }
 
-type ElementLimits = Map<string, ReferenceLimits>; // eg. Mn: { low..}
+type ElementLimits = Map<number, ReferenceLimits>; // eg. 55: { low..}
 
 type ReferenceMaterial = Map<string, ElementLimits>; //  eg. Bovine Liver: { Mn ..}
 

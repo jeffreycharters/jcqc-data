@@ -107,8 +107,7 @@
 					<tr class={bgColour}>
 						<td rowspan="2" class="first-column">{rmName}</td>
 						{#each elements as element}
-							{@const elementToken = element.mass + element.symbol}
-							{@const thisElement = referenceMaterials.get(rmName)?.get(elementToken)}
+							{@const thisElement = referenceMaterials.get(rmName)?.get(element.mass)}
 							<td class="text-center">
 								{thisElement?.low === 0 ? '- -' : thisElement?.low}
 							</td>
@@ -116,8 +115,7 @@
 					</tr>
 					<tr class="border-b border-gray-400 {bgColour}">
 						{#each elements as element}
-							{@const elementToken = element.mass + element.symbol}
-							{@const thisElement = referenceMaterials.get(rmName)?.get(elementToken)}
+							{@const thisElement = referenceMaterials.get(rmName)?.get(element.mass)}
 							<td class="text-center">
 								{thisElement?.high === 0 ? '- -' : thisElement?.high}
 							</td>

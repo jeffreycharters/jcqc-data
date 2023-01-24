@@ -71,7 +71,7 @@ const getMethodReferenceMaterials = async (methodId: string) => {
 
     rmElements.forEach(rm => {
         const name = rm.expand?.methodReferenceMaterial.expand?.referenceMaterial.name;
-        const element = `${rm.expand?.element.mass}${rm.expand?.element.symbol}`;
+        const element = rm.expand?.element.mass
 
         if (!rmMap.has(name)) rmMap.set(name, new Map());
         const currentRm = rmMap.get(name);
