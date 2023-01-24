@@ -28,6 +28,7 @@
 			const newMethodElement = await createMethodElement(element.elementId, $method.id);
 			element.inDb = true;
 			element.id = newMethodElement.id;
+			element.units = 'ppm';
 		}
 		const updatedElement = await toggleMethodElementActive(element.id, !element.active);
 		if (!updatedElement) return; //error?
@@ -39,7 +40,8 @@
 	const setUnits = async (newUnits: Units) => {
 		const updatedElement = await setMethodElementUnitsById(element.id, newUnits);
 		if (!updatedElement) return; // error?
-		element.units = updatedElement.units ?? 'unknown';
+		element.units = updatedElement.units ?? 'ppm';
+		dispatch('setMethodElementUnits', newUnits);
 	};
 
 	function debounce(callback: () => void, timeout = 300) {

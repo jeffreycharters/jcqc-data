@@ -13,6 +13,7 @@
 	import { quintOut } from 'svelte/easing';
 	import { crossfade, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+	import { element } from 'svelte/internal';
 
 	export let data: PageData;
 
@@ -93,6 +94,13 @@
 		methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
 		methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
 	};
+
+	const setMethodElementUnitsById = (elementId: string, newUnits: string) => {
+		const methodElement = methodElements.find((element) => element.id === elementId);
+		if (!methodElement) return;
+		const loqIndex = getLoqIndexByElementId(methodElement.elementId);
+		$loqs[loqIndex].units = newUnits;
+	};
 </script>
 
 <h1>
@@ -163,6 +171,8 @@
 						<MethodElement
 							{element}
 							on:toggleElement={(event) => toggleElementActive(event.detail)}
+							on:setMethodElementUnits={(event) =>
+								setMethodElementUnitsById(element.id, event.detail)}
 						/>
 					</div>
 				{/each}

@@ -111,7 +111,7 @@ export const toggleMethodElementActive = async (methodElementId: string, newActi
 }
 
 export const createMethodElement = async (elementId: string, methodId: string) => {
-    const data = JSON.stringify({ method: methodId, element: elementId, active: true, units: 'ppb' });
+    const data = JSON.stringify({ method: methodId, element: elementId, active: true, units: 'ppm' });
 
     const newElement: MethodElementsResponse = await pb.collection('methodElements').create(data);
     return newElement
