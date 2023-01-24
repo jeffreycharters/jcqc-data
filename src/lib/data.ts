@@ -1,5 +1,5 @@
 import cuid from "cuid";
-import { methodParams, reportData } from "$lib/stores";
+import { reportData } from "$lib/stores";
 
 export const sortedArrayFromMap = (map: Map<number, number>) => {
     return Array.from(map).sort((a, b) => (a[0] < b[0] ? -1 : 1));

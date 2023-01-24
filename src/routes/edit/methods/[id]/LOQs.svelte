@@ -1,5 +1,4 @@
 <script lang="ts">
-	import NumberInput from '$lib/components/NumberInput.svelte';
 	import { createElementLoq, updateElementLoq } from '$lib/methods';
 	import { loqs, method } from '$lib/stores';
 	import { flip } from 'svelte/animate';

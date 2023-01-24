@@ -12,7 +12,7 @@
 	</td>
 	{#each elements as [_, value]}
 		<td>
-			{parseFloat(roundToSigFigs(value, 3))}
+			{roundToSigFigs(value, 3)}
 		</td>
 	{/each}
 </tr>

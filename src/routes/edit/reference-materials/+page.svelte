@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { pb } from '$lib/pocketbase';
-	import type { ReferenceMaterialsResponse } from '$lib/pocketbase-types';
 	import type { PageData } from './$types';
 	import AddReferenceMaterialForm from './AddReferenceMaterialForm.svelte';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';

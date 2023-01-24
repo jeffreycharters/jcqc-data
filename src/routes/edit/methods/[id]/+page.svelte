@@ -21,7 +21,7 @@
 	const [send, receive] = crossfade({
 		duration: (d) => Math.sqrt(d * 200),
 
-		fallback(node, params) {
+		fallback(node) {
 			const style = getComputedStyle(node);
 			const transform = style.transform === 'none' ? '' : style.transform;
 

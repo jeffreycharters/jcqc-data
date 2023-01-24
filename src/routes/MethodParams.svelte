@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { generateMethodParams } from '$lib/methodParams';
-	import { methodParams, selectedMethodId } from '$lib/stores';
-	import { onMount } from 'svelte';
+	import { selectedMethodId } from '$lib/stores';
 	import { fade } from 'svelte/transition';
-	// export let methodId: string;
 
 	$: currentMethodParams = generateMethodParams($selectedMethodId);
 </script>

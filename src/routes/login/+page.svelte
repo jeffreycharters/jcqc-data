@@ -35,7 +35,7 @@
 				passwordConfirm: password,
 				name: 'New User'
 			};
-			const createdUser = await pb.collection('users').create(data);
+			await pb.collection('users').create(data);
 			await login();
 		} catch (err) {
 			const error = err as Error;
