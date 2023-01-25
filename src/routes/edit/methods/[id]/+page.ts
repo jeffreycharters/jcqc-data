@@ -69,7 +69,7 @@ export const load = (async ({ params }) => {
             symbol: e.symbol,
             mass: e.mass,
             inDb: !!loq,
-            value: loq && loq?.value && loq.value > 0 ? loq?.value : undefined,
+            value: loq && loq?.loq && loq.loq > 0 ? loq?.loq : undefined,
             units: currentMethodElement?.units ?? 'ppm',
             visible: !!currentMethodElement,
             elementId: e.id,

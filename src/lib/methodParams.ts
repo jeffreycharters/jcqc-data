@@ -59,7 +59,7 @@ const getMethodLoqs = async (methodId: string) => {
     const loqs: Record<number, number | undefined> = {};
 
     loqArray.forEach(loq => {
-        loqs[loq.expand?.element.mass] = loq.value
+        loqs[loq.expand?.element.mass] = loq.loq
     })
     return loqs
 }
