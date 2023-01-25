@@ -39,6 +39,7 @@ export type AuthSystemFields = {
 
 export type BlanksRecord = {
 	name: string
+	loqs?: RecordIdString
 }
 
 export type ElementsRecord = {
@@ -78,6 +79,7 @@ export type MethodsRecord = {
 	checkStandardName?: string
 	checkStandardLimit?: number
 	elements?: RecordIdString
+	blanks?: RecordIdString
 }
 
 export type ReferenceMaterialElementsRecord = {

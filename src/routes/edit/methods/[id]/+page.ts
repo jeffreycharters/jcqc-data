@@ -19,6 +19,7 @@ export const load = (async ({ params }) => {
     }
 
 
+
     const { allElementsList } = await getElementsByMethod(method.id);
 
     const allReferenceMaterials = await getallReferenceMaterials();
