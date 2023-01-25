@@ -29,13 +29,13 @@
 
 {#if loqsToShow.length > 0}
 	<div
-		class="basic-border py-4 px-8 mt-4"
+		class="basic-border py-4 px-8 mt-4 w-fit"
 		in:fly|local={{ y: 50, duration: 150 }}
 		out:fade|local={{ duration: 100 }}
 	>
 		<h2 class="my-2">Detection Limits</h2>
 		<form on:submit|preventDefault={saveLoqs}>
-			<div class="grid grid-cols-2 grid-flow-row gap-x-4">
+			<div class="grid grid-cols-5 grid-flow-row gap-x-8 w-fit">
 				{#each loqsToShow as element, index (`${element.id}-${element.mass}`)}
 					<div
 						class="max-w-[8rem] bg-gray-100 rounded my-1 p-1"

@@ -12,12 +12,33 @@
 	{:then methodParams}
 		{@const method = methodParams.method}
 
-		<div class="flex items-end justify-between my-8 gap-8">
-			<h2 class="text-2xl flex-grow border-b">
+		<div
+			class="flex {methodParams.elements.length < 10
+				? 'flex-col gap-4'
+				: 'justify-between gap-8'} items-end flex-wrap my-8"
+		>
+			<h2
+				class="text-2xl flex-grow border-b {methodParams.elements.length < 10
+					? 'self-start'
+					: 'self-end'}"
+			>
 				{method.name}{#if method.description}: {method.description}{/if}
 			</h2>
 
 			<div class="flex items-stretch gap-4">
+				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
+					<div class="text-xl font-bold text-gray-500">
+						{#if method.checkStandardLimit}
+							{method.checkStandardLimit}%
+						{:else}
+							- -
+						{/if}
+					</div>
+					<div class="text-sm text-center text-gray-400 font-semibold">
+						Check Standard Tolerance
+					</div>
+				</div>
+
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
 						{#if method.rpdLimit}
@@ -87,7 +108,7 @@
 					{/each}
 				</tr>
 				<tr class="bg-gray-200 border-b border-gray-400">
-					<td class="first-column">Calibration Check</td>
+					<td class="first-column">{method.checkStandardName}</td>
 					{#each elements as element}
 						<td class="text-center">
 							{element.checkStandard ?? '- -'}
@@ -102,7 +123,7 @@
 						{#each elements as element}
 							{@const thisElement = referenceMaterials.get(rmName)?.get(element.mass)}
 							<td class="text-center">
-								{thisElement?.low === 0 ? '- -' : thisElement?.low}
+								{thisElement?.low === 0 ? '- -' : thisElement?.low ?? '- -'}
 							</td>
 						{/each}
 					</tr>
@@ -110,7 +131,7 @@
 						{#each elements as element}
 							{@const thisElement = referenceMaterials.get(rmName)?.get(element.mass)}
 							<td class="text-center">
-								{thisElement?.high === 0 ? '- -' : thisElement?.high}
+								{thisElement?.high === 0 ? '- -' : thisElement?.high ?? '- -'}
 							</td>
 						{/each}
 					</tr>

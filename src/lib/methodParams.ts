@@ -37,7 +37,7 @@ export const generateMethodParams = async (methodId: string) => {
 
 
 const getMethodElements = async (methodId: string) => {
-    const params = { filter: `method = "${methodId}" && active = true`, expand: 'element' }
+    const params = { filter: `method = "${methodId}" && active = true`, expand: 'element', sort: 'element.mass' }
     const currentMethodElements: MethodElementsResponse[] = await pb.collection('methodElements').getFullList(undefined, params);
     const elementList = currentMethodElements.map(me => {
         if (!me.expand?.element) return;

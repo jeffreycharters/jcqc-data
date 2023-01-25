@@ -5,7 +5,7 @@
 	export let placeholder = '';
 </script>
 
-<div class="flex flex-col text-sm">
+<div class="flex flex-col text-sm my-2">
 	<label for={name}>{@html label}</label>
 	<input type="text" {name} class="number-input" bind:value {placeholder} />
 </div>

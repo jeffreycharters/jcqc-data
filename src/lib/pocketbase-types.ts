@@ -69,7 +69,8 @@ export type MethodsRecord = {
 	active?: boolean
 	calibrationCount: number
 	description?: string
-	checkStandardLimit?: string
+	checkStandardName?: string
+	checkStandardLimit?: number
 }
 
 export type ReferenceMaterialElementsRecord = {

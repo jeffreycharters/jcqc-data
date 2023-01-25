@@ -57,7 +57,7 @@
 
 		<form on:submit|preventDefault={saveData}>
 			{#if limitsArray}
-				<div class="basic-border w-fit">
+				<div class="basic-border w-fit mb-8">
 					<table class="table-auto">
 						<thead>
 							<tr>

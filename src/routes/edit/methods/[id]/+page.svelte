@@ -13,7 +13,6 @@
 	import { quintOut } from 'svelte/easing';
 	import { crossfade, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
-	import { element } from 'svelte/internal';
 
 	export let data: PageData;
 
@@ -44,7 +43,8 @@
 	$methodReferenceMaterials = data.methodReferenceMaterialsList;
 	if (!$method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
-	let { name, description, calibrationCount, rpdLimit } = data.method || undefined;
+	let { name, description, calibrationCount, rpdLimit, checkStandardLimit, checkStandardName } =
+		data.method || undefined;
 
 	const addFormMessage = (message: string, timeout: number = 3000) => {
 		formMessage = message;
@@ -60,6 +60,8 @@
 			name,
 			calibrationCount,
 			description,
+			checkStandardLimit,
+			checkStandardName,
 			rpdLimit: rpdLimit ?? 0
 		});
 		try {
@@ -107,11 +109,11 @@
 	{$method.name}{#if $method.description}: {$method.description}{/if}
 </h1>
 
-<div class="flex items-start gap-8 max-w-screen-xl">
-	<div>
-		<div class="basic-border mt-8 px-8 py-4 w-fit">
-			<h2>Edit Method</h2>
-			<form on:submit|preventDefault={editMethod}>
+<div>
+	<div class="basic-border mt-8 px-8 py-4 w-fit">
+		<h2>Edit Method</h2>
+		<form on:submit|preventDefault={editMethod}>
+			<div class="grid grid-cols-2 gap-x-12">
 				<TextInput
 					name="name"
 					placeholder="e.g. TOXI-064 or Serum Iodine"
@@ -122,7 +124,7 @@
 					name="description"
 					placeholder="e.g. Metals in serum"
 					bind:value={description}
-					label="Method Name"
+					label="Method Description"
 				/>
 				<NumberInput
 					name="cal-count"
@@ -132,77 +134,91 @@
 				/>
 				<NumberInput
 					name="rpd-limit"
-					label="RPD Warning limit"
+					label="RPD Warning limit (%)"
 					bind:value={rpdLimit}
 					placeholder="e.g. 15"
 				/>
-				<div class="flex items-baseline justify-between">
-					<div>
-						{#if formMessage}
-							<div class="text-sm lm-2" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
-								{formMessage}
-							</div>
-						{/if}
-					</div>
-					<div>
-						<input class="btn my-4" type="submit" value="Save Changes" />
-					</div>
+				<TextInput
+					name="check-standard-name"
+					label="Check Standard Name"
+					bind:value={checkStandardName}
+					placeholder="e.g. Calibration Check"
+				/>
+				<NumberInput
+					name="check-standard-limit"
+					label="Check Standard Tolerance (%)"
+					bind:value={checkStandardLimit}
+					placeholder="e.g. 15"
+				/>
+				<div>
+					{#if formMessage}
+						<div class="text-sm lm-2" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
+							{formMessage}
+						</div>
+					{/if}
 				</div>
-			</form>
+				<div class="justify-end">
+					<input class="btn my-4" type="submit" value="Save Changes" />
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="mt-8 w-full">
+	<div class="basic-border py-4 px-6">
+		<div class="flex justify-between items-baseline">
+			<h2 class="mb-4">
+				Elements used by this method
+				<span class="text-gray-400">[{methodElements.filter((me) => me.active)?.length}]</span>
+			</h2>
+			<div class="text-gray-500">Changes in this box are saved as soon as they are made.</div>
 		</div>
-		<LOQs />
+
+		<div class="grid grid-cols-8 gap-4">
+			{#each methodElements.filter((me) => me.active) as element (element.id)}
+				<div
+					class={element.active ? 'col-span-2' : ''}
+					in:receive|local={{ key: element.id }}
+					out:send|local={{ key: element.id }}
+					animate:flip={{ duration: 150 }}
+				>
+					<MethodElement
+						{element}
+						on:toggleElement={(event) => toggleElementActive(event.detail)}
+						on:setMethodElementUnits={(event) =>
+							setMethodElementUnitsById(element.id, event.detail)}
+					/>
+				</div>
+			{/each}
+			{#each methodElements.filter((me) => !me.active) as element (element.id)}
+				<div
+					in:receive|local={{ key: element.id }}
+					out:send|local={{ key: element.id }}
+					animate:flip={{ duration: 150 }}
+				>
+					<MethodElement
+						{element}
+						on:toggleElement={(event) => toggleElementActive(event.detail)}
+					/>
+				</div>
+			{/each}
+		</div>
 	</div>
 
-	<div class="mt-8 w-full">
-		<div class="basic-border py-4 px-6">
-			<div class="flex justify-between items-baseline">
-				<h2 class="mb-4">Elements used by this method</h2>
-				<div class="text-gray-500">Changes in this box are saved as soon as they are made.</div>
-			</div>
+	<LOQs />
 
-			<div class="grid grid-cols-6 gap-4">
-				{#each methodElements.filter((me) => me.active) as element (element.id)}
-					<div
-						class={element.active ? 'col-span-2' : ''}
-						in:receive|local={{ key: element.id }}
-						out:send|local={{ key: element.id }}
-						animate:flip={{ duration: 150 }}
-					>
-						<MethodElement
-							{element}
-							on:toggleElement={(event) => toggleElementActive(event.detail)}
-							on:setMethodElementUnits={(event) =>
-								setMethodElementUnitsById(element.id, event.detail)}
-						/>
-					</div>
-				{/each}
-				{#each methodElements.filter((me) => !me.active) as element (element.id)}
-					<div
-						in:receive|local={{ key: element.id }}
-						out:send|local={{ key: element.id }}
-						animate:flip={{ duration: 150 }}
-					>
-						<MethodElement
-							{element}
-							on:toggleElement={(event) => toggleElementActive(event.detail)}
-						/>
-					</div>
-				{/each}
-			</div>
-		</div>
+	<div class="basic-border my-4 py-4 px-6 w-full max-w-screen-xl">
+		<h2 class="mb-4">Reference Materials</h2>
 
-		<div class="basic-border my-4 py-4 px-6 w-full max-w-screen-xl">
-			<h2 class="mb-4">Reference Materials</h2>
+		<div class="grid grid-cols-3 gap-4">
+			{#each $methodReferenceMaterials.filter((rm) => rm.active) as rm (rm.id)}
+				<ReferenceMaterial {rm} />
+			{/each}
 
-			<div class="grid grid-cols-2 gap-4">
-				{#each $methodReferenceMaterials.filter((rm) => rm.active) as rm (rm.id)}
-					<ReferenceMaterial {rm} />
-				{/each}
-
-				{#each $methodReferenceMaterials.filter((rm) => !rm.active) as rm (rm.id)}
-					<ReferenceMaterial {rm} />
-				{/each}
-			</div>
+			{#each $methodReferenceMaterials.filter((rm) => !rm.active) as rm (rm.id)}
+				<ReferenceMaterial {rm} />
+			{/each}
 		</div>
 	</div>
 </div>

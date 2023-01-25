@@ -11,6 +11,8 @@
 	let rpdLimit: number;
 	let calibrationCount = 1;
 	let description: string;
+	let checkStandardLimit: number;
+	let checkStandardName: string;
 
 	let addFormDiv: HTMLElement;
 
@@ -28,7 +30,9 @@
 			calibrationCount,
 			rpdLimit,
 			description,
-			active: true
+			active: true,
+			checkStandardLimit,
+			checkStandardName
 		});
 		try {
 			const newMethod: MethodsResponse = await pb.collection('methods').create(methodData);
@@ -79,7 +83,7 @@
 				placeholder="e.g. Metals in sewage"
 				bind:value={description}
 			/>
-			<div class="flex gap-8">
+			<div class="flex gap-8 max-w-sm items-end">
 				<NumberInput
 					name="cal-count"
 					label="Number of non-blank calibration standards"
@@ -87,9 +91,24 @@
 				/>
 				<NumberInput
 					name="rpd-limit"
-					label="RPD warning limit"
+					label="RPD warning limit (%)"
 					bind:value={rpdLimit}
 					placeholder="e.g. 20"
+				/>
+			</div>
+
+			<div class="flex gap-8 my-2 items-end">
+				<TextInput
+					name="check-standard-name"
+					label="Check Standard Name"
+					bind:value={checkStandardName}
+					placeholder="e.g. Calibration Check"
+				/>
+				<NumberInput
+					name="check-standard-limit"
+					label="Check Standard Tolerance (%)"
+					bind:value={checkStandardLimit}
+					placeholder="e.g. 15"
 				/>
 			</div>
 

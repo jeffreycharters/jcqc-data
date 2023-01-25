@@ -15,7 +15,11 @@
 			return;
 		}
 
-		parseFileAndUpdateStore(inputFile, $methodParams?.referenceMaterialNames);
+		parseFileAndUpdateStore(
+			inputFile,
+			$methodParams?.referenceMaterialNames,
+			$methodParams?.method?.checkStandardName
+		);
 		goto('/report');
 	};
 
