@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { generateMethodParams } from '$lib/methodParams';
 	import { instrument, methodParams, selectedMethodId } from '$lib/stores';
 	import { fade } from 'svelte/transition';
@@ -98,4 +98,8 @@
 	.method-button {
 		@apply text-gray-600 border-gray-700 scale-95 transition-all;
 	}
-</style>
+</style> -->
+
+<div class="absolute bottom-4 left-4">
+	<a class="no-underline btn" href="/edit">Edit stuff</a>
+</div>

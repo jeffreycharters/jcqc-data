@@ -1,0 +1,50 @@
+methods {
+    id
+    name
+    slug
+    rpdLimit
+    active
+    calibrationCount
+    description
+    checkStandardName
+    checkStandardTolerance
+    elements ->
+    blanks ->
+    referenceMaterials ->
+}
+
+elements {
+    id
+    name
+    symbol
+    mass
+    active
+}
+
+blanks {
+    id
+    name
+    detectionLimits ->
+}
+
+detectionLimits {
+    id
+    mdl
+    loq
+    element ->
+}
+
+referenceMaterials {
+    id
+    name
+    active
+    referenceMaterialRanges ->
+}
+
+referenceMaterialRanges {
+    id
+    upper
+    lower
+    element ->
+    method ->
+}

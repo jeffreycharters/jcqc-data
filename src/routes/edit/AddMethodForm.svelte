@@ -5,13 +5,14 @@
 	import type { MethodsResponse } from '$lib/pocketbase-types';
 	import { methods, showAddForm } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
+	import slugify from 'slugify';
 
 	let formError = '';
 	let name: string;
 	let rpdLimit: number;
 	let calibrationCount = 1;
 	let description: string;
-	let checkStandardLimit: number;
+	let checkStandardTolerance: number;
 	let checkStandardName: string;
 
 	let addFormDiv: HTMLElement;
@@ -25,14 +26,16 @@
 
 	const addMethod = async () => {
 		if (!name || !calibrationCount) formError = 'Missing something';
+
 		const methodData = JSON.stringify({
 			name,
-			calibrationCount,
+			slug: slugify(name),
 			rpdLimit,
-			description,
 			active: true,
-			checkStandardLimit,
-			checkStandardName
+			calibrationCount,
+			description,
+			checkStandardName,
+			checkStandardTolerance
 		});
 		try {
 			const newMethod: MethodsResponse = await pb.collection('methods').create(methodData);
@@ -45,7 +48,7 @@
 			});
 		} catch (err) {
 			const error = err as Error;
-			console.log(error);
+			formError = error.message;
 		}
 	};
 </script>
@@ -107,7 +110,7 @@
 				<NumberInput
 					name="check-standard-limit"
 					label="Check Standard Tolerance (%)"
-					bind:value={checkStandardLimit}
+					bind:value={checkStandardTolerance}
 					placeholder="e.g. 15"
 				/>
 			</div>

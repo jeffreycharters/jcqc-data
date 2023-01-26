@@ -8,13 +8,13 @@
 
 	export let data: PageData;
 
-	methods.set(data.methodList);
+	$methods = data.methodList;
 
 	$: activeMethods = $methods.filter((e) => e.active);
 	$: inactiveMethods = $methods.filter((e) => !e.active);
 
 	const closeAddFormIfNecessary = (event: KeyboardEvent) => {
-		if (showAddForm && event.code === 'Escape') $showAddForm = false;
+		if ($showAddForm && event.code === 'Escape') $showAddForm = false;
 	};
 
 	onDestroy(() => {

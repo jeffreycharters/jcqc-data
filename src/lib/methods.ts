@@ -27,6 +27,11 @@ export const getMethodById = async (methodId: string) => {
     return method;
 }
 
+export const getMethodBySlug = async (slug: string) => {
+    const method: MethodsResponse = await pb.collection('methods').getFirstListItem(`slug = "${slug}"`);
+    return method;
+}
+
 export const getElementsByMethod = async (methodId: string) => {
     const elements: ElementsResponse[] = await pb.collection('elements').getFullList(200, { sort: 'mass', filter: 'retired = false' });
 

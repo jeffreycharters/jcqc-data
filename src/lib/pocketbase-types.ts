@@ -53,7 +53,7 @@ export type LoqsRecord = {
 	method: RecordIdString
 	loq?: number
 	element: RecordIdString
-	blank?: RecordIdString
+	mdl?: number
 }
 
 export type MethodElementsRecord = {

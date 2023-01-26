@@ -36,6 +36,7 @@
 	"type": "module",
 	"dependencies": {
 		"cuid": "^2.1.8",
-		"pocketbase": "^0.9.1"
+		"pocketbase": "^0.9.1",
+		"slugify": "^1.6.5"
 	}
 }

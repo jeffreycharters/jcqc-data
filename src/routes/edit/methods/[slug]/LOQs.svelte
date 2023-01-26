@@ -3,7 +3,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { method } from '$lib/stores';
 
-	let newBlankName = '';
+	let newBlankName = 'testor';
 	let blankMessage = '';
 	export let blank: Blank | undefined = undefined;
 
@@ -15,9 +15,15 @@
 			return;
 		}
 		blank = new Blank(undefined, $method.id);
-		blank.createNew(newBlankName);
+		try {
+			await blank.createNew(newBlankName);
+		} catch (err) {
+			const error = err as Error;
+			blankMessage = error.message;
+			return;
+		}
 
-		// newBlankName = '';
+		newBlankName = '';
 		blank = undefined;
 	};
 </script>

@@ -1,4 +1,10 @@
 <script lang="ts">
+	export let data;
+	let { method } = data;
+	console.log(method);
+</script>
+
+<!-- <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import NumberInput from '$lib/components/NumberInput.svelte';
@@ -105,10 +111,13 @@
 	};
 </script>
 
+-->
+
 <h1>
-	{$method.name}{#if $method.description}: {$method.description}{/if}
+	{method.name}{#if method.description}: {method.description}{/if}
 </h1>
 
+<!--
 <div>
 	<div class="basic-border mt-8 px-8 py-4 w-fit">
 		<h2>Edit Method</h2>
@@ -222,3 +231,4 @@
 		</div>
 	</div>
 </div>
+ -->
