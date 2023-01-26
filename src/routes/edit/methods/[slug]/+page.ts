@@ -11,8 +11,9 @@ export const load = (async ({ params }) => {
         throw redirect(302, '/edit');
     }
     const method = new Method(methodResponse.id);
-    await method.init();
+    await method.init({ blanks: true, elements: true, referenceMaterials: true });
 
+    //  TODO: Get list of all elements in db
 
 
     // const { allElementsList } = await getElementsByMethod(method.id);

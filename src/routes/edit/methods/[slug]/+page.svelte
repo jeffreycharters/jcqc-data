@@ -1,17 +1,11 @@
 <script lang="ts">
-	export let data;
-	let { method } = data;
-	console.log(method);
-</script>
-
-<!-- <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { MethodsResponse } from '$lib/pocketbase-types';
-	import { loqs, method, methodReferenceMaterials, methods } from '$lib/stores';
+	import { loqs, methodReferenceMaterials, methods } from '$lib/stores';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
@@ -21,8 +15,9 @@
 	import { flip } from 'svelte/animate';
 
 	export let data: PageData;
+	let { method } = data;
 
-	let { methodElements } = data;
+	// let { methodElements } = data;
 
 	const [send, receive] = crossfade({
 		duration: (d) => Math.sqrt(d * 200),
@@ -44,13 +39,13 @@
 
 	let formMessage = '';
 
-	$loqs = data.loqArray;
-	$method = data.method;
-	$methodReferenceMaterials = data.methodReferenceMaterialsList;
-	if (!$method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
+	// $loqs = data.loqArray;
+	// $method = data.method;
+	// $methodReferenceMaterials = data.methodReferenceMaterialsList;
+	// if (!$method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
 
-	let { name, description, calibrationCount, rpdLimit, checkStandardLimit, checkStandardName } =
-		data.method || undefined;
+	// let { name, description, calibrationCount, rpdLimit, checkStandardLimit, checkStandardName } =
+	// 	data.method || undefined;
 
 	const addFormMessage = (message: string, timeout: number = 3000) => {
 		formMessage = message;
@@ -58,28 +53,19 @@
 	};
 
 	const editMethod = async () => {
-		if (!name || !calibrationCount) {
+		if (!method.name || !method.calibrationCount) {
 			addFormMessage('Missing something');
 			return;
 		}
-		const updateData = JSON.stringify({
-			name,
-			calibrationCount,
-			description,
-			checkStandardLimit,
-			checkStandardName,
-			rpdLimit: rpdLimit ?? 0
-		});
 		try {
-			const newMethod: MethodsResponse = await pb
-				.collection('methods')
-				.update($method.id, updateData);
-			methods.update((n) => {
-				const newList = [...n, newMethod];
-				newList.sort((a, b) => (a.name < b.name ? 1 : -1));
-				return newList;
+			method.updateProperties({
+				name: method.name,
+				calibrationCount: method.calibrationCount,
+				description: method.description,
+				checkStandardTolerance: method.checkStandardTolerance,
+				checkStandardName: method.checkStandardName,
+				rpdLimit: method.rpdLimit
 			});
-			$method = newMethod;
 			addFormMessage('Saved');
 		} catch (err) {
 			const error = err as Error;
@@ -87,37 +73,34 @@
 		}
 	};
 
-	const getLoqIndexByElementId = (elementId: string) => {
-		return $loqs.findIndex((loq) => loq.elementId === elementId && loq.methodId === $method.id);
-	};
+	// const getLoqIndexByElementId = (elementId: string) => {
+	// 	return $loqs.findIndex((loq) => loq.elementId === elementId && loq.methodId === $method.id);
+	// };
 
-	const toggleElementActive = async (element: MethodElement) => {
-		const thisElement = methodElements.find((e) => e.id === element.id);
-		if (!thisElement || !thisElement.id) {
-			return;
-		}
+	// const toggleElementActive = async (element: MethodElement) => {
+	// 	const thisElement = methodElements.find((e) => e.id === element.id);
+	// 	if (!thisElement || !thisElement.id) {
+	// 		return;
+	// 	}
 
-		const loqIndex = getLoqIndexByElementId(thisElement.elementId);
-		$loqs[loqIndex].visible = thisElement.active;
-		methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
-		methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
-	};
+	// 	const loqIndex = getLoqIndexByElementId(thisElement.elementId);
+	// 	$loqs[loqIndex].visible = thisElement.active;
+	// 	methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
+	// 	methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
+	// };
 
-	const setMethodElementUnitsById = (elementId: string, newUnits: string) => {
-		const methodElement = methodElements.find((element) => element.id === elementId);
-		if (!methodElement) return;
-		const loqIndex = getLoqIndexByElementId(methodElement.elementId);
-		$loqs[loqIndex].units = newUnits;
-	};
+	// const setMethodElementUnitsById = (elementId: string, newUnits: string) => {
+	// 	const methodElement = methodElements.find((element) => element.id === elementId);
+	// 	if (!methodElement) return;
+	// 	const loqIndex = getLoqIndexByElementId(methodElement.elementId);
+	// 	$loqs[loqIndex].units = newUnits;
+	// };
 </script>
-
--->
 
 <h1>
 	{method.name}{#if method.description}: {method.description}{/if}
 </h1>
 
-<!--
 <div>
 	<div class="basic-border mt-8 px-8 py-4 w-fit">
 		<h2>Edit Method</h2>
@@ -126,37 +109,37 @@
 				<TextInput
 					name="name"
 					placeholder="e.g. TOXI-064 or Serum Iodine"
-					bind:value={name}
+					bind:value={method.name}
 					label="Method Name"
 				/>
 				<TextInput
 					name="description"
 					placeholder="e.g. Metals in serum"
-					bind:value={description}
+					bind:value={method.description}
 					label="Method Description"
 				/>
 				<NumberInput
 					name="cal-count"
 					label="Number of non-blank calibration standards"
-					bind:value={calibrationCount}
+					bind:value={method.calibrationCount}
 					placeholder="e.g. 6"
 				/>
 				<NumberInput
 					name="rpd-limit"
 					label="RPD Warning limit (%)"
-					bind:value={rpdLimit}
+					bind:value={method.rpdLimit}
 					placeholder="e.g. 15"
 				/>
 				<TextInput
 					name="check-standard-name"
 					label="Check Standard Name"
-					bind:value={checkStandardName}
+					bind:value={method.checkStandardName}
 					placeholder="e.g. Calibration Check"
 				/>
 				<NumberInput
 					name="check-standard-limit"
 					label="Check Standard Tolerance (%)"
-					bind:value={checkStandardLimit}
+					bind:value={method.checkStandardTolerance}
 					placeholder="e.g. 15"
 				/>
 				<div>
@@ -179,13 +162,13 @@
 		<div class="flex justify-between items-baseline">
 			<h2 class="mb-4">
 				Elements used by this method
-				<span class="text-gray-400">[{methodElements.filter((me) => me.active)?.length}]</span>
+				<!-- <span class="text-gray-400">[{methodElements.filter((me) => me.active)?.length}]</span> -->
 			</h2>
 			<div class="text-gray-500">Changes in this box are saved as soon as they are made.</div>
 		</div>
 
 		<div class="grid grid-cols-8 gap-4">
-			{#each methodElements.filter((me) => me.active) as element (element.id)}
+			<!-- {#each methodElements.filter((me) => me.active) as element (element.id)}
 				<div
 					class={element.active ? 'col-span-2' : ''}
 					in:receive|local={{ key: element.id }}
@@ -208,13 +191,14 @@
 				>
 					<MethodElement
 						{element}
-						on:toggleElement={(event) => toggleElementActive(event.detail)}
+						on:toggleElement={() => console.log('toggle element!')}
 					/>
 				</div>
-			{/each}
+			{/each} -->
 		</div>
 	</div>
 
+	<!--
 	<LOQs />
 
 	<div class="basic-border my-4 py-4 px-6 w-full max-w-screen-xl">
@@ -230,5 +214,5 @@
 			{/each}
 		</div>
 	</div>
+-->
 </div>
- -->
