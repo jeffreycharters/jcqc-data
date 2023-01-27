@@ -1,11 +1,9 @@
 <script lang="ts">
-	import type { ElementsResponse } from '$lib/pocketbase-types';
+	import type { Analyte } from '$lib/classes';
 	import { createEventDispatcher } from 'svelte';
 
-	export let element: ElementsResponse;
+	export let element: Analyte;
 	export let active: boolean;
-
-	let checkStd = 'cat';
 
 	let formHasError = false;
 	$: errorClasses = formHasError
@@ -14,21 +12,9 @@
 
 	const dispatch = createEventDispatcher();
 
-	const toggleElementActive = async () => {
-		// if (!element || !element.id) return;
-
-		// if (element.inDb) await toggleMethodElementActive(element.id, !element.active);
-		// else {
-		// 	const newMethodElement = await createMethodElement(element.elementId, $method.id);
-		// 	element.inDb = true;
-		// 	element.id = newMethodElement.id;
-		// 	element.units = 'ppm';
-		// }
-		// const updatedElement = await toggleMethodElementActive(element.id, !element.active);
-		// if (!updatedElement) return; //error?
-		// if (updatedElement && updatedElement.active != undefined)
-		// 	element.active = updatedElement.active;
-		dispatch('toggleElement', element);
+	const addElement = async () => {
+		if (!element || !element.id) return;
+		dispatch('addElement', element);
 	};
 
 	const setUnits = async (newUnits: Units) => {
@@ -64,38 +50,23 @@
 <div class="{active ? 'active-element' : 'inactive-element'} relative h-full">
 	<div class="flex flex-col h-full justify-between">
 		<div class="font-bold"><sup>{element.mass}</sup>{element.symbol}</div>
-		<button class="inactivate-button" on:click={toggleElementActive}
-			>{active ? 'Remove' : 'Add'}</button
-		>
+		<button class="inactivate-button" on:click={addElement}>{active ? 'Remove' : 'Add'}</button>
 	</div>
 
 	{#if active}
 		<div class="flex flex-col gap-2 items-end">
 			<div class="flex gap-1 items-baseline">
 				<button
-					class={'ppb' === 'ppb' ? 'active-units' : 'inactive-units'}
+					class={element.units === 'ppb' ? 'active-units' : 'inactive-units'}
 					on:click={() => setUnits('ppb')}
-					disabled={'ppb' === 'ppb'}>ppb</button
+					disabled={element.units === 'ppb'}>ppb</button
 				>
 
 				<button
-					class={'ppm' === 'ppm' ? 'active-units' : 'inactive-units'}
+					class={element.units === 'ppm' ? 'active-units' : 'inactive-units'}
 					on:click={() => setUnits('ppm')}
-					disabled={'ppm' === 'ppm'}>ppm</button
+					disabled={element.units === 'ppm'}>ppm</button
 				>
-			</div>
-
-			<div class="flex gap-1 text-sm">
-				<label for="cal-check-{element.symbol}">Cal Check</label>
-				<input
-					bind:value={checkStd}
-					type="text"
-					name="cal-check-{element.symbol}"
-					class="border border-b-2 p-0 w-8 rounded text-center relative mx-1 {errorClasses}"
-					on:keyup={processUpdate()}
-					on:click={() => (checkStd === '- -' ? (checkStd = '') : '')}
-				/>
-				{'ppm'}
 			</div>
 		</div>
 	{/if}
@@ -113,8 +84,5 @@
 	}
 	.inactive-units {
 		@apply border border-gray-400 shadow text-xs pt-0 pb-1 rounded px-2 border-dotted text-gray-500;
-	}
-	.list-grid-elements {
-		@apply grid grid-cols-5 gap-4;
 	}
 </style>

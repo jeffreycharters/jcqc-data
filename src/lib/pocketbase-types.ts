@@ -9,6 +9,7 @@ export enum Collections {
 	Methods = "methods",
 	ReferenceMaterialRanges = "referenceMaterialRanges",
 	ReferenceMaterials = "referenceMaterials",
+	Units = "units",
 	Users = "users",
 }
 
@@ -64,8 +65,8 @@ export type MethodsRecord = {
 	blanks?: RecordIdString
 	referenceMaterials?: RecordIdString
 	slug: string
-	field?: string
 	checkStandardTolerance?: number
+	units?: RecordIdString
 }
 
 export type ReferenceMaterialRangesRecord = {
@@ -80,6 +81,11 @@ export type ReferenceMaterialsRecord = {
 	active?: boolean
 }
 
+export type UnitsRecord = {
+	element: RecordIdString
+	units: string
+}
+
 export type UsersRecord = {
 	name?: string
 	avatar?: string
@@ -92,6 +98,7 @@ export type ElementsResponse = ElementsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
 export type ReferenceMaterialRangesResponse = ReferenceMaterialRangesRecord & BaseSystemFields
 export type ReferenceMaterialsResponse = ReferenceMaterialsRecord & BaseSystemFields
+export type UnitsResponse = UnitsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 
 export type CollectionRecords = {
@@ -101,5 +108,6 @@ export type CollectionRecords = {
 	methods: MethodsRecord
 	referenceMaterialRanges: ReferenceMaterialRangesRecord
 	referenceMaterials: ReferenceMaterialsRecord
+	units: UnitsRecord
 	users: UsersRecord
 }

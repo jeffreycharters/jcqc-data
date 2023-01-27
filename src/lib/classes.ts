@@ -1,13 +1,15 @@
 import { element } from "svelte/internal";
 import { createBlank, getBlanksByMethodId, updateMethodBlankList } from "./blanks";
 import { pb } from "./pocketbase";
-import type { ElementsResponse, MethodsResponse } from "./pocketbase-types";
+import type { ElementsResponse, MethodsResponse, UnitsResponse } from "./pocketbase-types";
 
 export type Analyte = {
     id: string
     mass: number
     name: string
     symbol: string
+    units: string;
+    unitsId: string;
 }
 
 export class Method {
@@ -41,7 +43,9 @@ export class Method {
         // determine which collections to expand from the database
         const expandList: string[] = [];
         for (const [key, value] of Object.entries(options)) {
+            this.elements?.map(element => element.id) ?? [];
             if (value) expandList.push(key);
+            if (value && key === 'elements') expandList.push('units')
         }
         let expandString = '';
         if (expandList.length > 0) {
@@ -52,7 +56,7 @@ export class Method {
         if (!methodsResponse) throw new Error('Method not found in database');
         this.setPropertiesFromMethodsResponse(methodsResponse);
 
-        if (options.elements) this.populateElements(methodsResponse.expand?.elements);
+        if (options.elements) this.populateElements(methodsResponse.expand?.elements, methodsResponse.expand?.units);
         if (options.blanks) this.populateBlankMap();
         if (options.referenceMaterials) this.populateReferenceMaterialMap();
 
@@ -66,15 +70,23 @@ export class Method {
         this.setPropertiesFromMethodsResponse(updatedMethod);
     }
 
-    private populateElements(elements: ElementsResponse[]) {
+    private populateElements(elements: ElementsResponse[], unitList: UnitsResponse[]) {
         console.log('populating elementMap!'); // TODO
-        if (!element || elements.length === 0) return [];
+        if (!elements || elements.length === 0) return [];
 
         const activeElements = elements.filter(element => element.active)
         this.elements = activeElements.map(element => {
-            return { id: element.id, name: element.name, mass: element.mass, symbol: element.symbol }
+            const elementUnits = unitList?.find(unitItem => unitItem.element === element.id);
+            if (!elementUnits) throw new Error('No element units found')
+            return {
+                id: element.id,
+                name: element.name,
+                mass: element.mass,
+                symbol: element.symbol,
+                units: elementUnits.units,
+                unitsId: elementUnits.id
+            }
         });
-        console.log(this.elements);
 
     }
 
@@ -87,7 +99,30 @@ export class Method {
 
     }
     async addElement(elementId: string) {
+        if (!this.id) throw new Error('Method not in database');
+        console.log('adding element', elementId);
 
+        const unitsData = JSON.stringify({ element: elementId, units: 'ppm' })
+        const newUnits: UnitsResponse = await pb.collection('units').create(unitsData);
+
+        const unitsList = [...this.unitsIdList(), newUnits.id];
+        let elementList = [...this.elementIdList(), elementId];
+
+        console.log(unitsList, elementList);
+
+        const elementsData = JSON.stringify({ elements: elementList, units: unitsList })
+        const updatedMethod: MethodsResponse = await pb.collection('methods').update(this.id, elementsData);
+
+        if (!updatedMethod || !newUnits) throw new Error('Error adding element')
+
+    }
+
+    elementIdList() {
+        return this.elements?.map(element => element.id) ?? [];
+    }
+
+    unitsIdList() {
+        return this.elements?.map(element => element.unitsId) ?? [];
     }
 
 

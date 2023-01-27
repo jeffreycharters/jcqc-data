@@ -17,6 +17,11 @@
 	export let data: PageData;
 	const { elementList } = data;
 
+	$: usedElements = $method.elements ?? [];
+	$: unusedElements = elementList?.filter(
+		(element) => !$method.elementIdList().includes(element.id)
+	);
+
 	const [send, receive] = crossfade({
 		duration: (d) => Math.sqrt(d * 200),
 
@@ -75,24 +80,20 @@
 	// 	return $loqs.findIndex((loq) => loq.elementId === elementId && loq.methodId === $method.id);
 	// };
 
-	// const toggleElementActive = async (element: MethodElement) => {
-	// 	const thisElement = methodElements.find((e) => e.id === element.id);
-	// 	if (!thisElement || !thisElement.id) {
-	// 		return;
-	// 	}
+	const addElement = async (element: MethodElement) => {
+		$method.addElement(element.id);
+		// 	const loqIndex = getLoqIndexByElementId(thisElement.elementId);
+		// 	$loqs[loqIndex].visible = thisElement.active;
+		// 	methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
+		// 	methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
+		// };
 
-	// 	const loqIndex = getLoqIndexByElementId(thisElement.elementId);
-	// 	$loqs[loqIndex].visible = thisElement.active;
-	// 	methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
-	// 	methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
-	// };
-
-	// const setMethodElementUnitsById = (elementId: string, newUnits: string) => {
-	// 	const methodElement = methodElements.find((element) => element.id === elementId);
-	// 	if (!methodElement) return;
-	// 	const loqIndex = getLoqIndexByElementId(methodElement.elementId);
-	// 	$loqs[loqIndex].units = newUnits;
-	// };
+		// const setMethodElementUnitsById = (elementId: string, newUnits: string) => {
+		// 	const methodElement = methodElements.find((element) => element.id === elementId);
+		// 	if (!methodElement) return;
+		// 	const loqIndex = getLoqIndexByElementId(methodElement.elementId);
+		// $loqs[loqIndex].units = newUnits;
+	};
 </script>
 
 <h1>
@@ -166,7 +167,18 @@
 		</div>
 
 		<div class="grid grid-cols-8 gap-4">
-			{#each elementList as element (element.id)}
+			{#each usedElements as element (element.id)}
+				{@const active = true}
+				<div
+					class={active ? 'col-span-2' : ''}
+					in:receive|local={{ key: element.id }}
+					out:send|local={{ key: element.id }}
+					animate:flip={{ duration: 150 }}
+				>
+					<MethodElement {element} {active} on:addElement={(event) => addElement(event.detail)} />
+				</div>
+			{/each}
+			{#each unusedElements as element (element.id)}
 				{@const active = false}
 				<div
 					class={active ? 'col-span-2' : ''}
@@ -174,36 +186,14 @@
 					out:send|local={{ key: element.id }}
 					animate:flip={{ duration: 150 }}
 				>
-					<MethodElement {element} {active} on:toggleElement={() => console.log('toggler')} />
-				</div>
-			{/each}
-			<!-- #each methodElements.filter((me) => me.active) as element (element.id)}
-				<div
-					class={element.active ? 'col-span-2' : ''}
-					in:receive|local={{ key: element.id }}
-					out:send|local={{ key: element.id }}
-					animate:flip={{ duration: 150 }}
-				>
 					<MethodElement
 						{element}
-						on:toggleElement={(event) => toggleElementActive(event.detail)}
-						on:setMethodElementUnits={(event) =>
-							setMethodElementUnitsById(element.id, event.detail)}
+						{active}
+						on:toggleElement={(event) => console.log('remove element!')}
+						on:setMethodElementUnits={(event) => console.log('swiiiitch')}
 					/>
 				</div>
 			{/each}
-			{#each methodElements.filter((me) => !me.active) as element (element.id)}
-				<div
-					in:receive|local={{ key: element.id }}
-					out:send|local={{ key: element.id }}
-					animate:flip={{ duration: 150 }}
-				>
-					<MethodElement
-						{element}
-						on:toggleElement={() => console.log('toggle element!')}
-					/>
-				</div>
-			{/each} -->
 		</div>
 	</div>
 
