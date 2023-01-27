@@ -1,20 +1,15 @@
 <script lang="ts">
 	import { methods, showAddForm } from '$lib/stores';
 	import { onDestroy } from 'svelte';
-	import type { PageData } from './$types';
 	import AddMethodCard from './AddMethodCard.svelte';
 	import AddMethodForm from './AddMethodForm.svelte';
 	import MethodCard from './MethodCard.svelte';
 
-	export let data: PageData;
-
-	$methods = data.methodList;
-
-	$: activeMethods = $methods.filter((e) => e.active);
-	$: inactiveMethods = $methods.filter((e) => !e.active);
+	$: activeMethods = $methods.filter((method) => method.active);
+	$: inactiveMethods = $methods.filter((method) => !method.active);
 
 	const closeAddFormIfNecessary = (event: KeyboardEvent) => {
-		if ($showAddForm && event.code === 'Escape') $showAddForm = false;
+		if (showAddForm && event.code === 'Escape') $showAddForm = false;
 	};
 
 	onDestroy(() => {

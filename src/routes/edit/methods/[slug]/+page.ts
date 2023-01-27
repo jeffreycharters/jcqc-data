@@ -2,6 +2,8 @@ import { Method } from '$lib/classes';
 import { getMethodBySlug } from '$lib/methods';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
+import { getElementList } from '$lib/elements';
+import { method } from '$lib/stores';
 
 
 export const load = (async ({ params }) => {
@@ -10,11 +12,11 @@ export const load = (async ({ params }) => {
     if (!methodResponse) {
         throw redirect(302, '/edit');
     }
-    const method = new Method(methodResponse.id);
-    await method.init({ blanks: true, elements: true, referenceMaterials: true });
+    const currentMethod = new Method(methodResponse.id);
+    await currentMethod.init({ blanks: true, elements: true, referenceMaterials: true });
+    method.set(currentMethod)
 
-    //  TODO: Get list of all elements in db
-
+    const elementList = await getElementList();
 
     // const { allElementsList } = await getElementsByMethod(method.id);
 
@@ -77,11 +79,11 @@ export const load = (async ({ params }) => {
 
 
     return {
-        title: `${method.name}${method.description ? `: ${method.description}` : ''}`,
-        method,
+        title: `${currentMethod.name}${currentMethod.description ? `: ${currentMethod.description}` : ''}`,
+        elementList,
         // loqArray,
         // loqList,
         // methodElements,
         // methodReferenceMaterialsList
-    };
+    }
 }) satisfies PageLoad;

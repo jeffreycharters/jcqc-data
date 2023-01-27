@@ -17,10 +17,7 @@
 
 	let addFormDiv: HTMLElement;
 
-	$: formHeight = (function () {
-		if (!addFormDiv || !$showAddForm) return '0';
-		return `${addFormDiv.scrollHeight}px`;
-	})();
+	$: formHeight = !addFormDiv || !$showAddForm ? '0' : `${addFormDiv.scrollHeight}px`;
 
 	const dispatch = createEventDispatcher();
 
@@ -29,7 +26,7 @@
 
 		const methodData = JSON.stringify({
 			name,
-			slug: slugify(name),
+			slug: slugify(name, { lower: true }),
 			rpdLimit,
 			active: true,
 			calibrationCount,

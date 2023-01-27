@@ -1,11 +1,12 @@
 import { getMethodList } from '$lib/methods';
+import { methods } from '$lib/stores';
 import type { PageLoad } from './$types';
 
 export const load = (async () => {
   const methodList = await getMethodList('name');
+  methods.set(methodList);
   return {
-    title: "Edit Data Processing parameters",
-    methodList
+    title: "Edit Stuff",
   };
 }) satisfies PageLoad;
 

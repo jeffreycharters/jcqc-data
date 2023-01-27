@@ -1,14 +1,28 @@
 <script lang="ts">
-	import { elements } from '$lib/stores';
+	import type { Analyte } from '$lib/classes';
+	import type { ElementsResponse } from '$lib/pocketbase-types';
 	import type { PageData } from './$types';
 	import AddElementForm from './AddElementForm.svelte';
 	import Element from './Element.svelte';
 
 	export let data: PageData;
-	elements.set(data.elementList);
+	let { elementList } = data;
 
-	$: retiredElements = $elements.filter((e) => e.retired);
-	$: unretiredElements = $elements.filter((e) => !e.retired);
+	$: activeElements = elementList.filter((element) => element.active);
+	$: inactiveElements = elementList.filter((element) => !element.active);
+
+	const toggleActive = (elementId: string, newState: boolean) => {
+		const element = elementList.find((element) => element.id === elementId);
+		if (!element) return;
+		element.active = newState;
+		elementList = elementList;
+	};
+
+	const addElement = (newElement: ElementsResponse) => {
+		elementList.push(newElement);
+		elementList.sort((a, b) => (a.mass < b.mass ? -1 : 1));
+		elementList = elementList;
+	};
 </script>
 
 <h1 class="my-4">Available Elements</h1>
@@ -19,14 +33,20 @@
 </p>
 
 <div class="grid grid-cols-5 gap-4">
-	{#each unretiredElements as element (element.id)}
-		<Element {element} />
+	{#each activeElements as element (element.id)}
+		<Element
+			{element}
+			on:toggleActive={(event) => toggleActive(event.detail.id, event.detail.state)}
+		/>
 	{/each}
 
-	{#each retiredElements as element (element.id)}
-		<Element {element} />
+	{#each inactiveElements as element (element.id)}
+		<Element
+			{element}
+			on:toggleActive={(event) => toggleActive(event.detail.id, event.detail.state)}
+		/>
 	{/each}
 	<div class="col-span-3 row-span-2">
-		<AddElementForm />
+		<AddElementForm on:addElement={(event) => addElement(event.detail)} />
 	</div>
 </div>

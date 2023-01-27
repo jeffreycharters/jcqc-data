@@ -2,35 +2,34 @@
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import type { ElementsResponse } from '$lib/pocketbase-types';
-	import { elements } from '$lib//stores';
 	import { pb } from '$lib/pocketbase';
+	import { createEventDispatcher } from 'svelte';
 
 	let name: string;
 	let symbol: string;
 	let mass: number;
 	let formError = '';
 
+	const dispatch = createEventDispatcher();
+
 	const addElement = async () => {
 		if (!name || !symbol || !mass) formError = 'Please complete all fields.';
 		const data = JSON.stringify({
 			name,
 			symbol,
-			mass
+			mass,
+			active: true
 		});
 		try {
 			const newElement: ElementsResponse = await pb.collection('elements').create(data);
-			elements.update((n) => {
-				const newList = [...n, newElement];
-				newList.sort((a, b) => (a.mass < b.mass ? -1 : 1));
-				return newList;
-			});
-			name = '';
-			symbol = '';
-			mass = 0;
+			dispatch('addElement', newElement);
 		} catch (err) {
 			const error = err as Error;
-			console.log(error);
+			return console.log(error);
 		}
+		name = '';
+		symbol = '';
+		mass = 0;
 	};
 </script>
 
@@ -42,7 +41,7 @@
 		<TextInput name="symbol" label="Chemical Symbol" bind:value={symbol} placeholder="e.g. Fe" />
 		<div class="flex items-end justify-between max-w-xs gap-4">
 			<NumberInput name="mass" label="Isotope Mass" bind:value={mass} placeholder="e.g. 57" />
-			<button type="submit" class="btn h-fit mb-2">Add Element</button>
+			<button type="submit" class="btn h-fit mb-2">Add</button>
 		</div>
 		{#if formError}
 			<div class="text-red-600 text-sm italic ml-2">{formError}</div>

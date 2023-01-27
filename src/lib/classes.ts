@@ -1,6 +1,14 @@
+import { element } from "svelte/internal";
 import { createBlank, getBlanksByMethodId, updateMethodBlankList } from "./blanks";
 import { pb } from "./pocketbase";
-import type { MethodsResponse } from "./pocketbase-types";
+import type { ElementsResponse, MethodsResponse } from "./pocketbase-types";
+
+export type Analyte = {
+    id: string
+    mass: number
+    name: string
+    symbol: string
+}
 
 export class Method {
     active?: boolean
@@ -11,6 +19,7 @@ export class Method {
     name?: string;
     rpdLimit?: number
     slug?: string
+    elements?: Analyte[]
 
     constructor(
         public id: string | undefined
@@ -34,37 +43,54 @@ export class Method {
         for (const [key, value] of Object.entries(options)) {
             if (value) expandList.push(key);
         }
-
         let expandString = '';
         if (expandList.length > 0) {
-            expandString = expandList.join(', ');
+            expandString = expandList.join(',');
         }
 
         const methodsResponse: MethodsResponse = await pb.collection('methods').getOne(this.id, { expand: expandString });
         if (!methodsResponse) throw new Error('Method not found in database');
         this.setPropertiesFromMethodsResponse(methodsResponse);
 
-        if (options.elements) {
-            console.log('loading elements!');
-        }
-        if (options.blanks) {
-            console.log('loading blanks!');
-        }
-        if (options.referenceMaterials) {
-            console.log('loading reference materials!');
-        }
-        console.log(methodsResponse);
+        if (options.elements) this.populateElements(methodsResponse.expand?.elements);
+        if (options.blanks) this.populateBlankMap();
+        if (options.referenceMaterials) this.populateReferenceMaterialMap();
 
     }
 
     async updateProperties(props: Record<string, string | number | undefined>) {
-        console.log(props);
         const updateData = JSON.stringify(props);
         if (!this.id) throw new Error('Method not in database')
         const updatedMethod: MethodsResponse = await pb.collection('methods').update(this.id, updateData);
         if (!updatedMethod) throw new Error('Error updating database')
         this.setPropertiesFromMethodsResponse(updatedMethod);
     }
+
+    private populateElements(elements: ElementsResponse[]) {
+        console.log('populating elementMap!'); // TODO
+        if (!element || elements.length === 0) return [];
+
+        const activeElements = elements.filter(element => element.active)
+        this.elements = activeElements.map(element => {
+            return { id: element.id, name: element.name, mass: element.mass, symbol: element.symbol }
+        });
+        console.log(this.elements);
+
+    }
+
+    private populateBlankMap() {
+        console.log('populating blankMap'); // TODO
+    }
+
+    private populateReferenceMaterialMap() {
+        console.log('populating referenceMaterialMap'); // TODO
+
+    }
+    async addElement(elementId: string) {
+
+    }
+
+
 }
 
 export class Blank {

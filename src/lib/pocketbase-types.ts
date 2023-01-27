@@ -4,12 +4,10 @@
 
 export enum Collections {
 	Blanks = "blanks",
+	DetectionLimits = "detectionLimits",
 	Elements = "elements",
-	Loqs = "loqs",
-	MethodElements = "methodElements",
-	MethodReferenceMaterials = "methodReferenceMaterials",
 	Methods = "methods",
-	ReferenceMaterialElements = "referenceMaterialElements",
+	ReferenceMaterialRanges = "referenceMaterialRanges",
 	ReferenceMaterials = "referenceMaterials",
 	Users = "users",
 }
@@ -39,34 +37,19 @@ export type AuthSystemFields = {
 
 export type BlanksRecord = {
 	name: string
-	loqs?: RecordIdString
+	detectionLimits?: RecordIdString
+}
+
+export type DetectionLimitsRecord = {
+	mdl?: number
+	loq?: string
+	element: RecordIdString
 }
 
 export type ElementsRecord = {
 	name: string
 	symbol: string
 	mass: number
-	retired?: boolean
-}
-
-export type LoqsRecord = {
-	method: RecordIdString
-	loq?: number
-	element: RecordIdString
-	mdl?: number
-}
-
-export type MethodElementsRecord = {
-	method: RecordIdString
-	element: RecordIdString
-	active?: boolean
-	units?: string
-	checkStandard?: number
-}
-
-export type MethodReferenceMaterialsRecord = {
-	method: RecordIdString
-	referenceMaterial: RecordIdString
 	active?: boolean
 }
 
@@ -74,19 +57,22 @@ export type MethodsRecord = {
 	name: string
 	rpdLimit?: number
 	active?: boolean
-	calibrationCount: number
+	calibrationCount?: number
 	description?: string
 	checkStandardName?: string
-	checkStandardLimit?: number
 	elements?: RecordIdString
 	blanks?: RecordIdString
+	referenceMaterials?: RecordIdString
+	slug: string
+	field?: string
+	checkStandardTolerance?: number
 }
 
-export type ReferenceMaterialElementsRecord = {
-	methodReferenceMaterial: RecordIdString
+export type ReferenceMaterialRangesRecord = {
+	lower?: number
+	upper?: number
 	element: RecordIdString
-	upperBound?: number
-	lowerBound?: number
+	method: RecordIdString
 }
 
 export type ReferenceMaterialsRecord = {
@@ -101,23 +87,19 @@ export type UsersRecord = {
 
 // Response types include system fields and match responses from the PocketBase API
 export type BlanksResponse = BlanksRecord & BaseSystemFields
+export type DetectionLimitsResponse = DetectionLimitsRecord & BaseSystemFields
 export type ElementsResponse = ElementsRecord & BaseSystemFields
-export type LoqsResponse = LoqsRecord & BaseSystemFields
-export type MethodElementsResponse = MethodElementsRecord & BaseSystemFields
-export type MethodReferenceMaterialsResponse = MethodReferenceMaterialsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
-export type ReferenceMaterialElementsResponse = ReferenceMaterialElementsRecord & BaseSystemFields
+export type ReferenceMaterialRangesResponse = ReferenceMaterialRangesRecord & BaseSystemFields
 export type ReferenceMaterialsResponse = ReferenceMaterialsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 
 export type CollectionRecords = {
 	blanks: BlanksRecord
+	detectionLimits: DetectionLimitsRecord
 	elements: ElementsRecord
-	loqs: LoqsRecord
-	methodElements: MethodElementsRecord
-	methodReferenceMaterials: MethodReferenceMaterialsRecord
 	methods: MethodsRecord
-	referenceMaterialElements: ReferenceMaterialElementsRecord
+	referenceMaterialRanges: ReferenceMaterialRangesRecord
 	referenceMaterials: ReferenceMaterialsRecord
 	users: UsersRecord
 }

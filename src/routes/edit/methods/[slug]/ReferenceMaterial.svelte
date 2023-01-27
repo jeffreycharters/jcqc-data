@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { page } from '$app/stores';
 	import {
 		getMethodReferenceMaterialByMethodAndMaterial,
@@ -65,4 +65,4 @@
 	.inactive-element {
 		@apply border border-gray-300 rounded shadow py-2 px-4 flex items-center justify-start text-gray-400;
 	}
-</style>
+</style> -->

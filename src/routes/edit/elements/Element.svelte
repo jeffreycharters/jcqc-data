@@ -3,13 +3,15 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { ElementsResponse } from '$lib/pocketbase-types';
-	import { elements } from '$lib/stores';
+	import { createEventDispatcher } from 'svelte';
 	import { fade } from 'svelte/transition';
 
 	export let element: ElementsResponse;
 	let { name, symbol, mass } = element;
 
 	let formMessage: string;
+
+	const dispatch = createEventDispatcher();
 
 	const addFormMessage = (message: string, timeout: number = 2000) => {
 		formMessage = message;
@@ -24,7 +26,7 @@
 
 	let editing = false;
 
-	let divClass = element.retired ? 'inactive-element' : 'active-element';
+	$: divClass = element.active ? 'active-element' : 'inactive-element';
 
 	async function saveChanges() {
 		if (!name || !symbol || !mass) {
@@ -34,30 +36,17 @@
 		const updatedElement: ElementsResponse = await pb
 			.collection('elements')
 			.update(element.id, JSON.stringify(data));
-		elements.update((n) => {
-			let listElement = n.find((e) => e.id === updatedElement.id);
-			if (!listElement) return n;
-			listElement.mass = mass;
-			listElement.symbol = symbol;
-			listElement.name = name;
-			return n;
-		});
 		editing = false;
 		addFormMessage('Saved!');
 	}
 
-	const toggleElementRetired = async () => {
+	const toggleElementActive = async () => {
 		const data = JSON.stringify({
-			retired: !element.retired
+			active: !element.active
 		});
 		const updatedElement = await pb.collection('elements').update(element.id, data);
-		elements.update((n) => {
-			const selectedElement = n.find((e) => e.id === updatedElement.id);
-			if (selectedElement) {
-				selectedElement.retired = updatedElement.retired;
-			}
-			return n;
-		});
+		element.active = updatedElement.active;
+		dispatch('toggleActive', { id: updatedElement.id, state: updatedElement.active });
 	};
 </script>
 
@@ -81,13 +70,13 @@
 	{:else}
 		<div class="flex flex-col">
 			<div>
-				<sup>{element.mass}</sup>{element.symbol}
+				<sup>{mass}</sup>{symbol}
 			</div>
-			<button class="inactivate-button" on:click={toggleElementRetired}
-				>{element.retired ? 'Activate' : 'Inactivate'}</button
+			<button class="inactivate-button" on:click={toggleElementActive}
+				>{element.active ? 'Inactivate' : 'Activate'}</button
 			>
 		</div>
-		{#if element.retired}
+		{#if !element.active}
 			<div class="w-12" />
 		{:else}
 			<div>

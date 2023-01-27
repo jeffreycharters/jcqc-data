@@ -5,7 +5,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { pb } from '$lib/pocketbase';
 	import type { MethodsResponse } from '$lib/pocketbase-types';
-	import { loqs, methodReferenceMaterials, methods } from '$lib/stores';
+	import { method } from '$lib/stores';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
@@ -15,9 +15,7 @@
 	import { flip } from 'svelte/animate';
 
 	export let data: PageData;
-	let { method } = data;
-
-	// let { methodElements } = data;
+	const { elementList } = data;
 
 	const [send, receive] = crossfade({
 		duration: (d) => Math.sqrt(d * 200),
@@ -53,18 +51,18 @@
 	};
 
 	const editMethod = async () => {
-		if (!method.name || !method.calibrationCount) {
+		if (!$method.name || !$method.calibrationCount) {
 			addFormMessage('Missing something');
 			return;
 		}
 		try {
-			method.updateProperties({
-				name: method.name,
-				calibrationCount: method.calibrationCount,
-				description: method.description,
-				checkStandardTolerance: method.checkStandardTolerance,
-				checkStandardName: method.checkStandardName,
-				rpdLimit: method.rpdLimit
+			$method.updateProperties({
+				name: $method.name,
+				calibrationCount: $method.calibrationCount,
+				description: $method.description,
+				checkStandardTolerance: $method.checkStandardTolerance,
+				checkStandardName: $method.checkStandardName,
+				rpdLimit: $method.rpdLimit
 			});
 			addFormMessage('Saved');
 		} catch (err) {
@@ -98,7 +96,7 @@
 </script>
 
 <h1>
-	{method.name}{#if method.description}: {method.description}{/if}
+	{$method.name}{#if $method.description}: {$method.description}{/if}
 </h1>
 
 <div>
@@ -109,37 +107,37 @@
 				<TextInput
 					name="name"
 					placeholder="e.g. TOXI-064 or Serum Iodine"
-					bind:value={method.name}
+					bind:value={$method.name}
 					label="Method Name"
 				/>
 				<TextInput
 					name="description"
 					placeholder="e.g. Metals in serum"
-					bind:value={method.description}
+					bind:value={$method.description}
 					label="Method Description"
 				/>
 				<NumberInput
 					name="cal-count"
 					label="Number of non-blank calibration standards"
-					bind:value={method.calibrationCount}
+					bind:value={$method.calibrationCount}
 					placeholder="e.g. 6"
 				/>
 				<NumberInput
 					name="rpd-limit"
 					label="RPD Warning limit (%)"
-					bind:value={method.rpdLimit}
+					bind:value={$method.rpdLimit}
 					placeholder="e.g. 15"
 				/>
 				<TextInput
 					name="check-standard-name"
 					label="Check Standard Name"
-					bind:value={method.checkStandardName}
+					bind:value={$method.checkStandardName}
 					placeholder="e.g. Calibration Check"
 				/>
 				<NumberInput
 					name="check-standard-limit"
 					label="Check Standard Tolerance (%)"
-					bind:value={method.checkStandardTolerance}
+					bind:value={$method.checkStandardTolerance}
 					placeholder="e.g. 15"
 				/>
 				<div>
@@ -168,7 +166,18 @@
 		</div>
 
 		<div class="grid grid-cols-8 gap-4">
-			<!-- {#each methodElements.filter((me) => me.active) as element (element.id)}
+			{#each elementList as element (element.id)}
+				{@const active = false}
+				<div
+					class={active ? 'col-span-2' : ''}
+					in:receive|local={{ key: element.id }}
+					out:send|local={{ key: element.id }}
+					animate:flip={{ duration: 150 }}
+				>
+					<MethodElement {element} {active} on:toggleElement={() => console.log('toggler')} />
+				</div>
+			{/each}
+			<!-- #each methodElements.filter((me) => me.active) as element (element.id)}
 				<div
 					class={element.active ? 'col-span-2' : ''}
 					in:receive|local={{ key: element.id }}
