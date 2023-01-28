@@ -1,56 +1,60 @@
 <script lang="ts">
-	import { Blank } from '$lib/classes';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { method } from '$lib/stores';
+	import Blank from '../../BlankList.svelte';
 
 	let newBlankName = 'testor';
 	let blankMessage = '';
-	export let blank: Blank | undefined = undefined;
 
 	const createNewBlank = async () => {
-		if (blank != undefined) return console.log('Error creating new blank!');
-
 		if (!newBlankName) {
 			blankMessage = 'Please add a blank name';
 			return;
 		}
-		blank = new Blank(undefined, $method.id);
 		try {
-			await blank.createNew(newBlankName);
+			await $method.createNewBlank(newBlankName);
+			$method = $method;
 		} catch (err) {
 			const error = err as Error;
 			blankMessage = error.message;
 			return;
 		}
 
-		newBlankName = '';
-		blank = undefined;
+		// newBlankName = '';
 	};
 </script>
 
-<div class="basic-border py-4 px-8 mt-4 w-fit">
+<div class="basic-border py-4 px-8 mt-4">
 	<h2>Blanks and Detection Limits/LOQs</h2>
 
-	<div class="basic-border p-4">
-		<h3>Add New Blank Type</h3>
-		<form>
-			<TextInput
-				label="Blank Name"
-				placeholder="e.g. Method Blank"
-				name="blank-name"
-				bind:value={newBlankName}
-			/>
+	<div class="flex flex-col gap-4">
+		{#if $method.blanks && $method.blanks?.size > 0}
+			{#each Array.from($method.blanks).sort() as [_, blank] (blank.id)}
+				<Blank {blank} />
+			{/each}
+		{/if}
 
-			<div class="flex gap-2 items-start">
-				<input
-					type="submit"
-					value="+Add"
-					class="btn font-semibold w-24"
-					on:click|preventDefault={createNewBlank}
+		<div class="basic-border p-4">
+			<h3>Add New Blank Type</h3>
+			<form>
+				<TextInput
+					label="Blank Name"
+					placeholder="e.g. Method Blank"
+					name="blank-name"
+					bind:value={newBlankName}
 				/>
-				<div class="text-sm text-red-500">{blankMessage ?? ''}</div>
-			</div>
-		</form>
+
+				<div class="flex gap-2 items-start">
+					<input
+						type="submit"
+						value="+Add"
+						class="btn font-semibold w-24"
+						on:click|preventDefault={createNewBlank}
+					/>
+					<div class="text-sm text-red-500">{blankMessage ?? ''}</div>
+				</div>
+			</form>
+		</div>
 	</div>
 </div>
 
@@ -74,7 +78,6 @@
 				const newLoq = await createElementLoq($method.id, loq.elementId, loq.value);
 				const storeIndex = $loqs.findIndex((l) => l.id === loq.id);
 				$loqs[storeIndex].id = newLoq.id;
-				$loqs[storeIndex].value = loq.value ?? undefined;
 				$loqs[storeIndex].inDb = true;
 			}
 		});

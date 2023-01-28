@@ -38,13 +38,13 @@ export type AuthSystemFields = {
 
 export type BlanksRecord = {
 	name: string
-	detectionLimits?: RecordIdString
+	detectionLimits?: RecordIdString[]
 }
 
 export type DetectionLimitsRecord = {
 	mdl?: number
-	loq?: string
 	element: RecordIdString
+	loq?: number
 }
 
 export type ElementsRecord = {

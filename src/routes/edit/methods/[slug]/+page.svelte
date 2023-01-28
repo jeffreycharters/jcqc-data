@@ -19,8 +19,8 @@
 	export let data: PageData;
 	let { elementList } = data;
 
-	let usedElements = $method.elements ?? [];
-	let unusedElements = elementList?.filter(
+	$: usedElements = $method.elements ?? [];
+	$: unusedElements = elementList?.filter(
 		(element) => !usedElements.map((e) => e.id).includes(element.id)
 	);
 
@@ -72,15 +72,12 @@
 
 	const addElement = async (elementId: string) => {
 		await $method.addElement(elementId);
-		unusedElements = unusedElements.filter((element) => element.id != elementId);
-		usedElements = $method.elements ?? [];
+		$method = $method;
 	};
 
 	const removeElement = async (element: Analyte) => {
 		await $method.removeElement(element);
-		usedElements = $method.elements ?? [];
-		const removedElement: ElementsResponse = await pb.collection('elements').getOne(element.id);
-		unusedElements = [...unusedElements, removedElement];
+		$method = $method;
 	};
 </script>
 
@@ -178,9 +175,9 @@
 		</div>
 	</div>
 
-	<!--
 	<LOQs />
 
+	<!--
 	<div class="basic-border my-4 py-4 px-6 w-full max-w-screen-xl">
 		<h2 class="mb-4">Reference Materials</h2>
 

@@ -4,6 +4,7 @@ import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import { getElementList } from '$lib/elements';
 import { method } from '$lib/stores';
+import { pb } from '$lib/pocketbase';
 
 
 export const load = (async ({ params }) => {
@@ -16,74 +17,10 @@ export const load = (async ({ params }) => {
     await currentMethod.init({ blanks: true, elements: true, referenceMaterials: true });
     method.set(currentMethod)
 
-    const elementList = await getElementList();
-
-    // const { allElementsList } = await getElementsByMethod(method.id);
-
-    // const allReferenceMaterials = await getallReferenceMaterials();
-    // const methodReferenceMaterials = await getMethodReferenceMaterialsByMethodId(method.id);
-
-    // const methodReferenceMaterialsList: BasicReferenceMaterial[] = allReferenceMaterials.map(rm => {
-    //     const thisReferenceMaterial = methodReferenceMaterials.find(mrm => mrm.referenceMaterial === rm.id);
-    //     return {
-    //         id: rm.id,
-    //         name: rm.name,
-    //         active: !!thisReferenceMaterial?.active,
-    //     };
-    // });
-
-
-    // const loqList = await getLoqsByMethodId(method.id);
-
-    // const elementList = await getElementList();
-
-    // const methodElements: MethodElement[] = elementList.map(e => {
-    //     const inDbElement = allElementsList.find(anElement => anElement.element === e.id);
-
-    //     const activeElements = allElementsList.filter(element => element.active);
-    //     const activeElement = activeElements.find(active => active.element === e.id);
-    //     return {
-    //         id: inDbElement?.id ?? Math.random().toString(),
-    //         symbol: e.symbol,
-    //         mass: e.mass,
-    //         active: !!activeElement?.active,
-    //         inDb: !!inDbElement,
-    //         elementId: e.id,
-    //         units: inDbElement?.units ?? 'ppb',
-    //         checkStd: inDbElement?.checkStandard
-    //     }
-    // })
-
-    // methodElements.sort((a, b) => a.mass < b.mass ? 1 : -1);
-    // methodElements.sort((a, b) => a.active < b.active ? -1 : 1);
-
-    // const loqArray: DetectionLimit[] = elementList.map(e => {
-    //     const loq = loqList.find(loq => loq.element === e.id);
-
-    //     const activeElements = methodElements.filter(me => me.active);
-    //     const currentMethodElement = activeElements.find(me => me.elementId === e.id);
-
-    //     return {
-    //         id: loq?.id ?? Math.random().toString(),
-    //         symbol: e.symbol,
-    //         mass: e.mass,
-    //         inDb: !!loq,
-    //         value: loq && loq?.loq && loq.loq > 0 ? loq?.loq : undefined,
-    //         units: currentMethodElement?.units ?? 'ppm',
-    //         visible: !!currentMethodElement,
-    //         elementId: e.id,
-    //         methodId: method?.id ?? Math.random().toString()
-    //     }
-    // })
-
-
+    const elementList = await pb.collection('elements').getFullList(undefined, { filter: 'active = true' });
 
     return {
         title: `${currentMethod.name}${currentMethod.description ? `: ${currentMethod.description}` : ''}`,
         elementList,
-        // loqArray,
-        // loqList,
-        // methodElements,
-        // methodReferenceMaterialsList
     }
 }) satisfies PageLoad;

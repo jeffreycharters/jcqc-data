@@ -15,12 +15,14 @@
 	const removeElement = async () => {
 		if (!element || !element.id) return;
 		dispatch('removeElement', element);
+		$method = $method;
 	};
 
 	const setUnits = async (newUnits: Units) => {
 		const updatedUnits = await $method.updateElementUnits(element.unitsId, newUnits);
 		element.units = updatedUnits.units;
 		dispatch('setMethodElementUnits', newUnits);
+		$method.elements = $method.elements;
 	};
 
 	function debounce(callback: () => void, timeout = 300) {
