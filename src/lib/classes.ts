@@ -121,6 +121,26 @@ export class Method {
 
     }
 
+    async removeElement(element: Analyte) {
+        if (!element.id || !this.id) throw new Error('Element or method not in database')
+        console.log('removing', element.unitsId);
+
+        const deletedUnits = await pb.collection('units').delete(element.unitsId);
+        if (!deletedUnits === null) throw new Error('Error deleting units');
+
+        const methodElements = this.elementIdList()?.filter(e => e != element.id)
+        const methodUpdateData = JSON.stringify({
+            elements: methodElements,
+        })
+        const updatedMethod = await pb.collection('methods').update(this.id, methodUpdateData);
+        if (!updatedMethod) throw new Error('error updating database method');
+
+        console.log('ok');
+
+
+        this.elements = this.elements?.filter(e => e.id != element.id);
+    }
+
     convertElementToAnalyte = (element: ElementsResponse, units: UnitsResponse): Analyte => {
         return {
             id: element.id,

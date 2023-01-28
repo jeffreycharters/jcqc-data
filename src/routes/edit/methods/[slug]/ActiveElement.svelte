@@ -12,7 +12,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	const addElement = async () => {
+	const removeElement = async () => {
 		if (!element || !element.id) return;
 		dispatch('removeElement', element);
 	};
@@ -50,7 +50,7 @@
 	<div class="active-element relative h-full">
 		<div class="flex flex-col h-full items-center">
 			<ElementWithMass symbol={element.symbol} mass={element.mass} />
-			<button class="inactivate-button" on:click={addElement}>Remove</button>
+			<button class="inactivate-button" on:click={removeElement}>Remove</button>
 		</div>
 
 		<div class="flex flex-col gap-2 items-end">

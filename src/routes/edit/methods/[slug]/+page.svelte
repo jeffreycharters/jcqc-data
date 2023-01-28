@@ -4,7 +4,7 @@
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { pb } from '$lib/pocketbase';
-	import type { MethodsResponse } from '$lib/pocketbase-types';
+	import type { ElementsResponse, MethodsResponse } from '$lib/pocketbase-types';
 	import { method } from '$lib/stores';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
@@ -20,8 +20,8 @@
 	let { elementList } = data;
 
 	let usedElements = $method.elements ?? [];
-	$: unusedElements = elementList?.filter(
-		(element) => !$method.elementIdList().includes(element.id)
+	let unusedElements = elementList?.filter(
+		(element) => !usedElements.map((e) => e.id).includes(element.id)
 	);
 
 	const [send, receive] = crossfade({
@@ -72,12 +72,15 @@
 
 	const addElement = async (elementId: string) => {
 		await $method.addElement(elementId);
+		unusedElements = unusedElements.filter((element) => element.id != elementId);
 		usedElements = $method.elements ?? [];
-		elementList = elementList.filter((element) => element.id != elementId);
 	};
 
 	const removeElement = async (element: Analyte) => {
-		console.log('removin');
+		await $method.removeElement(element);
+		usedElements = $method.elements ?? [];
+		const removedElement: ElementsResponse = await pb.collection('elements').getOne(element.id);
+		unusedElements = [...unusedElements, removedElement];
 	};
 </script>
 
@@ -152,7 +155,7 @@
 		</div>
 
 		<div class="grid grid-cols-8 gap-4">
-			{#each usedElements as element (element.id)}
+			{#each usedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
 				<div
 					class="col-span-2"
 					in:receive|local={{ key: element.id }}
@@ -163,7 +166,7 @@
 				</div>
 			{/each}
 
-			{#each unusedElements as element (element.id)}
+			{#each unusedElements.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
 				<div
 					in:receive|local={{ key: element.id }}
 					out:send|local={{ key: element.id }}
