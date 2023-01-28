@@ -9,15 +9,17 @@
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
-	import MethodElement from './MethodElement.svelte';
 	import { quintOut } from 'svelte/easing';
 	import { crossfade, fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+	import ActiveElement from './ActiveElement.svelte';
+	import InactiveElement from './InactiveElement.svelte';
+	import type { Analyte } from '$lib/classes';
 
 	export let data: PageData;
-	const { elementList } = data;
+	let { elementList } = data;
 
-	$: usedElements = $method.elements ?? [];
+	let usedElements = $method.elements ?? [];
 	$: unusedElements = elementList?.filter(
 		(element) => !$method.elementIdList().includes(element.id)
 	);
@@ -41,14 +43,6 @@
 	});
 
 	let formMessage = '';
-
-	// $loqs = data.loqArray;
-	// $method = data.method;
-	// $methodReferenceMaterials = data.methodReferenceMaterialsList;
-	// if (!$method && browser) goto('/edit/methods', { invalidateAll: true, replaceState: true });
-
-	// let { name, description, calibrationCount, rpdLimit, checkStandardLimit, checkStandardName } =
-	// 	data.method || undefined;
 
 	const addFormMessage = (message: string, timeout: number = 3000) => {
 		formMessage = message;
@@ -76,23 +70,14 @@
 		}
 	};
 
-	// const getLoqIndexByElementId = (elementId: string) => {
-	// 	return $loqs.findIndex((loq) => loq.elementId === elementId && loq.methodId === $method.id);
-	// };
+	const addElement = async (elementId: string) => {
+		await $method.addElement(elementId);
+		usedElements = $method.elements ?? [];
+		elementList = elementList.filter((element) => element.id != elementId);
+	};
 
-	const addElement = async (element: MethodElement) => {
-		$method.addElement(element.id);
-		// 	const loqIndex = getLoqIndexByElementId(thisElement.elementId);
-		// 	$loqs[loqIndex].visible = thisElement.active;
-		// 	methodElements.sort((a, b) => (a.mass < b.mass ? -1 : 1));
-		// 	methodElements = methodElements.sort((a, b) => (a.active < b.active ? 1 : -1));
-		// };
-
-		// const setMethodElementUnitsById = (elementId: string, newUnits: string) => {
-		// 	const methodElement = methodElements.find((element) => element.id === elementId);
-		// 	if (!methodElement) return;
-		// 	const loqIndex = getLoqIndexByElementId(methodElement.elementId);
-		// $loqs[loqIndex].units = newUnits;
+	const removeElement = async (element: Analyte) => {
+		console.log('removin');
 	};
 </script>
 
@@ -161,37 +146,30 @@
 		<div class="flex justify-between items-baseline">
 			<h2 class="mb-4">
 				Elements used by this method
-				<!-- <span class="text-gray-400">[{methodElements.filter((me) => me.active)?.length}]</span> -->
+				<span class="text-gray-400">[{usedElements?.length}]</span>
 			</h2>
 			<div class="text-gray-500">Changes in this box are saved as soon as they are made.</div>
 		</div>
 
 		<div class="grid grid-cols-8 gap-4">
 			{#each usedElements as element (element.id)}
-				{@const active = true}
 				<div
-					class={active ? 'col-span-2' : ''}
+					class="col-span-2"
 					in:receive|local={{ key: element.id }}
 					out:send|local={{ key: element.id }}
 					animate:flip={{ duration: 150 }}
 				>
-					<MethodElement {element} {active} on:addElement={(event) => addElement(event.detail)} />
+					<ActiveElement {element} on:removeElement={(event) => removeElement(event.detail)} />
 				</div>
 			{/each}
+
 			{#each unusedElements as element (element.id)}
-				{@const active = false}
 				<div
-					class={active ? 'col-span-2' : ''}
 					in:receive|local={{ key: element.id }}
 					out:send|local={{ key: element.id }}
 					animate:flip={{ duration: 150 }}
 				>
-					<MethodElement
-						{element}
-						{active}
-						on:toggleElement={(event) => console.log('remove element!')}
-						on:setMethodElementUnits={(event) => console.log('swiiiitch')}
-					/>
+					<InactiveElement {element} on:addElement={(event) => addElement(event.detail)} />
 				</div>
 			{/each}
 		</div>

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Analyte } from '$lib/classes';
+	import ElementWithMass from '$lib/components/ElementWithMass.svelte';
+	import { method } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
-
 	export let element: Analyte;
-	export let active: boolean;
 
 	let formHasError = false;
 	$: errorClasses = formHasError
@@ -14,13 +14,12 @@
 
 	const addElement = async () => {
 		if (!element || !element.id) return;
-		dispatch('addElement', element);
+		dispatch('removeElement', element);
 	};
 
 	const setUnits = async (newUnits: Units) => {
-		// const updatedElement = await setMethodElementUnitsById(element.id, newUnits);
-		// if (!updatedElement) return; // error?
-		// element.units = updatedElement.units ?? 'ppm';
+		const updatedUnits = await $method.updateElementUnits(element.unitsId, newUnits);
+		element.units = updatedUnits.units;
 		dispatch('setMethodElementUnits', newUnits);
 	};
 
@@ -47,13 +46,13 @@
 	const processUpdate = () => debounce(() => updateCalCheck());
 </script>
 
-<div class="{active ? 'active-element' : 'inactive-element'} relative h-full">
-	<div class="flex flex-col h-full justify-between">
-		<div class="font-bold"><sup>{element.mass}</sup>{element.symbol}</div>
-		<button class="inactivate-button" on:click={addElement}>{active ? 'Remove' : 'Add'}</button>
-	</div>
+<div class="col-span-2">
+	<div class="active-element relative h-full">
+		<div class="flex flex-col h-full items-center">
+			<ElementWithMass symbol={element.symbol} mass={element.mass} />
+			<button class="inactivate-button" on:click={addElement}>Remove</button>
+		</div>
 
-	{#if active}
 		<div class="flex flex-col gap-2 items-end">
 			<div class="flex gap-1 items-baseline">
 				<button
@@ -69,15 +68,12 @@
 				>
 			</div>
 		</div>
-	{/if}
+	</div>
 </div>
 
 <style lang="postcss">
 	.active-element {
 		@apply border border-gray-800 rounded shadow py-2 px-4 flex items-center justify-around;
-	}
-	.inactive-element {
-		@apply border border-gray-300 rounded shadow py-2 px-4 flex items-center justify-around text-gray-400;
 	}
 	.active-units {
 		@apply border border-gray-800 shadow font-bold text-xs pt-0 pb-1 rounded px-2;

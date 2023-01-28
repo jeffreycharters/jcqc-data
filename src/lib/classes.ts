@@ -108,13 +108,34 @@ export class Method {
         const unitsList = [...this.unitsIdList(), newUnits.id];
         let elementList = [...this.elementIdList(), elementId];
 
-        console.log(unitsList, elementList);
-
         const elementsData = JSON.stringify({ elements: elementList, units: unitsList })
         const updatedMethod: MethodsResponse = await pb.collection('methods').update(this.id, elementsData);
 
-        if (!updatedMethod || !newUnits) throw new Error('Error adding element')
+        if (!updatedMethod || !newUnits) throw new Error('Error adding element');
 
+        const addedElement: ElementsResponse = await pb.collection('elements').getOne(elementId);
+        const addedAnalyte = this.convertElementToAnalyte(addedElement, newUnits);
+        if (!addedElement) throw new Error('Error retrieving element from database');
+
+        this.elements = this.elements && this.elements.length > 0 ? [...this.elements, addedAnalyte] : [addedAnalyte]
+
+    }
+
+    convertElementToAnalyte = (element: ElementsResponse, units: UnitsResponse): Analyte => {
+        return {
+            id: element.id,
+            mass: element.mass,
+            symbol: element.symbol,
+            name: element.name,
+            units: units.units,
+            unitsId: units.id
+        }
+    }
+
+    async updateElementUnits(unitsId: string, newUnits: string) {
+        const data = JSON.stringify({ units: newUnits })
+        const updatedUnits: UnitsResponse = await pb.collection('units').update(unitsId, data);
+        return updatedUnits;
     }
 
     elementIdList() {
