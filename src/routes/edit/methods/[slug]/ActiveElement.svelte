@@ -24,28 +24,6 @@
 		dispatch('setMethodElementUnits', newUnits);
 		$method.elements = $method.elements;
 	};
-
-	function debounce(callback: () => void, timeout = 300) {
-		let timer: NodeJS.Timer;
-		return (...args: any) => {
-			clearTimeout(timer);
-			timer = setTimeout(() => {
-				callback.apply(debounce, args);
-			}, timeout);
-		};
-	}
-
-	const updateCalCheck = async () => {
-		// if (isNaN(Number(checkStd))) {
-		// 	formHasError = true;
-		// 	return;
-		// }
-		// formHasError = false;
-		// const updatedElement = await setCalCheckValueByMethodelementId(element.id, Number(checkStd));
-		// if (updatedElement.checkStandard != checkStd) formHasError = true;
-	};
-
-	const processUpdate = () => debounce(() => updateCalCheck());
 </script>
 
 <div class="col-span-2">

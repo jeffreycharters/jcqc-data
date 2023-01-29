@@ -1,9 +1,9 @@
 <script lang="ts">
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { method } from '$lib/stores';
-	import Blank from '../../BlankList.svelte';
+	import BlankList from './BlankList.svelte';
 
-	let newBlankName = 'testor';
+	let newBlankName = '';
 	let blankMessage = '';
 
 	const createNewBlank = async () => {
@@ -20,7 +20,7 @@
 			return;
 		}
 
-		// newBlankName = '';
+		newBlankName = '';
 	};
 </script>
 
@@ -30,13 +30,13 @@
 	<div class="flex flex-col gap-4">
 		{#if $method.blanks && $method.blanks?.size > 0}
 			{#each Array.from($method.blanks).sort() as [_, blank] (blank.id)}
-				<Blank {blank} />
+				<BlankList {blank} />
 			{/each}
 		{/if}
 
-		<div class="basic-border p-4">
+		<div class="basic-border p-4 w-fit">
 			<h3>Add New Blank Type</h3>
-			<form>
+			<form class="w-48">
 				<TextInput
 					label="Blank Name"
 					placeholder="e.g. Method Blank"
@@ -44,14 +44,15 @@
 					bind:value={newBlankName}
 				/>
 
-				<div class="flex gap-2 items-start">
+				<div class="flex flex-col gap-2 items-start">
+					<div class="text-sm text-red-500">{blankMessage ?? ''}</div>
 					<input
 						type="submit"
 						value="+Add"
-						class="btn font-semibold w-24"
+						class="btn font-semibold w-full"
 						on:click|preventDefault={createNewBlank}
 					/>
-					<div class="text-sm text-red-500">{blankMessage ?? ''}</div>
+					// TODO: Make this collapsible
 				</div>
 			</form>
 		</div>

@@ -209,7 +209,7 @@ export class Method {
             detectionLimitsIds = [...detectionLimitsIds, newDetectionLimits.id];
         }
 
-        const updatedNewBlank: BlanksResponse = await pb.collection('blanks').update(newBlank.id, { "detectionLimits": detectionLimitsIds })
+        const updatedNewBlank: BlanksResponse = await pb.collection('blanks').update(newBlank.id, { "detectionLimits": detectionLimitsIds }, { expand: 'detectionLimits' })
         if (!updatedNewBlank) throw new Error('Error updating detection limit ids');
         this.blanks.set(updatedNewBlank.name, updatedNewBlank)
         return updatedNewBlank;
@@ -226,8 +226,10 @@ export class Method {
             const newDl: DetectionLimitsResponse = await pb.collection('detectionLimits').create(dlData);
             if (!newDl) throw new Error('Error saving detection limit');
             //    update list of detection limits
-            const updatedDls = JSON.stringify({ detectionLimits: [...blank.detectionLimits ?? [], newDl.id] })
-            const updatedBlank: BlanksResponse = await pb.collection('blanks').update(blank.id, updatedDls);
+            const dlIdList = blank.detectionLimits && blank.detectionLimits.length > 0 ? [...blank.detectionLimits, newDl.id] : [newDl.id];
+
+            const updatedDls = JSON.stringify({ detectionsLimits: dlIdList })
+            const updatedBlank: BlanksResponse = await pb.collection('blanks').update(blank.id, updatedDls, { expand: 'detectionLimits' });
             this.blanks?.set(updatedBlank.name, updatedBlank)
         }
     }
@@ -255,7 +257,6 @@ export class Method {
         if (!this.blanks?.has(blankName)) throw new Error('Error: could not find blank');
 
         const blank = this.blanks.get(blankName);
-        console.log(blank);
 
         const detectionLimits = blank?.detectionLimits;
 
@@ -266,14 +267,19 @@ export class Method {
         if (!deletedBlank) console.error(`Error deleting blank ${blank.name}`)
         if (detectionLimits) {
             for (const detectionLimit of detectionLimits) {
-                console.log(detectionLimit);
-
                 const deletedDl = await pb.collection('detectionLimits').delete(detectionLimit);
                 if (!deletedDl) console.error(`error deleting detection limit with id ${detectionLimit}`);
             };
         }
-
         this.blanks?.delete(blankName)
+    }
+
+    async updateDetectionLimits(detectionLimitsId: string, toUpdate: "mdl" | "loq", value: number) {
+        if (!detectionLimitsId) throw new Error('Error finding detection limit in database');
+        const dataObject: Record<string, number> = {};
+        dataObject[toUpdate] = value;
+        const updatedDetectionLimit: DetectionLimitsResponse = await pb.collection('detectionLimits').update(detectionLimitsId, JSON.stringify(dataObject));
+        if (!updatedDetectionLimit) throw new Error('Error updated detection limits');
     }
 
     elementIdList() {
@@ -289,6 +295,11 @@ export class Method {
             idList.push(blankRecord.id)
         }
         return idList
+    }
+
+    get title() {
+        if (!this.description) return this.name
+        return `${this.name}: ${this.description}`
     }
 
 

@@ -2,9 +2,9 @@ import { Method } from '$lib/classes';
 import { getMethodBySlug } from '$lib/methods';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
-import { getElementList } from '$lib/elements';
 import { method } from '$lib/stores';
 import { pb } from '$lib/pocketbase';
+import type { ElementsResponse } from '$lib/pocketbase-types';
 
 
 export const load = (async ({ params }) => {
@@ -17,10 +17,10 @@ export const load = (async ({ params }) => {
     await currentMethod.init({ blanks: true, elements: true, referenceMaterials: true });
     method.set(currentMethod)
 
-    const elementList = await pb.collection('elements').getFullList(undefined, { filter: 'active = true' });
+    const elementList: ElementsResponse[] = await pb.collection('elements').getFullList(undefined, { filter: 'active = true' });
 
     return {
-        title: `${currentMethod.name}${currentMethod.description ? `: ${currentMethod.description}` : ''}`,
+        title: currentMethod.title,
         elementList,
     }
 }) satisfies PageLoad;
