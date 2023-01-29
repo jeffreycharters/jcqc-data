@@ -227,9 +227,9 @@ export class Method {
             if (!newDl) throw new Error('Error saving detection limit');
             //    update list of detection limits
             const dlIdList = blank.detectionLimits && blank.detectionLimits.length > 0 ? [...blank.detectionLimits, newDl.id] : [newDl.id];
-
-            const updatedDls = JSON.stringify({ detectionsLimits: dlIdList })
+            const updatedDls = JSON.stringify({ detectionLimits: dlIdList })
             const updatedBlank: BlanksResponse = await pb.collection('blanks').update(blank.id, updatedDls, { expand: 'detectionLimits' });
+
             this.blanks?.set(updatedBlank.name, updatedBlank)
         }
     }

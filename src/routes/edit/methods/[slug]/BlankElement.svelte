@@ -13,8 +13,14 @@
 		$method.blanks?.get(blankName)?.expand?.detectionLimits;
 	const detectionLimits = allDetectionLimits?.find((dl) => dl.element === element.id) ?? undefined;
 
-	let mdl = detectionLimits?.mdl === 0 ? '- -' : detectionLimits?.mdl;
-	let loq = detectionLimits?.loq === 0 ? '- -' : detectionLimits?.loq;
+	let mdlBase = allDetectionLimits.find(
+		(detectionLimit: DetectionLimitsResponse) => detectionLimit.element === element.id
+	)?.mdl;
+	let mdl = !mdlBase || mdlBase === 0 ? '- -' : mdlBase;
+	let loqBase = allDetectionLimits.find(
+		(detectionLimit: DetectionLimitsResponse) => detectionLimit.element === element.id
+	)?.loq;
+	let loq = !loqBase || loqBase === 0 ? '- -' : loqBase;
 
 	function debounce(callback: () => void, timeout = 1000) {
 		let timer: NodeJS.Timer;
@@ -28,18 +34,6 @@
 	}
 
 	const updateCalCheck = async (toUpdate: 'mdl' | 'loq') => {
-		// verify input
-		if (toUpdate === 'mdl') {
-			if (isNaN(Number(mdl))) {
-				dispatch('updateStatus', 'Illegal character!');
-				return;
-			}
-		} else {
-			if (isNaN(Number(loq))) {
-				dispatch('updateStatus', 'Illegal character!');
-				return;
-			}
-		}
 		// update database
 		await $method.updateDetectionLimits(
 			detectionLimits?.id ?? '',
