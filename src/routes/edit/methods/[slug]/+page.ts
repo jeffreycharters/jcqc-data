@@ -14,7 +14,7 @@ export const load = (async ({ params }) => {
         throw redirect(302, '/edit');
     }
     const currentMethod = new Method(methodResponse.id);
-    await currentMethod.init({ blanks: true, elements: true, referenceMaterials: true });
+    await currentMethod.init({ blanks: true, elements: true, referenceMaterials: true, checkStandards: true });
     method.set(currentMethod)
 
     const elementList: ElementsResponse[] = await pb.collection('elements').getFullList(undefined, { filter: 'active = true' });

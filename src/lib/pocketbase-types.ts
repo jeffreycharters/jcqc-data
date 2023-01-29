@@ -4,6 +4,8 @@
 
 export enum Collections {
 	Blanks = "blanks",
+	CheckStandards = "checkStandards",
+	CheckValues = "checkValues",
 	DetectionLimits = "detectionLimits",
 	Elements = "elements",
 	Methods = "methods",
@@ -41,6 +43,16 @@ export type BlanksRecord = {
 	detectionLimits?: RecordIdString[]
 }
 
+export type CheckStandardsRecord = {
+	name: string
+	checkValues?: RecordIdString
+}
+
+export type CheckValuesRecord = {
+	element: RecordIdString
+	value?: number
+}
+
 export type DetectionLimitsRecord = {
 	mdl?: number
 	element: RecordIdString
@@ -60,13 +72,12 @@ export type MethodsRecord = {
 	active?: boolean
 	calibrationCount?: number
 	description?: string
-	checkStandardName?: string
 	elements?: RecordIdString
 	blanks?: RecordIdString
 	referenceMaterials?: RecordIdString
 	slug: string
-	checkStandardTolerance?: number
 	units?: RecordIdString
+	checkStandards?: RecordIdString
 }
 
 export type ReferenceMaterialRangesRecord = {
@@ -93,6 +104,8 @@ export type UsersRecord = {
 
 // Response types include system fields and match responses from the PocketBase API
 export type BlanksResponse = BlanksRecord & BaseSystemFields
+export type CheckStandardsResponse = CheckStandardsRecord & BaseSystemFields
+export type CheckValuesResponse = CheckValuesRecord & BaseSystemFields
 export type DetectionLimitsResponse = DetectionLimitsRecord & BaseSystemFields
 export type ElementsResponse = ElementsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
@@ -103,6 +116,8 @@ export type UsersResponse = UsersRecord & AuthSystemFields
 
 export type CollectionRecords = {
 	blanks: BlanksRecord
+	checkStandards: CheckStandardsRecord
+	checkValues: CheckValuesRecord
 	detectionLimits: DetectionLimitsRecord
 	elements: ElementsRecord
 	methods: MethodsRecord

@@ -15,6 +15,7 @@
 	import ActiveElement from './ActiveElement.svelte';
 	import InactiveElement from './InactiveElement.svelte';
 	import type { Analyte } from '$lib/classes';
+	import CheckStandards from './CheckStandards.svelte';
 
 	export let data: PageData;
 	let { elementList } = data;
@@ -174,6 +175,8 @@
 			{/each}
 		</div>
 	</div>
+
+	<!-- <CheckStandards /> -->
 
 	<LOQs />
 
