@@ -163,7 +163,7 @@ export class Method {
         if (!element.id || !this.id) throw new Error('Element or method not in database')
 
         const deletedUnits = await pb.collection('units').delete(element.unitsId);
-        if (!deletedUnits === null) throw new Error('Error deleting units');
+        if (!deletedUnits) throw new Error('Error deleting units');
 
         const methodElements = this.elementIdList()?.filter(e => e != element.id)
         const methodUpdateData = JSON.stringify({
@@ -174,6 +174,7 @@ export class Method {
         this.elements = this.elements?.filter(e => e.id != element.id);
 
         await this.removeDetectionLimitsFromBlanks(element.id);
+        await this.removeValuesFromCheckStandards(element.id);
 
     }
 
@@ -284,8 +285,6 @@ export class Method {
         if (!blanks || blanks.size === 0) return;
         // for each blank
         for (const blank of blanks.values()) {
-            console.log(blank.detectionLimits);
-
             const detectionLimits: DetectionLimitsResponse[] = blank.expand?.detectionLimits ?? []
             //    find the detection limits of interest
             const detectionLimit = detectionLimits.find(dl => dl.element === elementId);
@@ -295,6 +294,26 @@ export class Method {
             if (!deletedDetectionLimit) console.error('Error removing detection limit');
             blank.detectionLimits = blank.detectionLimits?.filter(dl => dl != detectionLimit.id)
             this.blanks?.set(blank.name, blank);
+
+        }
+    }
+
+    async removeValuesFromCheckStandards(elementId: string) {
+        console.log('removing');
+        // retrieve list of blanks
+        const checkStandards = this.checkStandards;
+        if (!checkStandards || checkStandards.size === 0) return;
+        // for each blank
+        for (const checkStandard of checkStandards.values()) {
+            const checkValues: CheckValuesResponse[] = checkStandard.expand?.checkValues ?? []
+            //    find the detection limits of interest
+            const checkValue = checkValues.find(value => value.element === elementId);
+            if (!checkValue) throw new Error('Detection Limit is missing!');
+            //    remove detection limit row
+            const deletedCheckValue = await pb.collection('checkValues').delete(checkValue.id);
+            if (!deletedCheckValue) console.error('Error removing check value');
+            checkStandard.checkValues = checkStandard.checkValues?.filter(cv => cv != checkValue.id)
+            this.blanks?.set(checkStandard.name, checkStandard);
 
         }
     }
@@ -328,10 +347,12 @@ export class Method {
         if (!this.checkStandards?.has(checkStandardName)) throw new Error('Error: could not find blank');
 
         const checkStandard = this.checkStandards.get(checkStandardName);
-
         if (!checkStandard) throw new Error('Could not find blank');
-        const deletedCheckStandard = await pb.collection('checkStandards').delete(checkStandard.id);
-        if (!deletedCheckStandard) throw new Error('Error deleting check standard')
+
+        for (const valueId of checkStandard?.checkValues ?? []) {
+            const deletedValue: boolean = await pb.collection('checkValues').delete(valueId);
+            if (!deletedValue) throw new Error('Error deleting checkValue')
+        }
         this.checkStandards?.delete(checkStandardName)
     }
 
@@ -387,11 +408,16 @@ export class Method {
             if (!newValue) throw new Error('Error adding detection limits');
             checkValuesIds = [...checkValuesIds, newValue.id];
         }
+        try {
+            const updatedNewCheckStandard: CheckStandardsResponse = await pb.collection('checkStandards').update(newCheckStandard.id, { "checkValues": checkValuesIds }, { expand: 'checkValues' })
+            if (!updatedNewCheckStandard) throw new Error('Error updating detection limit ids');
+            this.checkStandards.set(updatedNewCheckStandard.name, updatedNewCheckStandard)
+            return updatedNewCheckStandard;
+        } catch (err) {
+            const error = err as Error;
+            console.error(error.message);
 
-        const updatedNewCheckStandard: CheckStandardsResponse = await pb.collection('checkStandards').update(newCheckStandard.id, { "checkValues": checkValuesIds }, { expand: 'checkValues' })
-        if (!updatedNewCheckStandard) throw new Error('Error updating detection limit ids');
-        this.checkStandards.set(updatedNewCheckStandard.name, updatedNewCheckStandard)
-        return updatedNewCheckStandard;
+        }
     }
 
     elementIdList() {

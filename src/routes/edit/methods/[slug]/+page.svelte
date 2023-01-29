@@ -176,7 +176,7 @@
 		</div>
 	</div>
 
-	<!-- <CheckStandards /> -->
+	<CheckStandards />
 
 	<LOQs />
 

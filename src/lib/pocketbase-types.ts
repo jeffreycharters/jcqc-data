@@ -45,7 +45,7 @@ export type BlanksRecord = {
 
 export type CheckStandardsRecord = {
 	name: string
-	checkValues?: RecordIdString
+	checkValues?: RecordIdString[]
 }
 
 export type CheckValuesRecord = {

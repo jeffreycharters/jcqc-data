@@ -81,5 +81,4 @@
 			/>
 		</div>
 	</div>
-	{detectionLimits?.id}
 </form>
