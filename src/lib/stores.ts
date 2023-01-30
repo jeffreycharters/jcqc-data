@@ -18,7 +18,7 @@ export const showAddForm: Writable<boolean> = writable(false);
 
 // export const selectedMethodId: Writable<string> = writable('');
 
-// export const referenceMaterials: Writable<ReferenceMaterialsResponse[]> = writable([]);
+export const referenceMaterials: Writable<ReferenceMaterialsResponse[]> = writable([]);
 
 // export const loqs: Writable<DetectionLimit[]> = writable([]);
 

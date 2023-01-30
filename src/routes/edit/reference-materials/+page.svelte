@@ -1,15 +1,10 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import { referenceMaterials } from '$lib/stores';
 	import AddReferenceMaterialForm from './AddReferenceMaterialForm.svelte';
 	import ReferenceMaterial from './ReferenceMaterial.svelte';
 
-	import { referenceMaterials } from '$lib/stores';
-
-	export let data: PageData;
-	$referenceMaterials = data.referenceMaterialList;
-
-	$: activeMaterials = $referenceMaterials.filter((m) => m.active);
-	$: inactiveMaterials = $referenceMaterials.filter((m) => !m.active);
+	$: activeRms = $referenceMaterials.filter((rm) => rm.active);
+	$: inactiveRms = $referenceMaterials.filter((rm) => !rm.active);
 </script>
 
 <h1>Reference Materials</h1>
@@ -20,13 +15,12 @@
 	>.
 </p>
 
-<div class="list-grid-container mt-8">
-	{#each activeMaterials as rm (rm.id)}
-		<ReferenceMaterial {rm} />
+<div class="grid grid-cols-5 gap-4">
+	{#each activeRms.sort( (a, b) => (a.name < b.name ? -1 : 1) ) as referenceMaterial (referenceMaterial.id)}
+		<ReferenceMaterial {referenceMaterial} />
 	{/each}
-
-	{#each inactiveMaterials as rm (rm.id)}
-		<ReferenceMaterial {rm} />
+	{#each inactiveRms.sort( (a, b) => (a.name < b.name ? -1 : 1) ) as referenceMaterial (referenceMaterial.id)}
+		<ReferenceMaterial {referenceMaterial} />
 	{/each}
 </div>
 
