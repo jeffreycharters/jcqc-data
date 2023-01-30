@@ -82,9 +82,7 @@
 	};
 </script>
 
-<h1>
-	{$method.name}{#if $method.description}: {$method.description}{/if}
-</h1>
+<h1>{$method.title}</h1>
 
 <div>
 	<div class="basic-border mt-8 px-8 py-4 w-fit">

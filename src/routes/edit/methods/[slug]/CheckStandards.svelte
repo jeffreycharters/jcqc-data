@@ -31,7 +31,6 @@
 		{#if $method.checkStandards && $method.checkStandards?.size > 0}
 			{#each Array.from($method.checkStandards).sort() as [_, checkStandard] (checkStandard.id)}
 				<CheckStandardList {checkStandard} />
-				<!-- TODO: Update this to be a check standard list -->
 			{/each}
 		{/if}
 

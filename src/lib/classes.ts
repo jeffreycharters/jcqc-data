@@ -103,7 +103,7 @@ export class Method {
         };
 
         const blankMap: Map<string, BlanksResponse> = new Map();
-        for (let blank of blanks) {
+        for (const blank of blanks) {
             if (!blankMap.has(blank.name)) {
                 blankMap.set(blank.name, blank)
             }
@@ -121,7 +121,7 @@ export class Method {
         };
 
         const checkStdMap: Map<string, CheckStandardsResponse> = new Map();
-        for (let checkStd of checkStandards) {
+        for (const checkStd of checkStandards) {
             if (!checkStdMap.has(checkStd.name)) {
                 checkStdMap.set(checkStd.name, checkStd)
             }
@@ -142,7 +142,7 @@ export class Method {
         const newUnits: UnitsResponse = await pb.collection('units').create(unitsData);
 
         const unitsList = [...this.unitsIdList(), newUnits.id];
-        let elementList = [...this.elementIdList(), elementId];
+        const elementList = [...this.elementIdList(), elementId];
 
         const elementsData = JSON.stringify({ elements: elementList, units: unitsList })
         const updatedMethod: MethodsResponse = await pb.collection('methods').update(this.id, elementsData);
@@ -154,7 +154,7 @@ export class Method {
         if (!addedElement) throw new Error('Error retrieving element from database');
 
         await this.addDetectionLimitsToBlanks(elementId);
-        await this.addDetectionLimitsToCheckStandards(elementId);
+        await this.addValuesToCheckStandards(elementId);
 
         this.elements = this.elements && this.elements.length > 0 ? [...this.elements, addedAnalyte] : [addedAnalyte]
     }
@@ -220,7 +220,7 @@ export class Method {
 
         // create dl for each element in dl collection
         // create array of new dl ids
-        let detectionLimitsIds: string[] = new Array();
+        let detectionLimitsIds: string[] = [];
         for (const currentElement of this.elements ?? []) {
 
             const dlData = JSON.stringify({
@@ -250,23 +250,22 @@ export class Method {
             //    update list of detection limits
             const dlIdList = blank.detectionLimits && blank.detectionLimits.length > 0 ? [...blank.detectionLimits, newDl.id] : [newDl.id];
 
-            const updatedDls = JSON.stringify({ detectionLimits: dlIdList })
+            const updatedDls = JSON.stringify({ detectionLimits: dlIdList });
 
             const updatedBlank: BlanksResponse = await pb.collection('blanks').update(blank.id, updatedDls, { expand: 'detectionLimits' });
-
             this.blanks?.set(updatedBlank.name, updatedBlank)
         }
     }
 
-    async addDetectionLimitsToCheckStandards(elementId: string) {
-        // retrieve list of blanks
+    async addValuesToCheckStandards(elementId: string) {
+        // retrieve list of check standards
         const checkStandards = this.checkStandards;
         if (!checkStandards || checkStandards.size === 0) return;
-        // for each blank
+        // for each check standard
         for (const checkStandard of checkStandards.values()) {
             //    add detection limit row and save id
             const checkValue = JSON.stringify({ element: elementId })
-            const newValue: DetectionLimitsResponse = await pb.collection('checkValues').create(checkValue);
+            const newValue: CheckValuesResponse = await pb.collection('checkValues').create(checkValue);
             if (!newValue) throw new Error('Error saving check value');
             //    update list of detection limits
             const valuesIdList = checkStandard.checkValues && checkStandard.checkValues.length > 0 ? [...checkStandard.checkValues, newValue.id] : [newValue.id];
@@ -292,7 +291,7 @@ export class Method {
             //    remove detection limit row
             const deletedDetectionLimit = await pb.collection('detectionLimits').delete(detectionLimit.id);
             if (!deletedDetectionLimit) console.error('Error removing detection limit');
-            blank.detectionLimits = blank.detectionLimits?.filter(dl => dl != detectionLimit.id)
+            blank.detectionLimits = blank.detectionLimits?.filter(dl => dl != detectionLimit.id);
             this.blanks?.set(blank.name, blank);
 
         }
@@ -300,21 +299,20 @@ export class Method {
 
     async removeValuesFromCheckStandards(elementId: string) {
         console.log('removing');
-        // retrieve list of blanks
+        // retrieve list of checkStandards
         const checkStandards = this.checkStandards;
         if (!checkStandards || checkStandards.size === 0) return;
-        // for each blank
+        // for each check
         for (const checkStandard of checkStandards.values()) {
             const checkValues: CheckValuesResponse[] = checkStandard.expand?.checkValues ?? []
-            //    find the detection limits of interest
+            //    find the values of interest
             const checkValue = checkValues.find(value => value.element === elementId);
-            if (!checkValue) throw new Error('Detection Limit is missing!');
-            //    remove detection limit row
+            if (!checkValue) throw new Error('Value entry is missing!');
+            //    remove value row
             const deletedCheckValue = await pb.collection('checkValues').delete(checkValue.id);
             if (!deletedCheckValue) console.error('Error removing check value');
             checkStandard.checkValues = checkStandard.checkValues?.filter(cv => cv != checkValue.id)
-            this.blanks?.set(checkStandard.name, checkStandard);
-
+            this.checkStandards?.set(checkStandard.name, checkStandard);
         }
     }
 
@@ -398,7 +396,7 @@ export class Method {
 
         // create dl for each element in dl collection
         // create array of new dl ids
-        let checkValuesIds: string[] = new Array();
+        let checkValuesIds: string[] = [];
         for (const currentElement of this.elements ?? []) {
 
             const checkValueData = JSON.stringify({
@@ -430,7 +428,7 @@ export class Method {
 
     blanksIdList() {
         const idList: string[] = []
-        for (let blankRecord of this.blanks?.values() ?? []) {
+        for (const blankRecord of this.blanks?.values() ?? []) {
             idList.push(blankRecord.id)
         }
         return idList
@@ -438,7 +436,7 @@ export class Method {
 
     checkStdsIdList() {
         const idList: string[] = []
-        for (let checkStdRecord of this.checkStandards?.values() ?? []) {
+        for (const checkStdRecord of this.checkStandards?.values() ?? []) {
             idList.push(checkStdRecord.id)
         }
         return idList
