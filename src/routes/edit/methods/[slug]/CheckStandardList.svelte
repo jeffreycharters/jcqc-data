@@ -1,12 +1,15 @@
 <script lang="ts">
+	import EditIcon from '$lib/components/EditIcon.svelte';
 	import type { CheckStandardsResponse } from '$lib/pocketbase-types';
 	import { method } from '$lib/stores';
 	import CheckStandardElement from './CheckStandardElement.svelte';
 
 	export let checkStandard: CheckStandardsResponse;
+	let { name } = checkStandard;
 
 	$: elementList = $method.elements;
 	let statusMessage = '';
+	let editing = false;
 
 	let timer: NodeJS.Timeout;
 	const statusUpdate = (message: string, timeout = 3000) => {
@@ -20,12 +23,37 @@
 		await $method.deleteCheckStandard(checkStandard.name);
 		$method = $method;
 	};
+
+	const updateName = async () => {
+		console.log('updating name!');
+		await $method.updateCheckStandardName(checkStandard.id, name);
+		$method = $method;
+		editing = false;
+	};
 </script>
 
 <div class="basic-border w-full h-full p-4">
 	<div class="flex justify-between items-center mb-4">
-		<div class="flex items-baseline gap-4">
-			<h3 class="">{checkStandard.name}</h3>
+		<div class="flex items-baseline gap-2">
+			<form
+				class="flex items-center {editing ? 'gap-1' : 'gap-2'}"
+				on:submit|preventDefault={updateName}
+			>
+				{#if editing}
+					<label for="check-name">Name:</label>
+					<input class="basic-border px-2" type="text" bind:value={name} />
+					<input type="submit" value="Update" class="btn" />
+				{:else}
+					<h3>{checkStandard.name}</h3>
+				{/if}
+				<button type="button" on:click={() => (editing = !editing)} class={editing ? 'btn' : ''}>
+					{#if editing}
+						Cancel
+					{:else}
+						<EditIcon classes="stroke-gray-400 h-5 w-5" strokeWidth="1.75" />
+					{/if}
+				</button>
+			</form>
 			<div class="italic font-bold text-amber-600">{statusMessage ?? ''}</div>
 		</div>
 		<button on:click={deleteCheckStandard}>

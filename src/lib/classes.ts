@@ -1,6 +1,6 @@
 import { createBlank, getBlanksByMethodId, updateMethodBlankList } from "./blanks";
 import { pb } from "./pocketbase";
-import type { BlanksResponse, CheckStandardsResponse, CheckValuesResponse, DetectionLimitsResponse, ElementsResponse, MethodsResponse, UnitsResponse } from "./pocketbase-types";
+import type { BlanksResponse, CheckStandardsResponse, CheckValuesResponse, DetectionLimitsResponse, ElementsResponse, MethodsResponse, ReferenceMaterialsResponse, UnitsResponse } from "./pocketbase-types";
 
 export type Analyte = {
     id: string
@@ -14,7 +14,6 @@ export type Analyte = {
 export class Method {
     active?: boolean
     calibrationCount?: number
-    checkStandardName?: string
     checkStandardTolerance?: number
     description?: string
     name?: string;
@@ -23,6 +22,7 @@ export class Method {
     elements?: Analyte[]
     blanks?: Map<string, BlanksResponse>
     checkStandards?: Map<string, CheckStandardsResponse>
+    referenceMaterials?: Map<string, ReferenceMaterialsResponse>
 
     constructor(
         public id: string | undefined
@@ -71,7 +71,6 @@ export class Method {
         if (!this.id) throw new Error('Method not in database')
         const updatedMethod: MethodsResponse = await pb.collection('methods').update(this.id, updateData);
         if (!updatedMethod) throw new Error('Error updating database')
-        this.setPropertiesFromMethodsResponse(updatedMethod);
     }
 
     private populateElements(elements: ElementsResponse[], unitList: UnitsResponse[]) {
@@ -298,7 +297,6 @@ export class Method {
     }
 
     async removeValuesFromCheckStandards(elementId: string) {
-        console.log('removing');
         // retrieve list of checkStandards
         const checkStandards = this.checkStandards;
         if (!checkStandards || checkStandards.size === 0) return;
@@ -320,15 +318,10 @@ export class Method {
         console.log(`deleting ${blankName}`);
 
         if (!this.blanks?.has(blankName)) throw new Error('Error: could not find blank');
-
         const blank = this.blanks.get(blankName);
-
         const detectionLimits = blank?.detectionLimits;
-
         if (!blank) throw new Error('Could not find blank');
-
         const deletedBlank = await pb.collection('blanks').delete(blank.id);
-
         if (!deletedBlank) console.error(`Error deleting blank ${blank.name}`)
         if (detectionLimits) {
             for (const detectionLimit of detectionLimits) {
@@ -351,6 +344,9 @@ export class Method {
             const deletedValue: boolean = await pb.collection('checkValues').delete(valueId);
             if (!deletedValue) throw new Error('Error deleting checkValue')
         }
+
+        const deletedCheckStandard = await pb.collection('checkStandards').delete(checkStandard.id);
+        if (!deletedCheckStandard) throw new Error('y u no delete check standard?')
         this.checkStandards?.delete(checkStandardName)
     }
 
@@ -369,6 +365,46 @@ export class Method {
         })
         const updatedDetectionLimit: DetectionLimitsResponse = await pb.collection('checkValues').update(checkValueId, data);
         if (!updatedDetectionLimit) throw new Error('Error updated detection limits');
+    }
+
+    getCheckStandardNameFromId(id: string) {
+        const stds = this.checkStandards;
+        for (const std of stds?.values() ?? []) {
+            if (std.id === id) return std.name;
+        }
+    }
+
+    async updateCheckStandardName(checkStandardId: string, newName: string) {
+        if (!this.checkStandards || this.checkStandards.size === 0) throw new Error('No check standard in method object')
+        const data = JSON.stringify({ name: newName });
+        const oldCheckStandard = this.getCheckStandardNameFromId(checkStandardId);
+        const updatedCheckStandard: CheckStandardsResponse = await pb
+            .collection('checkStandards')
+            .update(checkStandardId, data);
+        if (!updatedCheckStandard) throw new Error('Error updating name');
+
+        this.checkStandards.delete(oldCheckStandard ?? '');
+        this.checkStandards.set(updatedCheckStandard.name, updatedCheckStandard);
+    }
+
+    getBlankNameFromId(id: string) {
+        const blanks = this.blanks;
+        for (const blank of blanks?.values() ?? []) {
+            if (blank.id === id) return blank.name;
+        }
+    }
+
+    async updateBlankName(blankId: string, newName: string) {
+        if (!this.blanks || this.blanks.size === 0) throw new Error('No blanks in method object')
+        const data = JSON.stringify({ name: newName });
+        const oldBlank = this.getBlankNameFromId(blankId);
+        const updatedBlank: BlanksResponse = await pb
+            .collection('blanks')
+            .update(blankId, data);
+        if (!updatedBlank) throw new Error('Error updating name');
+
+        this.blanks.delete(oldBlank ?? '');
+        this.blanks.set(updatedBlank.name, updatedBlank);
     }
 
     async createNewCheckStandard(name: string) {

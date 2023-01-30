@@ -1,12 +1,7 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
 	import NumberInput from '$lib/components/NumberInput.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
-	import { pb } from '$lib/pocketbase';
-	import type { ElementsResponse, MethodsResponse } from '$lib/pocketbase-types';
 	import { method } from '$lib/stores';
-	import ReferenceMaterial from './ReferenceMaterial.svelte';
 	import type { PageData } from './$types';
 	import LOQs from './LOQs.svelte';
 	import { quintOut } from 'svelte/easing';
@@ -16,6 +11,7 @@
 	import InactiveElement from './InactiveElement.svelte';
 	import type { Analyte } from '$lib/classes';
 	import CheckStandards from './CheckStandards.svelte';
+	import ReferenceMaterials from './ReferenceMaterials.svelte';
 
 	export let data: PageData;
 	let { elementList } = data;
@@ -61,7 +57,6 @@
 				calibrationCount: $method.calibrationCount,
 				description: $method.description,
 				checkStandardTolerance: $method.checkStandardTolerance,
-				checkStandardName: $method.checkStandardName,
 				rpdLimit: $method.rpdLimit
 			});
 			addFormMessage('Saved');
@@ -86,11 +81,14 @@
 
 <div>
 	<div class="basic-border mt-8 px-8 py-4 w-fit">
-		<h2>Edit Method</h2>
+		<div class="flex items-baseline gap-4">
+			<h2>Edit Method</h2>
+			<div>// Todo: Make this auto-save.</div>
+		</div>
 		<form on:submit|preventDefault={editMethod}>
 			<div class="grid grid-cols-2 gap-x-12">
 				<TextInput
-					name="name"
+					name="method-name"
 					placeholder="e.g. TOXI-064 or Serum Iodine"
 					bind:value={$method.name}
 					label="Method Name"
@@ -113,27 +111,19 @@
 					bind:value={$method.rpdLimit}
 					placeholder="e.g. 15"
 				/>
-				<TextInput
-					name="check-standard-name"
-					label="Check Standard Name"
-					bind:value={$method.checkStandardName}
-					placeholder="e.g. Calibration Check"
-				/>
 				<NumberInput
 					name="check-standard-limit"
 					label="Check Standard Tolerance (%)"
 					bind:value={$method.checkStandardTolerance}
 					placeholder="e.g. 15"
 				/>
-				<div>
+				<div class="self-end">
 					{#if formMessage}
 						<div class="text-sm lm-2" in:fade={{ duration: 200 }} out:fade={{ duration: 100 }}>
 							{formMessage}
 						</div>
 					{/if}
-				</div>
-				<div class="justify-end">
-					<input class="btn my-4" type="submit" value="Save Changes" />
+					<input class="btn my-2" type="submit" value="Save Changes" />
 				</div>
 			</div>
 		</form>
@@ -147,7 +137,10 @@
 				Elements used by this method
 				<span class="text-gray-400">[{usedElements?.length}]</span>
 			</h2>
-			<div class="text-gray-500">Changes in this box are saved as soon as they are made.</div>
+			<div class="text-gray-500">
+				//TODO: add save indicators to this box || Changes in this box are saved as soon as they are
+				made.
+			</div>
 		</div>
 
 		<div class="grid grid-cols-8 gap-4">
@@ -173,6 +166,8 @@
 			{/each}
 		</div>
 	</div>
+
+	<ReferenceMaterials />
 
 	<CheckStandards />
 

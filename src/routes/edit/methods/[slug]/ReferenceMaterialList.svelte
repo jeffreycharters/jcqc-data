@@ -1,15 +1,16 @@
 <script lang="ts">
 	import EditIcon from '$lib/components/EditIcon.svelte';
-	import type { BlanksResponse } from '$lib/pocketbase-types';
+	import type { CheckStandardsResponse, ReferenceMaterialsResponse } from '$lib/pocketbase-types';
 	import { method } from '$lib/stores';
-	import BlankElement from './BlankElement.svelte';
+	import CheckStandardElement from './CheckStandardElement.svelte';
 
-	export let blank: BlanksResponse;
+	export let referenceMaterial: ReferenceMaterialsResponse;
+	let { name } = referenceMaterial;
+
+	// TODO: Make this about RMs and not check standards
 
 	$: elementList = $method.elements;
 	let statusMessage = '';
-
-	let { name } = blank;
 	let editing = false;
 
 	let timer: NodeJS.Timeout;
@@ -20,13 +21,14 @@
 		timer = setTimeout(() => (statusMessage = ''), timeout);
 	};
 
-	const deleteBlank = async () => {
-		await $method.deleteBlank(blank.name);
+	const deleteCheckStandard = async () => {
+		await $method.deleteCheckStandard(referenceMaterial.name);
 		$method = $method;
 	};
 
 	const updateName = async () => {
-		await $method.updateBlankName(blank.id, name);
+		console.log('updating name!');
+		await $method.updateCheckStandardName(referenceMaterial.id, name);
 		$method = $method;
 		editing = false;
 	};
@@ -44,7 +46,7 @@
 					<input class="basic-border px-2" type="text" bind:value={name} />
 					<input type="submit" value="Update" class="btn" />
 				{:else}
-					<h3>{blank.name}</h3>
+					<h3>{referenceMaterial.name}</h3>
 				{/if}
 				<button type="button" on:click={() => (editing = !editing)} class={editing ? 'btn' : ''}>
 					{#if editing}
@@ -56,7 +58,7 @@
 			</form>
 			<div class="italic font-bold text-amber-600">{statusMessage ?? ''}</div>
 		</div>
-		<button on:click={deleteBlank}>
+		<button on:click={deleteCheckStandard}>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				class="h-8 w-8 stroke-red-700 hover:bg-red-100 py-[6px] rounded-full transition-colors"
@@ -79,9 +81,9 @@
 	{#if elementList && elementList.length > 0}
 		<div class="grid grid-cols-6 gap-4 text-center">
 			{#each elementList.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
-				<BlankElement
+				<CheckStandardElement
 					{element}
-					blankName={blank.name}
+					checkStandardName={referenceMaterial.name}
 					on:updateStatus={(event) => statusUpdate(event.detail)}
 				/>
 			{/each}
