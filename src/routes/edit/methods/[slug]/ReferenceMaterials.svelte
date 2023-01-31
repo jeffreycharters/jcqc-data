@@ -12,7 +12,8 @@
 	let formMessage: string;
 
 	const createNewReferenceMaterial = async () => {
-		console.log('creatin');
+		await $method.createNewReferenceMaterial(newReferenceMaterialName);
+		$method = $method;
 	};
 </script>
 

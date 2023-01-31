@@ -22,14 +22,13 @@
 	};
 
 	const deleteCheckStandard = async () => {
-		await $method.deleteCheckStandard(referenceMaterial.name);
+		await $method.deleteReferenceMaterial(referenceMaterial.name);
 		$method = $method;
 	};
 
 	const updateName = async () => {
 		console.log('updating name!');
-		await $method.updateCheckStandardName(referenceMaterial.id, name);
-		$method = $method;
+		await $method.updateReferenceMaterialName(referenceMaterial.id, name);
 		editing = false;
 	};
 </script>
@@ -46,7 +45,7 @@
 					<input class="basic-border px-2" type="text" bind:value={name} />
 					<input type="submit" value="Update" class="btn" />
 				{:else}
-					<h3>{referenceMaterial.name}</h3>
+					<h3>{name}</h3>
 				{/if}
 				<button type="button" on:click={() => (editing = !editing)} class={editing ? 'btn' : ''}>
 					{#if editing}

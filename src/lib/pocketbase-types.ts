@@ -9,8 +9,8 @@ export enum Collections {
 	DetectionLimits = "detectionLimits",
 	Elements = "elements",
 	Methods = "methods",
-	ReferenceMaterialRanges = "referenceMaterialRanges",
 	ReferenceMaterials = "referenceMaterials",
+	ReferenceMaterialsRanges = "referenceMaterialsRanges",
 	Units = "units",
 	Users = "users",
 }
@@ -78,18 +78,19 @@ export type MethodsRecord = {
 	slug: string
 	units?: RecordIdString
 	checkStandards?: RecordIdString
-}
-
-export type ReferenceMaterialRangesRecord = {
-	lower?: number
-	upper?: number
-	element: RecordIdString
-	method: RecordIdString
+	checkStandardTolerance?: number
 }
 
 export type ReferenceMaterialsRecord = {
 	name: string
 	active?: boolean
+	ranges?: RecordIdString[]
+}
+
+export type ReferenceMaterialsRangesRecord = {
+	lower?: number
+	upper?: number
+	element: RecordIdString
 }
 
 export type UnitsRecord = {
@@ -109,8 +110,8 @@ export type CheckValuesResponse = CheckValuesRecord & BaseSystemFields
 export type DetectionLimitsResponse = DetectionLimitsRecord & BaseSystemFields
 export type ElementsResponse = ElementsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
-export type ReferenceMaterialRangesResponse = ReferenceMaterialRangesRecord & BaseSystemFields
 export type ReferenceMaterialsResponse = ReferenceMaterialsRecord & BaseSystemFields
+export type ReferenceMaterialsRangesResponse = ReferenceMaterialsRangesRecord & BaseSystemFields
 export type UnitsResponse = UnitsRecord & BaseSystemFields
 export type UsersResponse = UsersRecord & AuthSystemFields
 
@@ -121,8 +122,8 @@ export type CollectionRecords = {
 	detectionLimits: DetectionLimitsRecord
 	elements: ElementsRecord
 	methods: MethodsRecord
-	referenceMaterialRanges: ReferenceMaterialRangesRecord
 	referenceMaterials: ReferenceMaterialsRecord
+	referenceMaterialsRanges: ReferenceMaterialsRangesRecord
 	units: UnitsRecord
 	users: UsersRecord
 }
