@@ -3,6 +3,7 @@
 	import type { CheckStandardsResponse, ReferenceMaterialsResponse } from '$lib/pocketbase-types';
 	import { method } from '$lib/stores';
 	import CheckStandardElement from './CheckStandardElement.svelte';
+	import ReferenceMaterialElement from './ReferenceMaterialElement.svelte';
 
 	export let referenceMaterial: ReferenceMaterialsResponse;
 	let { name } = referenceMaterial;
@@ -80,9 +81,9 @@
 	{#if elementList && elementList.length > 0}
 		<div class="grid grid-cols-6 gap-4 text-center">
 			{#each elementList.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
-				<CheckStandardElement
+				<ReferenceMaterialElement
 					{element}
-					checkStandardName={referenceMaterial.name}
+					referenceMaterialName={referenceMaterial.name}
 					on:updateStatus={(event) => statusUpdate(event.detail)}
 				/>
 			{/each}

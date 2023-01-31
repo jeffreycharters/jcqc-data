@@ -1,3 +1,4 @@
+import slugify from "slugify";
 import { createBlank, getBlanksByMethodId, updateMethodBlankList } from "./blanks";
 import { pb } from "./pocketbase";
 import type { BlanksResponse, CheckStandardsResponse, CheckValuesResponse, DetectionLimitsResponse, ElementsResponse, MethodsResponse, ReferenceMaterialsRangesResponse, ReferenceMaterialsResponse, UnitsResponse } from "./pocketbase-types";
@@ -49,6 +50,7 @@ export class Method {
             if (value && key === 'elements') expandList.push('units');
             if (value && key === 'blanks') expandList.push('blanks.detectionLimits');
             if (value && key === 'checkStandards') expandList.push('checkStandards.checkValues');
+            if (value && key === 'referenceMaterials') expandList.push('referenceMaterials.ranges');
         }
         let expandString = '';
         if (expandList.length > 0) {
@@ -67,6 +69,7 @@ export class Method {
     }
 
     async updateProperties(props: Record<string, string | number | undefined>) {
+        if (props.name != undefined) props['slug'] = slugify(props.name.toString(), { lower: true })
         const updateData = JSON.stringify(props);
         if (!this.id) throw new Error('Method not in database')
         const updatedMethod: MethodsResponse = await pb.collection('methods').update(this.id, updateData);
@@ -421,6 +424,15 @@ export class Method {
         const deletedCheckStandard = await pb.collection('checkStandards').delete(checkStandard.id);
         if (!deletedCheckStandard) throw new Error('y u no delete check standard?')
         this.checkStandards?.delete(checkStandardName)
+    }
+
+
+    async updateReferenceRanges(rangeId: string, toUpdate: "lower" | "upper", value: number) {
+        if (!rangeId) throw new Error('Error finding range in database');
+        const dataObject: Record<string, number> = {};
+        dataObject[toUpdate] = value;
+        const updatedRange: ReferenceMaterialsRangesResponse = await pb.collection('referenceMaterialsRanges').update(rangeId, JSON.stringify(dataObject));
+        if (!updatedRange) throw new Error('Error updating ranges');
     }
 
     async updateDetectionLimits(detectionLimitsId: string, toUpdate: "mdl" | "loq", value: number) {

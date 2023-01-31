@@ -167,25 +167,9 @@
 		</div>
 	</div>
 
-	<ReferenceMaterials />
-
 	<CheckStandards />
 
 	<LOQs />
 
-	<!--
-	<div class="basic-border my-4 py-4 px-6 w-full max-w-screen-xl">
-		<h2 class="mb-4">Reference Materials</h2>
-
-		<div class="grid grid-cols-3 gap-4">
-			{#each $methodReferenceMaterials.filter((rm) => rm.active) as rm (rm.id)}
-				<ReferenceMaterial {rm} />
-			{/each}
-
-			{#each $methodReferenceMaterials.filter((rm) => !rm.active) as rm (rm.id)}
-				<ReferenceMaterial {rm} />
-			{/each}
-		</div>
-	</div>
--->
+	<ReferenceMaterials />
 </div>
