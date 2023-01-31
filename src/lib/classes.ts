@@ -1,6 +1,6 @@
 import { createBlank, getBlanksByMethodId, updateMethodBlankList } from "./blanks";
 import { pb } from "./pocketbase";
-import type { BlanksResponse, CheckStandardsResponse, CheckValuesResponse, DetectionLimitsResponse, ElementsResponse, MethodsResponse, ReferenceMaterialsResponse, UnitsResponse } from "./pocketbase-types";
+import type { BlanksResponse, CheckStandardsResponse, CheckValuesResponse, DetectionLimitsResponse, ElementsResponse, MethodsResponse, ReferenceMaterialsRangesResponse, ReferenceMaterialsResponse, UnitsResponse } from "./pocketbase-types";
 
 export type Analyte = {
     id: string
@@ -62,7 +62,7 @@ export class Method {
         if (options.elements) this.populateElements(methodsResponse.expand?.elements, methodsResponse.expand?.units);
         if (options.blanks) this.populateBlankMap(methodsResponse.expand?.blanks);
         if (options.checkStandards) this.populateCheckStandardsMap(methodsResponse.expand?.checkStandards);
-        if (options.referenceMaterials) this.populateReferenceMaterialMap();
+        if (options.referenceMaterials) this.populateReferenceMaterialMap(methodsResponse.expand?.referenceMaterials);
 
     }
 
@@ -130,10 +130,25 @@ export class Method {
     }
 
 
-    private populateReferenceMaterialMap() {
-        console.log('populating referenceMaterialMap'); // TODO
+    private populateReferenceMaterialMap(referenceMaterials: ReferenceMaterialsResponse[]) {
+        console.log('populating referenceMaterialMap');
+
+        if (!referenceMaterials) {
+            this.referenceMaterials = new Map();
+            return;
+        };
+
+        const referenceMaterialsMap: Map<string, CheckStandardsResponse> = new Map();
+        for (const rm of referenceMaterials) {
+            if (!referenceMaterialsMap.has(rm.name)) {
+                referenceMaterialsMap.set(rm.name, rm)
+            }
+        }
+        this.referenceMaterials = referenceMaterialsMap;
 
     }
+
+
     async addElement(elementId: string) {
         if (!this.id) throw new Error('Method not in database');
 
@@ -154,6 +169,7 @@ export class Method {
 
         await this.addDetectionLimitsToBlanks(elementId);
         await this.addValuesToCheckStandards(elementId);
+        await this.addRangestoReferenceMaterials(elementId);
 
         this.elements = this.elements && this.elements.length > 0 ? [...this.elements, addedAnalyte] : [addedAnalyte]
     }
@@ -174,6 +190,8 @@ export class Method {
 
         await this.removeDetectionLimitsFromBlanks(element.id);
         await this.removeValuesFromCheckStandards(element.id);
+        await this.removeRangesFromReferenceMaterials(element.id);
+
 
     }
 
@@ -256,6 +274,26 @@ export class Method {
         }
     }
 
+    async addRangestoReferenceMaterials(elementId: string) {
+        // retrieve list of reference materials
+        const referenceMaterials = this.referenceMaterials;
+        if (!referenceMaterials || referenceMaterials.size === 0) return;
+        // for each check standard
+        for (const referenceMaterial of referenceMaterials.values()) {
+            //    add detection limit row and save id
+            const rangeData = JSON.stringify({ element: elementId })
+            const newRange: ReferenceMaterialsRangesResponse = await pb.collection('referenceMaterialsRanges').create(rangeData);
+            if (!newRange) throw new Error('Error saving range');
+            //    update list of detection limits
+            const rangesIdList = referenceMaterial.ranges && referenceMaterial.ranges.length > 0 ? [...referenceMaterial.ranges, newRange.id] : [newRange.id];
+            const updatedRanges = JSON.stringify({ ranges: rangesIdList })
+
+            const updatedReferenceMaterial: ReferenceMaterialsResponse = await pb.collection('referenceMaterials').update(referenceMaterial.id, updatedRanges, { expand: 'ranges' });
+
+            this.referenceMaterials?.set(updatedReferenceMaterial.name, updatedReferenceMaterial)
+        }
+    }
+
     async addValuesToCheckStandards(elementId: string) {
         // retrieve list of check standards
         const checkStandards = this.checkStandards;
@@ -296,6 +334,23 @@ export class Method {
         }
     }
 
+    async removeRangesFromReferenceMaterials(elementId: string) {
+        // retrieve list of reference materials
+        const referenceMaterials = this.referenceMaterials;
+        if (!referenceMaterials || referenceMaterials.size === 0) return;
+
+        for (const referenceMaterial of referenceMaterials.values()) {
+            const ranges: ReferenceMaterialsRangesResponse[] = referenceMaterial.expand?.ranges ?? []
+            //    find the values of interest
+            const range = ranges.find(range => range.element === elementId);
+            if (!range) throw new Error('Range entry is missing!');
+            //    remove value row
+            const deletedRange = await pb.collection('referenceMaterialsRanges').delete(range.id);
+            if (!deletedRange) console.error('Error removing range');
+            referenceMaterial.ranges = referenceMaterial.ranges?.filter(r => r != range.id)
+            this.referenceMaterials?.set(referenceMaterial.name, referenceMaterial);
+        }
+    }
     async removeValuesFromCheckStandards(elementId: string) {
         // retrieve list of checkStandards
         const checkStandards = this.checkStandards;
@@ -330,6 +385,24 @@ export class Method {
             };
         }
         this.blanks?.delete(blankName)
+    }
+
+    async deleteReferenceMaterial(referenceMaterialName: string) {
+        console.log(`deleting ${referenceMaterialName}`);
+
+        if (!this.referenceMaterials?.has(referenceMaterialName)) throw new Error('Could not find reference material');
+
+        const referenceMaterial = this.referenceMaterials.get(referenceMaterialName);
+        if (!referenceMaterial) throw new Error('Could not find reference material');
+
+        for (const valueId of referenceMaterial?.ranges ?? []) {
+            const deletedValue: boolean = await pb.collection('referenceMaterialsRanges').delete(valueId);
+            if (!deletedValue) throw new Error('Error deleting range')
+        }
+
+        const deletedReferenceMaterial = await pb.collection('referenceMaterials').delete(referenceMaterial.id);
+        if (!deletedReferenceMaterial) throw new Error('y u no delete reference material?')
+        this.referenceMaterials?.delete(referenceMaterialName)
     }
 
     async deleteCheckStandard(checkStandardName: string) {
@@ -385,6 +458,26 @@ export class Method {
 
         this.checkStandards.delete(oldCheckStandard ?? '');
         this.checkStandards.set(updatedCheckStandard.name, updatedCheckStandard);
+    }
+
+    getReferenceMaterialNameFromId(id: string) {
+        const blanks = this.blanks;
+        for (const blank of blanks?.values() ?? []) {
+            if (blank.id === id) return blank.name;
+        }
+    }
+
+    async updateReferenceMaterialName(referenceMaterialId: string, newName: string) {
+        if (!this.referenceMaterials || this.referenceMaterials.size === 0) throw new Error('No reference material in method object')
+        const data = JSON.stringify({ name: newName });
+        const oldReferenceMaterial = this.getReferenceMaterialNameFromId(referenceMaterialId);
+        const updatedReferenceMaterial: ReferenceMaterialsResponse = await pb
+            .collection('referenceMaterials')
+            .update(referenceMaterialId, data);
+        if (!updatedReferenceMaterial) throw new Error('Error updating name');
+
+        this.referenceMaterials.delete(oldReferenceMaterial ?? '');
+        this.referenceMaterials.set(updatedReferenceMaterial.name, updatedReferenceMaterial);
     }
 
     getBlankNameFromId(id: string) {
@@ -454,6 +547,49 @@ export class Method {
         }
     }
 
+    async createNewReferenceMaterial(name: string) {
+        console.log('creating new reference material', name);
+        if (!this.id) throw new Error('Method not in database')
+
+        // create rm in referenceMaterials collection
+        const data = JSON.stringify({
+            name,
+            active: true
+        })
+        const newReferenceMaterial: ReferenceMaterialsResponse = await pb.collection('referenceMaterials').create(data);
+
+        // update method reference materials to include new one
+        if (!this.referenceMaterials || this.referenceMaterials.size === 0) {
+            const materialsMap = new Map();
+            materialsMap.set(newReferenceMaterial.name, newReferenceMaterial)
+            this.referenceMaterials = materialsMap;
+        } else this.referenceMaterials.set(newReferenceMaterial.name, newReferenceMaterial);
+        const referencesData = JSON.stringify({
+            referenceMaterials: this.referenceMaterialsIdList()
+        });
+
+        const updatedMethod: MethodsResponse = await pb.collection('methods').update(this.id, referencesData);
+        if (!updatedMethod) throw new Error('Error updating method reference materials');
+
+        // create range for each element in materials collection
+        // create array of new range ids
+        let rangeIds: string[] = [];
+        for (const currentElement of this.elements ?? []) {
+
+            const rangeData = JSON.stringify({
+                element: currentElement.id
+            })
+            const range: DetectionLimitsResponse = await pb.collection('referenceMaterialsRanges').create(rangeData);
+            if (!range) throw new Error('Error adding new ranges');
+            rangeIds = [...rangeIds, range.id];
+        }
+
+        const updatedNewReferenceMaterial: ReferenceMaterialsResponse = await pb.collection('referenceMaterials').update(newReferenceMaterial.id, { "ranges": rangeIds }, { expand: 'ranges' })
+        if (!updatedNewReferenceMaterial) throw new Error('Error updating rm range ids');
+        this.referenceMaterials.set(updatedNewReferenceMaterial.name, updatedNewReferenceMaterial)
+        return updatedNewReferenceMaterial;
+    }
+
     elementIdList() {
         return this.elements?.map(element => element.id) ?? [];
     }
@@ -466,6 +602,14 @@ export class Method {
         const idList: string[] = []
         for (const blankRecord of this.blanks?.values() ?? []) {
             idList.push(blankRecord.id)
+        }
+        return idList
+    }
+
+    referenceMaterialsIdList() {
+        const idList: string[] = []
+        for (const referenceMaterial of this.referenceMaterials?.values() ?? []) {
+            idList.push(referenceMaterial.id)
         }
         return idList
     }
