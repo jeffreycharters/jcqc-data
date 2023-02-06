@@ -36,6 +36,8 @@
 	</div>
 </div>
 
+<slot />
+
 <div class="absolute bottom-4 left-4">
 	<a class="no-underline btn" href="/edit">Edit stuff</a>
 </div>

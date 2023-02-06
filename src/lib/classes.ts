@@ -638,8 +638,6 @@ export class Method {
         if (!this.description) return this.name
         return `${this.name}: ${this.description}`
     }
-
-
 }
 
 export class Blank {

@@ -1,7 +1,6 @@
-<!-- <script lang="ts">
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { parseFileAndUpdateStore } from '$lib/data';
-	import { methodParams } from '$lib/stores';
 
 	let files: HTMLInputElement['files'];
 	let errorMessage: string = '';
@@ -15,12 +14,12 @@
 			return;
 		}
 
-		parseFileAndUpdateStore(
-			inputFile,
-			$methodParams?.referenceMaterialNames,
-			$methodParams?.method?.checkStandardName
-		);
-		goto('/report');
+		// parseFileAndUpdateStore(
+		// 	inputFile,
+		// 	$methodParams?.referenceMaterialNames,
+		// 	$methodParams?.method?.checkStandardName
+		// );
+		// goto('/report');
 	};
 
 	$: parseInput(files);
@@ -57,4 +56,4 @@
 	<div class="text-red-600 mt-2 rounded italic whitespace-nowrap">
 		{errorMessage ?? ''}
 	</div>
-</div> -->
+</div>

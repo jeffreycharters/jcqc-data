@@ -1,13 +1,13 @@
 <script>
-	import FilePicker from '../FilePicker.svelte';
+	// import FilePicker from '../FilePicker.svelte';
 	import MainPageStuff from '../MainPageStuff.svelte';
-	import MethodParams from '../MethodParams.svelte';
+	// import MethodParams from '../MethodParams.svelte';
 </script>
 
 <MainPageStuff>
-	<FilePicker />
-
-	<MethodParams />
+	hello
+	<!-- <FilePicker /> -->
+	<!-- <MethodParams /> -->
 </MainPageStuff>
 
 <div class="absolute bottom-4 left-4">
