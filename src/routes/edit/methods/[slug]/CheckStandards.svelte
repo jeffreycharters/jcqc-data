@@ -24,8 +24,8 @@
 			calMessage = error.message;
 			return;
 		}
-
 		newCalName = '';
+		addFormOpen = false;
 	};
 </script>
 
@@ -71,8 +71,12 @@
 				{/each}
 			{/if}
 
-			<div class="basic-border p-4 w-fit">
-				<button class="flex items-center gap-2" on:click={() => (addFormOpen = !addFormOpen)}>
+			<div class="basic-border py-2 px-4 w-fit transition-all">
+				<button
+					class="flex items-center gap-2"
+					on:click={() => (addFormOpen = !addFormOpen)}
+					on:click={() => (contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`)}
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						class="h-5 w-5 stroke-gray-400 transition-all {addFormOpen ? 'rotate-90' : ''}"
@@ -91,7 +95,7 @@
 				</button>
 
 				<div
-					class="overflow-hidden transition-all"
+					class="overflow-hidden"
 					style="max-height: {addFormOpen ? `${addFormDiv.scrollHeight}px` : '0'}"
 					bind:this={addFormDiv}
 				>

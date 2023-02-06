@@ -1,10 +1,15 @@
 <script lang="ts">
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { method } from '$lib/stores';
+	import { fade } from 'svelte/transition';
 	import BlankList from './BlankList.svelte';
 
 	let newBlankName = '';
 	let blankMessage = '';
+	let open = false;
+	let addFormOpen = false;
+	let addFormDiv: HTMLDivElement;
+	let contentDiv: HTMLDivElement;
 
 	const createNewBlank = async () => {
 		if (!newBlankName) {
@@ -19,112 +24,102 @@
 			blankMessage = error.message;
 			return;
 		}
-
 		newBlankName = '';
+		addFormOpen = false;
 	};
 </script>
 
 <div class="basic-border py-4 px-8 mt-4">
-	<h2>Blanks and Detection Limits/LOQs</h2>
+	<div class="flex items-end gap-4">
+		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}"
+				viewBox="0 0 24 24"
+				stroke-width="2"
+				stroke="currentColor"
+				fill="none"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+				<path d="M7 7l5 5l-5 5" />
+				<path d="M13 7l5 5l-5 5" />
+			</svg>
+			<h2 class="inline-flex gap-4">Blanks and Detection Limits</h2>
+		</button>
 
-	<div class="flex flex-col gap-4">
-		{#if $method.blanks && $method.blanks?.size > 0}
-			{#each Array.from($method.blanks).sort() as [_, blank] (blank.id)}
-				<BlankList {blank} />
-			{/each}
+		{#if blankMessage}
+			<div
+				class="text-sm text-amber-600 italic tracking-wide w-36 text-center"
+				in:fade={{ duration: 200 }}
+				out:fade={{ duration: 100 }}
+			>
+				{blankMessage}
+			</div>
 		{/if}
+	</div>
 
-		<div class="basic-border p-4 w-fit">
-			<h3>Add New Blank Type</h3>
-			<form class="w-48">
-				<TextInput
-					label="Blank Name"
-					placeholder="e.g. Method Blank"
-					name="blank-name"
-					bind:value={newBlankName}
-				/>
+	<div
+		class="overflow-hidden transition-all"
+		style="max-height: {open ? `${contentDiv.scrollHeight}px` : '0'}"
+		bind:this={contentDiv}
+	>
+		<div class="flex flex-col gap-4 mt-4">
+			{#if $method.blanks && $method.blanks?.size > 0}
+				{#each Array.from($method.blanks).sort() as [_, blank] (blank.id)}
+					<BlankList {blank} />
+				{/each}
+			{/if}
 
-				<div class="flex flex-col gap-2 items-start">
-					<div class="text-sm text-red-500">{blankMessage ?? ''}</div>
-					<input
-						type="submit"
-						value="+Add"
-						class="btn font-semibold w-full"
-						on:click|preventDefault={createNewBlank}
-					/>
-					// TODO: Make this collapsible
+			<div class="basic-border py-2 px-4 w-fit transition-all">
+				<button
+					class="flex items-center gap-2"
+					on:click={() => (addFormOpen = !addFormOpen)}
+					on:click={() => (contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`)}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5 stroke-gray-400 transition-all {addFormOpen ? 'rotate-90' : ''}"
+						viewBox="0 0 24 24"
+						stroke-width="2"
+						stroke="currentColor"
+						fill="none"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+						<path d="M7 7l5 5l-5 5" />
+						<path d="M13 7l5 5l-5 5" />
+					</svg>
+					<h3>Add New Blank Type</h3>
+				</button>
+
+				<div
+					class="overflow-hidden"
+					style="max-height: {addFormOpen ? `${addFormDiv.scrollHeight}px` : '0'}"
+					bind:this={addFormDiv}
+				>
+					<form class="w-48">
+						<TextInput
+							label="Blank Name"
+							placeholder="e.g. Method Blank"
+							name="blank-name"
+							bind:value={newBlankName}
+						/>
+
+						<div class="flex flex-col gap-2 items-start">
+							<div class="text-sm text-red-500">{blankMessage ?? ''}</div>
+							<input
+								type="submit"
+								value="+Add"
+								class="btn font-semibold w-full"
+								on:click|preventDefault={createNewBlank}
+							/>
+						</div>
+					</form>
 				</div>
-			</form>
+			</div>
 		</div>
 	</div>
 </div>
-
-<!-- <script lang="ts">
-	import { createElementLoq, updateElementLoq } from '$lib/methods';
-	import { loqs, method } from '$lib/stores';
-	import { flip } from 'svelte/animate';
-	import { fade, fly } from 'svelte/transition';
-
-	let loqMessage = '';
-
-	$: loqsToShow = $loqs.filter((loq) => loq.visible);
-
-	const saveLoqs = async () => {
-		loqsToShow.forEach(async (loq) => {
-			if (loq.inDb && typeof loq.id === 'string') {
-				await updateElementLoq(loq.id, loq.value ?? 0);
-				const storeIndex = $loqs.findIndex((l) => l.id === loq.id);
-				$loqs[storeIndex].value = loq.value;
-			} else {
-				const newLoq = await createElementLoq($method.id, loq.elementId, loq.value);
-				const storeIndex = $loqs.findIndex((l) => l.id === loq.id);
-				$loqs[storeIndex].id = newLoq.id;
-				$loqs[storeIndex].inDb = true;
-			}
-		});
-		loqMessage = 'Saved!';
-		setTimeout(() => (loqMessage = ''), 1500);
-	};
-</script>
-
-{#if loqsToShow.length > 0}
-	<div
-		class="basic-border py-4 px-8 mt-4 w-fit"
-		in:fly|local={{ y: 50, duration: 150 }}
-		out:fade|local={{ duration: 100 }}
-	>
-		<h2 class="my-2">Detection Limits</h2>
-		<form on:submit|preventDefault={saveLoqs}>
-			<div class="grid grid-cols-5 grid-flow-row gap-x-8 w-fit">
-				{#each loqsToShow as element, index (`${element.id}-${element.mass}`)}
-					<div
-						class="max-w-[8rem] bg-gray-100 rounded my-1 p-1"
-						transition:fade|local={{ duration: 150 }}
-						animate:flip={{ duration: 150 }}
-					>
-						<div class="flex flex-col text-sm">
-							<div class="flex  items-baseline justify-between mx-1">
-								<label for="{element.symbol}-{element.mass}-loq}">
-									<sup>{element.mass}</sup>{element.symbol}
-								</label>
-								<div class="text-xs text-gray-400 mr-2 font-bold">
-									{element.units}
-								</div>
-							</div>
-							<input
-								type="text"
-								class="number-input"
-								bind:value={loqsToShow[index].value}
-								name="{element.symbol}-{element.mass}-loq"
-							/>
-						</div>
-					</div>
-				{/each}
-			</div>
-			<div class="flex justify-between items-center mt-2">
-				<div class="text-sm text-green-600">{loqMessage}</div>
-				<button class="btn w-fit h-fit self-center justify-self-center">Save LOQs</button>
-			</div>
-		</form>
-	</div>
-{/if} -->

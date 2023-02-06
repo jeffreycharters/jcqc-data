@@ -66,7 +66,7 @@
 				<path d="M7 7l5 5l-5 5" />
 				<path d="M13 7l5 5l-5 5" />
 			</svg>
-			<h2 class="inline-flex gap-4">
+			<h2 class="inline-flex whitespace-nowrap gap-4">
 				Add/Remove elements
 				<span class="text-gray-400 flex items-center font-semibold">
 					<svg
