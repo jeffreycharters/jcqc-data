@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { methodParams, reportData } from '$lib/stores';
 	import HeaderInfo from './HeaderInfo.svelte';
 	import Calibration from './Calibration.svelte';
@@ -82,4 +82,4 @@
 		font-family: Arial, Helvetica, sans-serif;
 		@apply text-[0.75rem];
 	}
-</style>
+</style> -->

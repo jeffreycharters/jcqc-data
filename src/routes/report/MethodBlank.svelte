@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
 	import { methodParams } from '$lib/stores';
 	import HeaderRow from './HeaderRow.svelte';
@@ -34,4 +34,4 @@
 			</tr>
 		</tbody>
 	</table>
-</div>
+</div> -->

@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
 	import { methodParams } from '$lib/stores';
@@ -79,4 +79,4 @@
 		</tbody>
 	</table>
 	<br />
-</div>
+</div> -->

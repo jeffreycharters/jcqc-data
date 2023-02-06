@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { generateMethodParams } from '$lib/methodParams';
 	import { selectedMethodId } from '$lib/stores';
 	import { fade } from 'svelte/transition';
@@ -148,4 +148,4 @@
 	td.first-column {
 		@apply font-semibold text-gray-800 text-left;
 	}
-</style>
+</style> -->

@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { methodParams } from '$lib/stores';
 
 	export let firstColumnLabel = '';
@@ -26,4 +26,4 @@
 	th.heading {
 		@apply border-b-2 border-b-gray-900 w-[105px];
 	}
-</style>
+</style> -->
