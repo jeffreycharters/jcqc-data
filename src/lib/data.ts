@@ -1,5 +1,6 @@
 import cuid from "cuid";
-import { reportData } from "$lib/stores";
+import { method, reportData } from "$lib/stores";
+import type { Method } from "./classes";
 
 export const sortedArrayFromMap = (map: Map<number, number>) => {
     return Array.from(map).sort((a, b) => (a[0] < b[0] ? -1 : 1));
@@ -111,32 +112,31 @@ const parseJsonData = (rawInput: { name: string, results: Map<number, number> }[
     return runList
 };
 
-const addSampleTypesTo = (input: RunListEntry[], rms: string[], checkStdName: string) => {
-    const referenceMaterialsLower = rms.map((rm) => rm.toLowerCase());
+const addSampleTypesTo = (input: RunListEntry[], method: Method) => {
     const submissionRegex = /\d{2}-\d{6}-\d{4}/;
 
     input.forEach(sample => {
-        const sampleNameLower = sample.name.toLowerCase();
+        const sampleNameLower = sample.name.toLowerCase().trim();
 
-        sample.isCalBlank = ['calibration blank', 'cal blank'].includes(sampleNameLower);
-        sample.isCalCheck = checkStdName.toLowerCase().trim().includes(sampleNameLower) || sampleNameLower.endsWith('ppb check');
+        sample.isCalBlank = method.lowerCaseBlankNames.includes(sampleNameLower);
+        sample.isCalCheck = method.checkStandardNames.includes(sampleNameLower);
         sample.isMethodBlank = sampleNameLower === 'method blank';
-        sample.isReferenceMaterial = referenceMaterialsLower.includes(sampleNameLower);
-        sample.isSample = (submissionRegex.test(sample.name) || sample.name.toLowerCase().startsWith('qc')) && !sample.isDup
+        sample.isReferenceMaterial = method.referenceMaterialNames.includes(sampleNameLower);
+        sample.isSample = (submissionRegex.test(sample.name) || sampleNameLower.startsWith('qc')) && !sample.isDup
     })
     return input;
 }
 
 
 
-export const parseFileAndUpdateStore = (inputFile: File, referenceMaterialNames: string[], checkStdName: string) => {
+export const parseFileAndUpdateStore = (inputFile: File, method: Method) => {
     const reader = new FileReader();
     reader.readAsText(inputFile);
     reader.onloadend = () => {
         if (!reader.result || typeof reader.result != 'string') return;
         const jsonData = csvParse(reader.result);
         const parsedData = parseJsonData(jsonData);
-        const dataWithSampleTypes = addSampleTypesTo(parsedData, referenceMaterialNames, checkStdName);
+        const dataWithSampleTypes = addSampleTypesTo(parsedData, method);
         reportData.set(dataWithSampleTypes)
     }
 }

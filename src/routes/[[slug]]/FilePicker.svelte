@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { parseFileAndUpdateStore } from '$lib/data';
+	import { method } from '$lib/stores';
 
 	let files: HTMLInputElement['files'];
 	let errorMessage: string = '';
@@ -14,12 +15,9 @@
 			return;
 		}
 
-		// parseFileAndUpdateStore(
-		// 	inputFile,
-		// 	$methodParams?.referenceMaterialNames,
-		// 	$methodParams?.method?.checkStandardName
-		// );
-		// goto('/report');
+		if (!$method) throw new Error('no method set!');
+		parseFileAndUpdateStore(inputFile, $method);
+		goto('/report');
 	};
 
 	$: parseInput(files);

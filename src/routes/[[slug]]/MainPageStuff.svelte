@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { methods } from '$lib/stores';
+	import { method, methods } from '$lib/stores';
 	import SelectInstrument from './SelectInstrument.svelte';
 </script>
 
@@ -23,13 +23,19 @@
 				<div class="flex flex-wrap justify-center mx-auto gap-3">
 					{#each $methods as method (method.id)}
 						<a
+							data-sveltekit-preload-data="tap"
 							href="/{method.slug}"
 							class="btn my-2 no-underline {$page.params.slug === method.slug
 								? 'selected-button'
 								: 'method-button'}">{method.name}</a
 						>
 					{/each}
-					<a href="/" class="btn my-2 method-button no-underline">Clear</a>
+					<a
+						href="/"
+						data-sveltekit-preload-data="tap"
+						class="btn my-2 method-button no-underline"
+						on:click={() => ($method = null)}>Clear</a
+					>
 				</div>
 			</div>
 		</div>

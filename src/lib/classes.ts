@@ -1,4 +1,5 @@
 import slugify from "slugify";
+import { element } from "svelte/internal";
 import { createBlank, getBlanksByMethodId, updateMethodBlankList } from "./blanks";
 import { pb } from "./pocketbase";
 import type { BlanksResponse, CheckStandardsResponse, CheckValuesResponse, DetectionLimitsResponse, ElementsResponse, MethodsResponse, ReferenceMaterialsRangesResponse, ReferenceMaterialsResponse, UnitsResponse } from "./pocketbase-types";
@@ -77,7 +78,7 @@ export class Method {
     }
 
     private populateElements(elements: ElementsResponse[], unitList: UnitsResponse[]) {
-        console.log('populating elementMap!'); // TODO
+        console.log('populating elementMap!');
         if (!elements || elements.length === 0) return [];
 
         const activeElements = elements.filter(element => element.active)
@@ -638,37 +639,31 @@ export class Method {
         if (!this.description) return this.name
         return `${this.name}: ${this.description}`
     }
-}
 
-export class Blank {
-
-
-    constructor(
-        public id: string | undefined,
-        public methodId: string,
-    ) { }
-
-    async createNew(name: string) {
-        const methodBlanks = await getBlanksByMethodId(this.methodId)
-        const existingBlank = methodBlanks.find(blank => blank.name === name);
-        if (existingBlank) throw new Error('Blank already exists');
-
-        const newBlank = await createBlank(name);
-        if (!newBlank) throw new Error('Error creating blank');
-
-        this.id = newBlank.id;
-
-        methodBlanks.push(newBlank);
-        const methodBlankList: string[] = methodBlanks.map(blank => blank.id);
-        const updatedMethod = await updateMethodBlankList(this.methodId, methodBlankList);
-
-        if (!updatedMethod) throw new Error('Error updating method');
+    get blankNames() {
+        if (!this.blanks || this.blanks.size === 0) return [];
+        return [...this.blanks.keys()];
     }
 
-    async getMethodElements() {
-        // const 
-        console.log('hi');
-
+    get lowerCaseBlankNames() {
+        return this.blankNames.map(blank => blank.toLowerCase());
     }
 
+    get checkStandardNames() {
+        if (!this.checkStandards || this.checkStandards.size === 0) return [];
+        return [...this.checkStandards.keys()];
+    }
+
+    get lowerCaseCheckStandardNames() {
+        return this.checkStandardNames.map(std => std.toLowerCase());
+    }
+
+    get referenceMaterialNames() {
+        if (!this.referenceMaterials || this.referenceMaterials.size === 0) return [];
+        return [...this.referenceMaterials.keys()];
+    }
+
+    get lowerCaseReferenceMaterialNames() {
+        return this.referenceMaterialNames.map(rm => rm.toLowerCase());
+    }
 }

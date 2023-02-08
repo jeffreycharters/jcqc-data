@@ -1,35 +1,29 @@
-<!-- <script lang="ts">
-	import { generateMethodParams } from '$lib/methodParams';
-	import { selectedMethodId } from '$lib/stores';
+<script lang="ts">
+	import { method } from '$lib/stores';
 	import { fade } from 'svelte/transition';
 
-	$: currentMethodParams = generateMethodParams($selectedMethodId);
+	$: elements = $method?.elements ?? [];
+	$: lowElementCount = elements && elements?.length < 10;
+
+	// TODO: add blanks, cal checks, rms. to the table.
 </script>
 
-<div class="w-fit mx-auto" in:fade|local={{ duration: 200 }}>
-	{#await currentMethodParams}
-		<div />
-	{:then methodParams}
-		{@const method = methodParams.method}
-
+{#if $method}
+	<div class="w-fit mx-auto" in:fade|local={{ duration: 200 }}>
 		<div
-			class="flex {methodParams.elements.length < 10
+			class="flex {lowElementCount
 				? 'flex-col gap-4'
 				: 'justify-between gap-8'} items-end flex-wrap my-8"
 		>
-			<h2
-				class="text-2xl flex-grow border-b {methodParams.elements.length < 10
-					? 'self-start'
-					: 'self-end'}"
-			>
-				{method.name}{#if method.description}: {method.description}{/if}
+			<h2 class="text-2xl flex-grow border-b {lowElementCount ? 'self-start' : 'self-end'}">
+				{$method.title}
 			</h2>
 
 			<div class="flex items-stretch gap-4">
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
-						{#if method.checkStandardLimit}
-							{method.checkStandardLimit}%
+						{#if $method.checkStandardTolerance}
+							{$method.checkStandardTolerance}%
 						{:else}
 							- -
 						{/if}
@@ -41,8 +35,8 @@
 
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
-						{#if method.rpdLimit}
-							{method.rpdLimit}%
+						{#if $method.rpdLimit}
+							{$method.rpdLimit}%
 						{:else}
 							- -
 						{/if}
@@ -52,8 +46,8 @@
 
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
-						{#if method.calibrationCount}
-							{method.calibrationCount}
+						{#if $method.calibrationCount}
+							{$method.calibrationCount}
 						{:else}
 							- -
 						{/if}
@@ -63,7 +57,7 @@
 
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
-						{#if method}
+						{#if $method}
 							3
 						{:else}
 							??
@@ -73,11 +67,6 @@
 				</div>
 			</div>
 		</div>
-
-		{@const elements = methodParams.elements}
-		{@const loqs = methodParams.loqs}
-		{@const referenceMaterials = methodParams.referenceMaterials}
-		{@const referenceMaterialNames = methodParams.referenceMaterialNames}
 		<table class="text-sm my-2 w-fit mx-auto">
 			<thead>
 				<tr class="border-b border-gray-400">
@@ -102,44 +91,34 @@
 				<tr class="border-b border-gray-400">
 					<td class="first-column">Method Blank LOQs</td>
 					{#each elements as element}
-						<td class="text-center">
-							{loqs[element.mass] ?? '- -'}
-						</td>
+						<td class="text-center">{element.mass}</td>
 					{/each}
 				</tr>
+				<!--
 				<tr class="bg-gray-200 border-b border-gray-400">
-					<td class="first-column">{method.checkStandardName}</td>
+					<td class="first-column">Check STanadrds (fix)</td>
 					{#each elements as element}
-						<td class="text-center">
-							{element.checkStandard ?? '- -'}
-						</td>
+						<td class="text-center"> fix </td>
 					{/each}
 				</tr>
 
-				{#each referenceMaterialNames as rmName, index}
+				{#each [] as rmName, index}
 					{@const bgColour = index % 2 === 1 ? 'bg-gray-200' : ''}
 					<tr class={bgColour}>
-						<td rowspan="2" class="first-column">{rmName}</td>
 						{#each elements as element}
-							{@const thisElement = referenceMaterials.get(rmName)?.get(element.mass)}
-							<td class="text-center">
-								{thisElement?.low === 0 ? '- -' : thisElement?.low ?? '- -'}
-							</td>
+							<td class="text-center"> low </td>
 						{/each}
 					</tr>
 					<tr class="border-b border-gray-400 {bgColour}">
 						{#each elements as element}
-							{@const thisElement = referenceMaterials.get(rmName)?.get(element.mass)}
-							<td class="text-center">
-								{thisElement?.high === 0 ? '- -' : thisElement?.high ?? '- -'}
-							</td>
+							<td class="text-center"> range </td>
 						{/each}
 					</tr>
-				{/each}
+				{/each} -->
 			</tbody>
 		</table>
-	{/await}
-</div>
+	</div>
+{/if}
 
 <style lang="postcss">
 	td {
@@ -148,4 +127,4 @@
 	td.first-column {
 		@apply font-semibold text-gray-800 text-left;
 	}
-</style> -->
+</style>

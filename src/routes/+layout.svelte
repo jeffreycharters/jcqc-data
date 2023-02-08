@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import '../app.postcss';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
