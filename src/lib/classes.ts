@@ -4,7 +4,7 @@ import type { BlanksResponse, CheckStandardsResponse, CheckValuesResponse, Detec
 
 export type SampleType = "blanks" | "checkStandards" | "referenceMaterials";
 
-export type ExpandType = "checkValues" | "detectionLimits" | "referenceMaterialsRanges"
+export type ExpandType = "checkValues" | "detectionLimits" | "ranges"
 
 export type Analyte = {
     id: string
@@ -640,6 +640,7 @@ export class Method {
     getValue(sampleType: SampleType, name: string, expandType: ExpandType, element: string) {
         if (!this[sampleType]?.has(name)) return null;
         const targetSample = this[sampleType]?.get(name);
+
         if (!targetSample?.expand || !targetSample.expand[expandType]) return null;
         const targetElements = targetSample.expand[expandType].find((x: CheckValuesResponse) => x.element === element);
         return targetElements;

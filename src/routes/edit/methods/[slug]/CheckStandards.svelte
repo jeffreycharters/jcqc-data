@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { method } from '$lib/stores';
 	import { fade } from 'svelte/transition';
@@ -11,13 +12,15 @@
 	let addFormDiv: HTMLDivElement;
 	let contentDiv: HTMLElement;
 
+	if (!$method) goto('/', { invalidateAll: true });
+
 	const createNewCheckStandard = async () => {
 		if (!newCalName) {
 			calMessage = 'Please add a blank name';
 			return;
 		}
 		try {
-			await $method.createNewCheckStandard(newCalName);
+			await $method?.createNewCheckStandard(newCalName);
 			$method = $method;
 		} catch (err) {
 			const error = err as Error;
@@ -65,7 +68,7 @@
 		bind:this={contentDiv}
 	>
 		<div class="flex flex-col gap-4 mt-4">
-			{#if $method.checkStandards && $method.checkStandards?.size > 0}
+			{#if $method?.checkStandards && $method.checkStandards?.size > 0}
 				{#each Array.from($method.checkStandards).sort() as [_, checkStandard] (checkStandard.id)}
 					<CheckStandardList {checkStandard} />
 				{/each}

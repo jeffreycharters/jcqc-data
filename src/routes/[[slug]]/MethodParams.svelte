@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { method } from '$lib/stores';
 
-	$: elements = $method?.elements ?? [];
+	$: elements = $method?.elements?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? [];
 	$: lowElementCount = elements && elements?.length < 10;
 
 	$: methodHasCheckStandards = $method?.checkStandards && $method?.checkStandards.size > 0;
@@ -82,6 +82,14 @@
 			</thead>
 
 			<tbody>
+				{#if elements.length > 0}
+					<tr>
+						<td class="first-column">Units</td>
+						{#each elements as element}
+							<td class="text-center">{element.units}</td>
+						{/each}
+					</tr>
+				{/if}
 				{#if methodHasCheckStandards}
 					{#each Array.from($method.checkStandards?.values() ?? []) as checkStandard (checkStandard.id)}
 						<tr class="border-b border-gray-400">
@@ -134,19 +142,42 @@
 						</tr>
 					{/each}
 				{/if}
-				<!--				{#each [] as rmName, index}
-					{@const bgColour = index % 2 === 1 ? 'bg-gray-200' : ''}
-					<tr class={bgColour}>
-						{#each elements as element}
-							<td class="text-center"> low </td>
-						{/each}
-					</tr>
-					<tr class="border-b border-gray-400 {bgColour}">
-						{#each elements as element}
-							<td class="text-center"> range </td>
-						{/each}
-					</tr>
-				{/each} -->
+
+				{#if methodHasReferenceMaterials}
+					{#each Array.from($method.referenceMaterials?.values() ?? []) as referenceMaterial (referenceMaterial.id)}
+						<tr class="border-b border-gray-400">
+							<td class="first-column items-center gap-2 flex justify-between">
+								<div>
+									{referenceMaterial.name}
+								</div>
+								<div class="table font-normal">
+									<div>Low</div>
+									<div>High</div>
+								</div>
+							</td>
+							{#each elements as element}
+								{@const values = $method.getValue(
+									'referenceMaterials',
+									referenceMaterial.name,
+									'ranges',
+									element.id
+								)}
+								<td class="text-center">
+									<div class="table mx-auto">
+										<div class="table-row">
+											<div class="table-cell text-center">
+												{values?.lower === 0 ? '- -' : values?.lower}
+											</div>
+										</div>
+										<div>
+											{values?.upper === 0 ? '- -' : values?.upper}
+										</div>
+									</div>
+								</td>
+							{/each}
+						</tr>
+					{/each}
+				{/if}
 			</tbody>
 		</table>
 	</div>
