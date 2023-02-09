@@ -4,6 +4,7 @@
 	import MainPageStuff from './MainPageStuff.svelte';
 	import type { PageData } from './$types';
 	import MethodParams from './MethodParams.svelte';
+	import { fade, fly } from 'svelte/transition';
 
 	export let data: PageData;
 	const methodList = data.methods;
@@ -11,11 +12,17 @@
 	if (methodList) {
 		$methods = methodList;
 	}
+
+	const transitionDuration = 200;
 </script>
 
 <MainPageStuff>
 	<FilePicker />
-	<MethodParams />
+	{#key $method}
+		<div in:fly|local={{ x: -20, duration: transitionDuration }}>
+			<MethodParams />
+		</div>
+	{/key}
 </MainPageStuff>
 
 <div class="absolute bottom-4 left-4">

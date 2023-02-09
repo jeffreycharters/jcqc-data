@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { method } from '$lib/stores';
-	import { fade } from 'svelte/transition';
 
 	$: elements = $method?.elements ?? [];
 	$: lowElementCount = elements && elements?.length < 10;
 
-	// TODO: add blanks, cal checks, rms. to the table.
+	$: methodHasCheckStandards = $method?.checkStandards && $method?.checkStandards.size > 0;
+	$: methodHasBlanks = $method?.blanks && $method?.blanks.size > 0;
+	$: methodHasReferenceMaterials =
+		$method?.referenceMaterials && $method?.referenceMaterials.size > 0;
 </script>
 
 {#if $method}
-	<div class="w-fit mx-auto" in:fade|local={{ duration: 200 }}>
+	<div class="w-fit mx-auto">
 		<div
 			class="flex {lowElementCount
 				? 'flex-col gap-4'
@@ -80,29 +82,59 @@
 			</thead>
 
 			<tbody>
-				<tr class="bg-gray-200 border-b border-gray-400">
-					<td class="first-column">Units</td>
-					{#each elements as element}
-						<td class="text-center">
-							{element.units}
-						</td>
+				{#if methodHasCheckStandards}
+					{#each Array.from($method.checkStandards?.values() ?? []) as checkStandard (checkStandard.id)}
+						<tr class="border-b border-gray-400">
+							<td class="first-column">{checkStandard.name}</td>
+							{#each elements as element}
+								{@const values = $method.getValue(
+									'checkStandards',
+									checkStandard.name,
+									'checkValues',
+									element.id
+								)}
+								<td class="text-center">{values.value}</td>
+							{/each}
+						</tr>
 					{/each}
-				</tr>
-				<tr class="border-b border-gray-400">
-					<td class="first-column">Method Blank LOQs</td>
-					{#each elements as element}
-						<td class="text-center">{element.mass}</td>
-					{/each}
-				</tr>
-				<!--
-				<tr class="bg-gray-200 border-b border-gray-400">
-					<td class="first-column">Check STanadrds (fix)</td>
-					{#each elements as element}
-						<td class="text-center"> fix </td>
-					{/each}
-				</tr>
+				{/if}
 
-				{#each [] as rmName, index}
+				{#if methodHasBlanks}
+					{#each Array.from($method.blanks?.values() ?? []) as blank (blank.id)}
+						<tr class="border-b border-gray-400">
+							<td class="first-column items-center gap-2 flex justify-between">
+								<div>
+									{blank.name}
+								</div>
+								<div class="table font-normal">
+									<div>MDL</div>
+									<div>LOQ</div>
+								</div>
+							</td>
+							{#each elements as element}
+								{@const values = $method.getValue(
+									'blanks',
+									blank.name,
+									'detectionLimits',
+									element.id
+								)}
+								<td class="text-center">
+									<div class="table mx-auto">
+										<div class="table-row">
+											<div class="table-cell text-center">
+												{values.mdl === 0 ? '- -' : values.mdl}
+											</div>
+										</div>
+										<div>
+											{values.loq === 0 ? '- -' : values.loq}
+										</div>
+									</div>
+								</td>
+							{/each}
+						</tr>
+					{/each}
+				{/if}
+				<!--				{#each [] as rmName, index}
 					{@const bgColour = index % 2 === 1 ? 'bg-gray-200' : ''}
 					<tr class={bgColour}>
 						{#each elements as element}
@@ -121,6 +153,9 @@
 {/if}
 
 <style lang="postcss">
+	tr:nth-child(even) {
+		@apply bg-gray-100;
+	}
 	td {
 		@apply py-[6px] px-[10px];
 	}

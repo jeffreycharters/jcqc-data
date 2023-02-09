@@ -1,8 +1,10 @@
 import slugify from "slugify";
-import { element } from "svelte/internal";
-import { createBlank, getBlanksByMethodId, updateMethodBlankList } from "./blanks";
 import { pb } from "./pocketbase";
 import type { BlanksResponse, CheckStandardsResponse, CheckValuesResponse, DetectionLimitsResponse, ElementsResponse, MethodsResponse, ReferenceMaterialsRangesResponse, ReferenceMaterialsResponse, UnitsResponse } from "./pocketbase-types";
+
+export type SampleType = "blanks" | "checkStandards" | "referenceMaterials";
+
+export type ExpandType = "checkValues" | "detectionLimits" | "referenceMaterialsRanges"
 
 export type Analyte = {
     id: string
@@ -633,6 +635,15 @@ export class Method {
             idList.push(checkStdRecord.id)
         }
         return idList
+    }
+
+    getValue(sampleType: SampleType, name: string, expandType: ExpandType, element: string) {
+        if (!this[sampleType]?.has(name)) return null;
+        const targetSample = this[sampleType]?.get(name);
+        if (!targetSample?.expand || !targetSample.expand[expandType]) return null;
+        const targetElements = targetSample.expand[expandType].find((x: CheckValuesResponse) => x.element === element);
+        return targetElements;
+
     }
 
     get title() {
