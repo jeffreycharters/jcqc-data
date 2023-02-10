@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
-	import { methodParams } from '$lib/stores';
 	import HeaderRow from './HeaderRow.svelte';
+	import { method } from '$lib/stores';
 
 	export let sample: RunListEntry;
 	let values = sortedArrayFromMap(sample.results.values);
-	$: checkStandardLimit = $methodParams?.method.checkStandardLimit / 100;
+	$: checkStandardLimit = 100; // TODO fix this
 </script>
 
 <div>
@@ -30,9 +30,8 @@
 					<td>Within Range</td>
 					{#each values as [key, value]}
 						{@const prettifiedValue = value < 1 ? value * 1000 : value}
-						{@const elementExpected = $methodParams.elements.find(
-							(element) => element.mass === key
-						)?.checkStandard}
+						{@const elementExpected =
+							$method?.elements?.find((element) => element.mass === key)?.mass ?? 0};
 						{@const tolerance = elementExpected * checkStandardLimit}
 						{@const passes =
 							prettifiedValue < elementExpected + tolerance &&

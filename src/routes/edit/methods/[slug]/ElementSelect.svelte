@@ -13,19 +13,19 @@
 	let formMessage = '';
 	let open = false;
 
-	$: usedElements = $method.elements ?? [];
+	$: usedElements = $method?.elements ?? [];
 	$: unusedElements = elementList?.filter(
 		(element) => !usedElements.map((e) => e.id).includes(element.id)
 	);
 
 	const addElement = async (elementId: string) => {
-		await $method.addElement(elementId);
+		await $method?.addElement(elementId);
 		$method = $method;
 		contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
 	};
 
 	const removeElement = async (element: Analyte) => {
-		await $method.removeElement(element);
+		await $method?.removeElement(element);
 		$method = $method;
 		contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
 	};

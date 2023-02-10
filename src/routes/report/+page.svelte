@@ -1,5 +1,5 @@
-<!-- <script lang="ts">
-	import { methodParams, reportData } from '$lib/stores';
+<script lang="ts">
+	import { method, reportData } from '$lib/stores';
 	import HeaderInfo from './HeaderInfo.svelte';
 	import Calibration from './Calibration.svelte';
 	import CheckStandard from './CheckStandard.svelte';
@@ -10,7 +10,7 @@
 	import Duplicate from './Duplicate.svelte';
 	import { browser } from '$app/environment';
 
-	let methodElementCount = $methodParams?.elements?.length || 0;
+	let methodElementCount = $method?.elements?.length || 0;
 	let analysisElementCount = $reportData?.length > 0 ? $reportData[0]?.results.values.size : 0;
 
 	const getSampleBlock = (index: number) => {
@@ -48,10 +48,10 @@
 				{:else}
 					{#if sample.isCalBlank}
 						<Calibration
-							samples={$reportData.slice(index, index + $methodParams.method.calibrationCount + 1)}
+							samples={$reportData.slice(index, index + ($method?.calibrationCount ?? 0) + 1)}
 						/>
 					{/if}
-
+					<!-- 
 					{#if sample.isCalCheck}
 						<CheckStandard {sample} />
 					{/if}
@@ -66,7 +66,7 @@
 
 					{#if sample.isDup}
 						<Duplicate {sample} />
-					{/if}
+					{/if} -->
 				{/if}
 			{/each}
 		{:else}
@@ -82,4 +82,4 @@
 		font-family: Arial, Helvetica, sans-serif;
 		@apply text-[0.75rem];
 	}
-</style> -->
+</style>

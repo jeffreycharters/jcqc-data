@@ -11,7 +11,7 @@
 	let { elementList } = data;
 </script>
 
-<h1>{$method.title}</h1>
+<h1>{$method?.title}</h1>
 
 <EditMethod />
 

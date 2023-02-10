@@ -118,9 +118,9 @@ const addSampleTypesTo = (input: RunListEntry[], method: Method) => {
     input.forEach(sample => {
         const sampleNameLower = sample.name.toLowerCase().trim();
 
-        sample.isCalBlank = method.lowerCaseBlankNames.includes(sampleNameLower);
+        sample.isCalBlank = ["calibration blank", "cal blank"].includes(sampleNameLower);
         sample.isCalCheck = method.checkStandardNames.includes(sampleNameLower);
-        sample.isMethodBlank = sampleNameLower === 'method blank';
+        sample.isMethodBlank = method.lowerCaseBlankNames.includes(sampleNameLower);
         sample.isReferenceMaterial = method.referenceMaterialNames.includes(sampleNameLower);
         sample.isSample = (submissionRegex.test(sample.name) || sampleNameLower.startsWith('qc')) && !sample.isDup
     })
