@@ -1,21 +1,29 @@
-<!-- <script lang="ts">
+<script lang="ts">
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
-	import { methodParams } from '$lib/stores';
+	import type {
+		ReferenceMaterialsRangesResponse,
+		ReferenceMaterialsResponse
+	} from '$lib/pocketbase-types';
+	import { method } from '$lib/stores';
 	import HeaderRow from './HeaderRow.svelte';
 
 	export let sample: RunListEntry;
+	export let rm: ReferenceMaterialsResponse | undefined;
 
-	export let rm = $methodParams.referenceMaterials?.get(sample.name);
-	let elements = sortedArrayFromMap(sample?.results?.values);
+	let values = sortedArrayFromMap(sample.results.values);
 
 	type PassesString = 'passes' | 'fails' | 'neutral';
 
-	const checkRanges = (value: number, ranges: ReferenceLimits): [PassesString, string] => {
-		const { low, high } = ranges;
-		if ((low === 0 && high === 0) || (!low && !high)) return ['neutral', '- -'];
-		if ((!low || low === 0) && high && value < high) return ['passes', 'Yes'];
-		if ((!high || high === 0) && low && value > low) return ['passes', 'Yes'];
-		if (low && high && value > low && value < high) return ['passes', 'Yes'];
+	const checkRanges = (
+		value: number,
+		ranges: ReferenceMaterialsRangesResponse
+	): [PassesString, string] => {
+		const { lower, upper } = ranges;
+
+		if ((lower === 0 && upper === 0) || (!lower && !upper)) return ['neutral', '- -'];
+		if ((!lower || lower === 0) && upper && value < upper) return ['passes', 'Yes'];
+		if ((!upper || upper === 0) && lower && value > lower) return ['passes', 'Yes'];
+		if (lower && upper && value > lower && value < upper) return ['passes', 'Yes'];
 		return ['fails', 'No'];
 	};
 </script>
@@ -28,18 +36,22 @@
 		<tbody>
 			<tr class="border-b border-b-gray-400">
 				<td class="firstCol">{sample.name}</td>
-				{#each elements as element}
-					{@const elementValue = roundToSigFigs(element[1], 3)}
+				{#each values as [key, value]}
 					<td>
-						{elementValue}
+						{roundToSigFigs(value, 3)}
 					</td>
 				{/each}
 			</tr>
 			<tr>
 				<td class="firstCol">Within Range</td>
 
-				{#each elements as [mass, value]}
-					{@const ranges = rm?.get(mass)}
+				{#each values as [mass, value]}
+					{@const ranges = $method?.getValue(
+						'referenceMaterials',
+						rm?.name ?? '',
+						'ranges',
+						$method.getElementIdFromMass(mass) ?? ''
+					)}
 
 					{#if ranges}
 						{@const [passes, output] = checkRanges(value, ranges)}
@@ -53,4 +65,4 @@
 		</tbody>
 	</table>
 	<br />
-</div> -->
+</div>

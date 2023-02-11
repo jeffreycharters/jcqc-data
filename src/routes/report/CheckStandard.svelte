@@ -2,14 +2,16 @@
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
 	import HeaderRow from './HeaderRow.svelte';
 	import { method } from '$lib/stores';
+	import type { CheckStandardsResponse } from '$lib/pocketbase-types';
 
 	export let sample: RunListEntry;
+	export let checkStandard: CheckStandardsResponse | undefined;
+
 	let values = sortedArrayFromMap(sample.results.values);
-	$: checkStandardLimit = 100; // TODO fix this
+	$: checkStandardLimit = ($method?.checkStandardTolerance ?? 0) / 100; // TODO fix this
 </script>
 
 <div>
-	<br />
 	<table class="results">
 		<HeaderRow firstColumnLabel="Check Standard" />
 
@@ -18,9 +20,8 @@
 				<td class="firstCol">{sample.name}</td>
 
 				{#each values as [_, value]}
-					{@const prettifiedValue = value < 2 ? value * 1000 : value}
 					<td class="text-center">
-						{roundToSigFigs(prettifiedValue, 3)}
+						{roundToSigFigs(value, 3)}
 					</td>
 				{/each}
 			</tr>
@@ -29,16 +30,23 @@
 				<tr>
 					<td>Within Range</td>
 					{#each values as [key, value]}
-						{@const prettifiedValue = value < 1 ? value * 1000 : value}
 						{@const elementExpected =
-							$method?.elements?.find((element) => element.mass === key)?.mass ?? 0};
+							$method?.getValue(
+								'checkStandards',
+								checkStandard?.name ?? '',
+								'checkValues',
+								$method.getElementIdFromMass(key) ?? ''
+							).value ?? 0}
 						{@const tolerance = elementExpected * checkStandardLimit}
 						{@const passes =
-							prettifiedValue < elementExpected + tolerance &&
-							prettifiedValue > elementExpected - tolerance}
-						<td class={passes ? 'passes' : 'fails'}>
-							{passes ? 'Yes' : 'No'}
-						</td>
+							value < elementExpected + tolerance && value > elementExpected - tolerance}
+						{#if elementExpected != 0}
+							<td class={passes ? 'passes' : 'fails'}>
+								{passes ? 'Yes' : 'No'}
+							</td>
+						{:else}
+							<td>- -</td>
+						{/if}
 					{/each}
 				</tr>
 			{/if}

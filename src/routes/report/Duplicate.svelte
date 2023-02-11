@@ -1,13 +1,13 @@
-<!-- <script lang="ts">
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
-	import { methodParams } from '$lib/stores';
+	import { method } from '$lib/stores';
 	import HeaderRow from './HeaderRow.svelte';
 
 	export let sample: RunListEntry;
 	let values = sortedArrayFromMap(sample?.results?.values);
 	let dupValues = sortedArrayFromMap(sample?.results.dupValues ?? new Map());
-	$: rpdLimit = $methodParams.method.rpdLimit;
+	$: rpdLimit = $method?.rpdLimit ?? 0;
 
 	if (dupValues.length === 0) goto('/');
 
@@ -24,7 +24,6 @@
 </script>
 
 <div>
-	<br />
 	<table class="results">
 		<HeaderRow firstColumnLabel="Duplicate" />
 
@@ -63,7 +62,12 @@
 					<td>RPD (%)</td>
 					{#each values as [mass, value], index}
 						{@const rpd = calculateRPD(value, dupValues[index][1])}
-						{@const loq = $methodParams.loqs[mass]}
+						{@const loq = $method?.getValue(
+							'blanks',
+							[...($method.blanks?.values() ?? [])][0].name,
+							'detectionLimits',
+							$method?.getElementIdFromMass(mass) ?? ''
+						)}
 						{@const average = (value + dupValues[index][1]) / 2}
 						{@const passing = checkIfDupPassing(average, rpd, loq)}
 						<td class={passing}>
@@ -79,4 +83,4 @@
 		</tbody>
 	</table>
 	<br />
-</div> -->
+</div>

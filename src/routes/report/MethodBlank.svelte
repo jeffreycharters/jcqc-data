@@ -1,37 +1,44 @@
-<!-- <script lang="ts">
+<script lang="ts">
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
-	import { methodParams } from '$lib/stores';
+	import { method } from '$lib/stores';
 	import HeaderRow from './HeaderRow.svelte';
 
 	export let sample: RunListEntry;
-	$: loqs = $methodParams.loqs;
 
-	let elements = sortedArrayFromMap(sample?.results?.values);
+	let values = sortedArrayFromMap(sample.results.values);
+
+	let methodBlanks = [...($method?.blanks?.values() ?? [])];
+	let methodBlank = methodBlanks.find((b) => b.name.toLowerCase() === sample.name.toLowerCase());
 </script>
 
 <div>
 	<br />
-	<table class="results">
+	<table class="results mb-4">
 		<HeaderRow firstColumnLabel="Method Blank" />
 
 		<tbody>
 			<tr class="border-b border-b-gray-400">
 				<td class="firstCol">{sample.name}</td>
-				{#each elements as elementResult}
-					<td>{roundToSigFigs(elementResult[1], 3)}</td>
+				{#each [...values] as [key, value]}
+					<td>{roundToSigFigs(value, 3)}</td>
 				{/each}
 			</tr>
 			<tr>
 				<td class="firstCol">Below LOQ</td>
-				{#each elements as element}
-					{@const loq = loqs[element[0]]}
-					{@const measured = element[1]}
-					{@const tdClass = loq && measured ? (measured < loq ? 'passes' : 'fails') : 'neutral'}
+				{#each [...values] as [key, value]}
+					{@const loq =
+						$method?.getValue(
+							'blanks',
+							methodBlank?.name ?? '',
+							'detectionLimits',
+							$method.getElementIdFromMass(key) ?? ''
+						).loq ?? 0}
+					{@const tdClass = loq != 0 && value ? (value < loq ? 'passes' : 'fails') : 'neutral'}
 					<td class={tdClass}>
-						{loq ?? '- -'}
+						{loq != 0 ? loq : '- -'}
 					</td>
 				{/each}
 			</tr>
 		</tbody>
 	</table>
-</div> -->
+</div>

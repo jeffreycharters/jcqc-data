@@ -51,9 +51,8 @@
 							samples={$reportData.slice(index, index + ($method?.calibrationCount ?? 0) + 1)}
 						/>
 					{/if}
-					<!-- 
-					{#if sample.isCalCheck}
-						<CheckStandard {sample} />
+					{#if sample.isCalCheck && $method?.checkStandards?.has(sample.name)}
+						<CheckStandard {sample} checkStandard={$method?.checkStandards?.get(sample.name)} />
 					{/if}
 
 					{#if sample.isMethodBlank}
@@ -61,12 +60,12 @@
 					{/if}
 
 					{#if sample.isReferenceMaterial}
-						<ReferenceMaterial {sample} />
+						<ReferenceMaterial {sample} rm={$method?.getReferenceMaterialNameByName(sample.name)} />
 					{/if}
 
 					{#if sample.isDup}
 						<Duplicate {sample} />
-					{/if} -->
+					{/if}
 				{/if}
 			{/each}
 		{:else}

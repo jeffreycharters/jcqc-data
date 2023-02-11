@@ -2,8 +2,7 @@
 	import HeaderRow from './HeaderRow.svelte';
 </script>
 
-<br />
-<table class="results">
+<table class="results mb-4">
 	<HeaderRow firstColumnLabel="Sample Name" />
 	<tbody>
 		<slot />

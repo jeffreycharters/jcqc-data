@@ -647,6 +647,15 @@ export class Method {
 
     }
 
+    getElementIdFromMass(mass: number) {
+        return this.elements?.find(element => element.mass === mass)?.id;
+    }
+
+    getReferenceMaterialNameByName(name: string) {
+        const rms = Array.from(this.referenceMaterials?.values() ?? [])
+        return rms?.find(rm => rm.name.toLowerCase() === name.toLowerCase())
+    }
+
     get title() {
         if (!this.description) return this.name
         return `${this.name}: ${this.description}`

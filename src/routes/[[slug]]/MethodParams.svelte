@@ -101,7 +101,7 @@
 									'checkValues',
 									element.id
 								)}
-								<td class="text-center">{values.value}</td>
+								<td class="text-center">{values?.value}</td>
 							{/each}
 						</tr>
 					{/each}
