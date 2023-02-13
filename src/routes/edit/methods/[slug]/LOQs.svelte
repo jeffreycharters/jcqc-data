@@ -17,7 +17,7 @@
 			return;
 		}
 		try {
-			await $method.createNewBlank(newBlankName);
+			await $method?.createNewBlank(newBlankName);
 			$method = $method;
 		} catch (err) {
 			const error = err as Error;
@@ -66,7 +66,7 @@
 		bind:this={contentDiv}
 	>
 		<div class="flex flex-col gap-4 mt-4">
-			{#if $method.blanks && $method.blanks?.size > 0}
+			{#if $method?.blanks && $method.blanks?.size > 0}
 				{#each Array.from($method.blanks).sort() as [_, blank] (blank.id)}
 					<BlankList {blank} />
 				{/each}

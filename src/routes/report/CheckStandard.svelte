@@ -8,7 +8,7 @@
 	export let checkStandard: CheckStandardsResponse | undefined;
 
 	let values = sortedArrayFromMap(sample.results.values);
-	$: checkStandardLimit = ($method?.checkStandardTolerance ?? 0) / 100; // TODO fix this
+	$: checkStandardLimit = ($method?.checkStandardTolerance ?? 0) / 100;
 </script>
 
 <div>
@@ -36,7 +36,7 @@
 								checkStandard?.name ?? '',
 								'checkValues',
 								$method.getElementIdFromMass(key) ?? ''
-							).value ?? 0}
+							)?.value ?? 0}
 						{@const tolerance = elementExpected * checkStandardLimit}
 						{@const passes =
 							value < elementExpected + tolerance && value > elementExpected - tolerance}

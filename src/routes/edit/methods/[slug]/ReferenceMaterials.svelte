@@ -4,7 +4,7 @@
 	import TextInput from '$lib/components/TextInput.svelte';
 	import ReferenceMaterialList from './ReferenceMaterialList.svelte';
 
-	$: referenceMaterials = $method.referenceMaterials;
+	$: referenceMaterials = $method?.referenceMaterials;
 
 	let newReferenceMaterialName = '';
 	let formMessage: string;
@@ -14,7 +14,7 @@
 	let contentDiv: HTMLElement;
 
 	const createNewReferenceMaterial = async () => {
-		await $method.createNewReferenceMaterial(newReferenceMaterialName);
+		await $method?.createNewReferenceMaterial(newReferenceMaterialName);
 		$method = $method;
 		newReferenceMaterialName = '';
 		addFormOpen = false;

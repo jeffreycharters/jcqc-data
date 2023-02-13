@@ -32,7 +32,7 @@
 							methodBlank?.name ?? '',
 							'detectionLimits',
 							$method.getElementIdFromMass(key) ?? ''
-						).loq ?? 0}
+						)?.loq ?? 0}
 					{@const tdClass = loq != 0 && value ? (value < loq ? 'passes' : 'fails') : 'neutral'}
 					<td class={tdClass}>
 						{loq != 0 ? loq : '- -'}

@@ -10,6 +10,8 @@
 	let open = false;
 	let contentDiv: HTMLElement;
 
+	let { name, calibrationCount, description, checkStandardTolerance, rpdLimit } = $method || {};
+
 	const addFormMessage = (message: string, timeout: number = 3000) => {
 		if (timer) clearTimeout(timer);
 		formMessage = message;
@@ -17,17 +19,17 @@
 	};
 
 	const editMethod = async () => {
-		if (!$method.name || !$method.calibrationCount) {
+		if (!$method?.name || !$method?.calibrationCount) {
 			addFormMessage('Missing something');
 			return;
 		}
 		try {
-			$method.updateProperties({
-				name: $method.name,
-				calibrationCount: $method.calibrationCount,
-				description: $method.description,
-				checkStandardTolerance: $method.checkStandardTolerance,
-				rpdLimit: $method.rpdLimit
+			$method?.updateProperties({
+				name,
+				calibrationCount,
+				description,
+				checkStandardTolerance,
+				rpdLimit
 			});
 			addFormMessage('Saved!');
 		} catch (err) {
@@ -89,31 +91,31 @@
 				<TextInput
 					name="method-name"
 					placeholder="e.g. TOXI-064 or Serum Iodine"
-					bind:value={$method.name}
+					bind:value={name}
 					label="Method Name"
 				/>
 				<TextInput
 					name="description"
 					placeholder="e.g. Metals in serum"
-					bind:value={$method.description}
+					bind:value={description}
 					label="Method Description"
 				/>
 				<NumberInput
 					name="cal-count"
 					label="Number of non-blank calibration standards"
-					bind:value={$method.calibrationCount}
+					bind:value={calibrationCount}
 					placeholder="e.g. 6"
 				/>
 				<NumberInput
 					name="rpd-limit"
 					label="RPD Warning limit (%)"
-					bind:value={$method.rpdLimit}
+					bind:value={rpdLimit}
 					placeholder="e.g. 15"
 				/>
 				<NumberInput
 					name="check-standard-limit"
 					label="Check Standard Tolerance (%)"
-					bind:value={$method.checkStandardTolerance}
+					bind:value={checkStandardTolerance}
 					placeholder="e.g. 15"
 				/>
 			</div>
