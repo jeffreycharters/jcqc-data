@@ -8,6 +8,7 @@
 	let values = sortedArrayFromMap(sample?.results?.values);
 	let dupValues = sortedArrayFromMap(sample?.results.dupValues ?? new Map());
 	$: rpdLimit = $method?.rpdLimit ?? 0;
+	let lowestLoqs = $method?.getLowestLoqs();
 
 	if (dupValues.length === 0) goto('/');
 
@@ -62,12 +63,7 @@
 					<td>RPD (%)</td>
 					{#each values as [mass, value], index}
 						{@const rpd = calculateRPD(value, dupValues[index][1])}
-						{@const loq = $method?.getValue(
-							'blanks',
-							[...($method.blanks?.values() ?? [])][0].name,
-							'detectionLimits',
-							$method?.getElementIdFromMass(mass) ?? ''
-						)}
+						{@const loq = lowestLoqs?.get(mass)}
 						{@const average = (value + dupValues[index][1]) / 2}
 						{@const passing = checkIfDupPassing(average, rpd, loq)}
 						<td class={passing}>

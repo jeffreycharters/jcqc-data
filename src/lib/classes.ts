@@ -656,6 +656,21 @@ export class Method {
         return rms?.find(rm => rm.name.toLowerCase() === name.toLowerCase())
     }
 
+    getLowestLoqs() {
+        const blanks = this.blanks;
+        const lowestLoqs = new Map();
+        if (!blanks) return lowestLoqs;
+        for (const blank of blanks.values()) {
+            const detectionLimits = blank.expand?.detectionLimits;
+            for (const dl of detectionLimits) {
+                const mass = this.elements?.find(e => e.id === dl.element)?.mass;
+                if (!lowestLoqs.has(mass)) lowestLoqs.set(mass, dl.loq);
+                else if (lowestLoqs.get(mass).loq > dl.loq) lowestLoqs.set(mass, dl.loq);
+            }
+        }
+        return lowestLoqs;
+    }
+
     get title() {
         if (!this.description) return this.name
         return `${this.name}: ${this.description}`
