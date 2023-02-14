@@ -10,8 +10,6 @@
 	import Duplicate from './Duplicate.svelte';
 	import { browser } from '$app/environment';
 
-	console.log($method?.getLowestLoqs());
-
 	let methodElementCount = $method?.elements?.length || 0;
 	let analysisElementCount = $reportData?.length > 0 ? $reportData[0]?.results.values.size : 0;
 
