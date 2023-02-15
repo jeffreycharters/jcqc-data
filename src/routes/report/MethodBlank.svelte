@@ -21,7 +21,7 @@
 		<tbody>
 			<tr class="border-b border-b-gray-400">
 				<td class="firstCol">{sample.name}</td>
-				{#each [...values] as [key, value]}
+				{#each [...values] as [_, value]}
 					<td>{roundToSigFigs(value, 3)}</td>
 				{/each}
 			</tr>

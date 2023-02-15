@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { Analyte } from '$lib/classes';
 	import type { ElementsResponse } from '$lib/pocketbase-types';
 	import type { PageData } from './$types';
 	import AddElementForm from './AddElementForm.svelte';

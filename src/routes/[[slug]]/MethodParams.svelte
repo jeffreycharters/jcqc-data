@@ -95,7 +95,7 @@
 						<tr class="border-b border-gray-400">
 							<td class="first-column">{checkStandard.name}</td>
 							{#each elements as element}
-								{@const values = $method.getValue(
+								{@const values = $method?.getValue(
 									'checkStandards',
 									checkStandard.name,
 									'checkValues',
@@ -108,7 +108,7 @@
 				{/if}
 
 				{#if methodHasBlanks}
-					{#each Array.from($method.blanks?.values() ?? []) as blank (blank.id)}
+					{#each Array.from($method?.blanks?.values() ?? []) as blank (blank.id)}
 						<tr class="border-b border-gray-400">
 							<td class="first-column items-center gap-2 flex justify-between">
 								<div>
@@ -120,7 +120,7 @@
 								</div>
 							</td>
 							{#each elements as element}
-								{@const values = $method.getValue(
+								{@const values = $method?.getValue(
 									'blanks',
 									blank.name,
 									'detectionLimits',
@@ -156,7 +156,7 @@
 								</div>
 							</td>
 							{#each elements as element}
-								{@const values = $method.getValue(
+								{@const values = $method?.getValue(
 									'referenceMaterials',
 									referenceMaterial.name,
 									'ranges',

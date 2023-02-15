@@ -10,7 +10,7 @@
 	const dispatch = createEventDispatcher();
 
 	let allRanges: ReferenceMaterialsRangesResponse[] =
-		$method.referenceMaterials?.get(referenceMaterialName)?.expand?.ranges;
+		$method?.referenceMaterials?.get(referenceMaterialName)?.expand?.ranges;
 
 	const range = allRanges?.find((dl) => dl.element === element.id) ?? undefined;
 
@@ -36,7 +36,7 @@
 
 	const updateCalCheck = async (toUpdate: 'lower' | 'upper') => {
 		// update database
-		await $method.updateReferenceRanges(
+		await $method?.updateReferenceRanges(
 			range?.id ?? '',
 			toUpdate,
 			Number(toUpdate === 'lower' ? lower : upper)

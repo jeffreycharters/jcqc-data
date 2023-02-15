@@ -33,9 +33,7 @@
 			addFormMessage('Input missing data');
 			return;
 		}
-		const updatedElement: ElementsResponse = await pb
-			.collection('elements')
-			.update(element.id, JSON.stringify(data));
+		await pb.collection('elements').update(element.id, JSON.stringify(data));
 		editing = false;
 		addFormMessage('Saved!');
 	}

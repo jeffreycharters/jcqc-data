@@ -6,7 +6,7 @@
 
 	export let blank: BlanksResponse;
 
-	$: elementList = $method.elements;
+	$: elementList = $method?.elements;
 	let statusMessage = '';
 
 	let { name } = blank;
@@ -21,12 +21,12 @@
 	};
 
 	const deleteBlank = async () => {
-		await $method.deleteBlank(blank.name);
+		await $method?.deleteBlank(blank.name);
 		$method = $method;
 	};
 
 	const updateName = async () => {
-		await $method.updateBlankName(blank.id, name);
+		await $method?.updateBlankName(blank.id, name);
 		$method = $method;
 		editing = false;
 	};

@@ -7,7 +7,7 @@
 	export let checkStandard: CheckStandardsResponse;
 	let { name } = checkStandard;
 
-	$: elementList = $method.elements;
+	$: elementList = $method?.elements;
 	let statusMessage = '';
 	let editing = false;
 
@@ -20,13 +20,13 @@
 	};
 
 	const deleteCheckStandard = async () => {
-		await $method.deleteCheckStandard(checkStandard.name);
+		await $method?.deleteCheckStandard(checkStandard.name);
 		$method = $method;
 	};
 
 	const updateName = async () => {
 		console.log('updating name!');
-		await $method.updateCheckStandardName(checkStandard.id, name);
+		await $method?.updateCheckStandardName(checkStandard.id, name);
 		$method = $method;
 		editing = false;
 	};

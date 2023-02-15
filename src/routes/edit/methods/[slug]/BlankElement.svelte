@@ -10,7 +10,7 @@
 	const dispatch = createEventDispatcher();
 
 	let allDetectionLimits: DetectionLimitsResponse[] =
-		$method.blanks?.get(blankName)?.expand?.detectionLimits;
+		$method?.blanks?.get(blankName)?.expand?.detectionLimits;
 
 	const detectionLimits = allDetectionLimits?.find((dl) => dl.element === element.id) ?? undefined;
 
@@ -36,7 +36,7 @@
 
 	const updateCalCheck = async (toUpdate: 'mdl' | 'loq') => {
 		// update database
-		await $method.updateDetectionLimits(
+		await $method?.updateDetectionLimits(
 			detectionLimits?.id ?? '',
 			toUpdate,
 			Number(toUpdate === 'mdl' ? mdl : loq)

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Analyte } from '$lib/classes';
 	import ElementWithMass from '$lib/components/ElementWithMass.svelte';
-	import type { CheckValuesResponse, DetectionLimitsResponse } from '$lib/pocketbase-types';
+	import type { CheckValuesResponse } from '$lib/pocketbase-types';
 	import { method } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
 
@@ -10,7 +10,7 @@
 	const dispatch = createEventDispatcher();
 
 	let allCheckValues: CheckValuesResponse[] =
-		$method.checkStandards?.get(checkStandardName)?.expand?.checkValues;
+		$method?.checkStandards?.get(checkStandardName)?.expand?.checkValues;
 
 	const checkValues =
 		allCheckValues?.find((checkValue) => checkValue.element === element.id) ?? undefined;
@@ -31,7 +31,7 @@
 
 	const updateCalCheck = async () => {
 		// update database
-		await $method.updateCheckStandardValue(checkValues?.id ?? '', Number(value));
+		await $method?.updateCheckStandardValue(checkValues?.id ?? '', Number(value));
 		dispatch('updateStatus', 'Saved!');
 	};
 

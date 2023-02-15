@@ -1,8 +1,7 @@
 <script lang="ts">
 	import EditIcon from '$lib/components/EditIcon.svelte';
-	import type { CheckStandardsResponse, ReferenceMaterialsResponse } from '$lib/pocketbase-types';
+	import type { ReferenceMaterialsResponse } from '$lib/pocketbase-types';
 	import { method } from '$lib/stores';
-	import CheckStandardElement from './CheckStandardElement.svelte';
 	import ReferenceMaterialElement from './ReferenceMaterialElement.svelte';
 
 	export let referenceMaterial: ReferenceMaterialsResponse;
@@ -10,7 +9,7 @@
 
 	// TODO: Make this about RMs and not check standards
 
-	$: elementList = $method.elements;
+	$: elementList = $method?.elements;
 	let statusMessage = '';
 	let editing = false;
 
@@ -23,13 +22,13 @@
 	};
 
 	const deleteCheckStandard = async () => {
-		await $method.deleteReferenceMaterial(referenceMaterial.name);
+		await $method?.deleteReferenceMaterial(referenceMaterial.name);
 		$method = $method;
 	};
 
 	const updateName = async () => {
 		console.log('updating name!');
-		await $method.updateReferenceMaterialName(referenceMaterial.id, name);
+		await $method?.updateReferenceMaterialName(referenceMaterial.id, name);
 		editing = false;
 	};
 </script>

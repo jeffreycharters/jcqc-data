@@ -1,5 +1,5 @@
 import cuid from "cuid";
-import { method, reportData } from "$lib/stores";
+import { reportData } from "$lib/stores";
 import type { Method } from "./classes";
 
 export const sortedArrayFromMap = (map: Map<number, number>) => {

@@ -5,11 +5,6 @@
 	import { createEventDispatcher } from 'svelte';
 	export let element: Analyte;
 
-	let formHasError = false;
-	$: errorClasses = formHasError
-		? 'border-red-600 text-red-600 border-b-red-700'
-		: 'border-b-gray-400';
-
 	const dispatch = createEventDispatcher();
 
 	const removeElement = async () => {
@@ -19,10 +14,11 @@
 	};
 
 	const setUnits = async (newUnits: Units) => {
-		const updatedUnits = await $method.updateElementUnits(element.unitsId, newUnits);
-		element.units = updatedUnits.units;
+		const updatedUnits = await $method?.updateElementUnits(element.unitsId, newUnits);
+		element.units = updatedUnits?.units || 'unknown';
 		dispatch('setMethodElementUnits', newUnits);
-		$method.elements = $method.elements;
+		if (!$method) return;
+		$method.elements = $method?.elements;
 	};
 </script>
 
