@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
+	import type { DetectionLimitsResponse } from '$lib/pocketbase-types';
 	import { method } from '$lib/stores';
 	import HeaderRow from './HeaderRow.svelte';
 
@@ -9,6 +10,7 @@
 
 	let methodBlanks = [...($method?.blanks?.values() ?? [])];
 	let methodBlank = methodBlanks.find((b) => b.name.toLowerCase() === sample.name.toLowerCase());
+	let detectionLimits: DetectionLimitsResponse[] = methodBlank?.expand?.detectionLimits;
 </script>
 
 <div>
@@ -27,12 +29,8 @@
 				<td class="firstCol">Below LOQ</td>
 				{#each [...values] as [key, value]}
 					{@const loq =
-						$method?.getValue(
-							'blanks',
-							methodBlank?.name ?? '',
-							'detectionLimits',
-							$method.getElementIdFromMass(key) ?? ''
-						)?.loq ?? 0}
+						detectionLimits.find((dl) => dl.element === $method?.getElementIdFromMass(key))?.loq ??
+						0}
 					{@const tdClass = loq != 0 && value ? (value < loq ? 'passes' : 'fails') : 'neutral'}
 					<td class={tdClass}>
 						{loq != 0 ? loq : '- -'}
