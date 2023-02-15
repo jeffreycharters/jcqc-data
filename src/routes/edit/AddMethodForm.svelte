@@ -13,7 +13,6 @@
 	let calibrationCount = 1;
 	let description: string;
 	let checkStandardTolerance: number;
-	let checkStandardName: string;
 
 	let addFormDiv: HTMLElement;
 
@@ -31,7 +30,6 @@
 			active: true,
 			calibrationCount,
 			description,
-			checkStandardName,
 			checkStandardTolerance
 		});
 		try {
@@ -98,12 +96,6 @@
 			</div>
 
 			<div class="flex gap-8 my-2 items-end">
-				<TextInput
-					name="check-standard-name"
-					label="Check Standard Name"
-					bind:value={checkStandardName}
-					placeholder="e.g. Calibration Check"
-				/>
 				<NumberInput
 					name="check-standard-limit"
 					label="Check Standard Tolerance (%)"

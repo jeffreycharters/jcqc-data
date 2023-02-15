@@ -2,6 +2,7 @@
 	import { method } from '$lib/stores';
 
 	export let firstColumnLabel = '';
+	$: elementCount = $method?.elements?.length || 0;
 </script>
 
 <thead>
@@ -11,7 +12,9 @@
 		>
 		{#each [...($method?.elements ?? [])] as element (element.id)}
 			<th class="heading font-semibold">
-				<div class="flex flex-col gap-0">
+				<div
+					class="flex {elementCount > 10 ? 'flex-col gap-0' : 'gap-1 items-center justify-center'}"
+				>
 					<div class="leading-[0.5rem]">
 						<sup>{element.mass}</sup>{element.symbol}
 					</div>
