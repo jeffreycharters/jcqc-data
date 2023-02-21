@@ -2,7 +2,7 @@
 	import { method } from '$lib/stores';
 
 	$: elements = $method?.elements?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? [];
-	$: lowElementCount = elements && elements?.length < 10;
+	$: lowElementCount = elements && elements?.length < 15;
 
 	$: methodHasCheckStandards = $method?.checkStandards && $method?.checkStandards.size > 0;
 	$: methodHasBlanks = $method?.blanks && $method?.blanks.size > 0;
