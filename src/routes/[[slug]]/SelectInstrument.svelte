@@ -1,23 +1,20 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import type { InstrumentsResponse } from '$lib/pocketbase-types';
 	import { instrument, instruments } from '$lib/stores';
-	import { onMount } from 'svelte';
 
 	$: selectedInstrument = $instrument;
 
-	onMount(() => {
-		const savedInstrument = localStorage.getItem('instrument') || '';
-		if (savedInstrument) {
-			$instrument = $instruments.find((i) => i.serial === savedInstrument) ?? $instruments[0];
+	if (browser) {
+		const serial = localStorage.getItem('instrument');
+		if (serial) {
+			const savedInstrument = $instruments.find((i) => i.serial === serial);
+			if (savedInstrument) $instrument = savedInstrument;
 		}
-	});
+	}
 
 	const saveInstrument = async (index: number) => {
 		$instrument = $instruments[index];
-		if (browser) {
-			localStorage.setItem('instrument', $instrument.serial);
-		}
+		localStorage.setItem('instrument', $instrument.serial);
 	};
 </script>
 
@@ -25,12 +22,12 @@
 	<h2 class="mb-2 text-center">Select Instrument</h2>
 
 	<div class="flex flex-col items-center">
-		{#each $instruments || [] as instrument, index (instrument.id)}
+		{#each $instruments || [] as inst, index (inst.id)}
 			<button
-				class="btn my-2 {selectedInstrument === instrument ? 'selected-button' : 'method-button'}"
+				class="btn my-2 {$instrument === inst ? 'selected-button' : 'method-button'}"
 				on:click={() => saveInstrument(index)}
 			>
-				{instrument.name}
+				{inst.name}
 			</button>{' '}
 		{/each}
 	</div>
