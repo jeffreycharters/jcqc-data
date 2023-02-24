@@ -8,6 +8,7 @@ export enum Collections {
 	CheckValues = "checkValues",
 	DetectionLimits = "detectionLimits",
 	Elements = "elements",
+	Instruments = "instruments",
 	Methods = "methods",
 	ReferenceMaterials = "referenceMaterials",
 	ReferenceMaterialsRanges = "referenceMaterialsRanges",
@@ -40,12 +41,12 @@ export type AuthSystemFields = {
 
 export type BlanksRecord = {
 	name: string
-	detectionLimits?: RecordIdString[]
+	detectionLimits?: RecordIdString
 }
 
 export type CheckStandardsRecord = {
 	name: string
-	checkValues?: RecordIdString[]
+	checkValues?: RecordIdString
 }
 
 export type CheckValuesRecord = {
@@ -66,6 +67,13 @@ export type ElementsRecord = {
 	active?: boolean
 }
 
+export type InstrumentsRecord = {
+	serial: string
+	name: string
+	softwareVersion: string
+	autosamplerInfo: string
+}
+
 export type MethodsRecord = {
 	name: string
 	rpdLimit?: number
@@ -84,7 +92,7 @@ export type MethodsRecord = {
 export type ReferenceMaterialsRecord = {
 	name: string
 	active?: boolean
-	ranges?: RecordIdString[]
+	ranges?: RecordIdString
 }
 
 export type ReferenceMaterialsRangesRecord = {
@@ -109,6 +117,7 @@ export type CheckStandardsResponse = CheckStandardsRecord & BaseSystemFields
 export type CheckValuesResponse = CheckValuesRecord & BaseSystemFields
 export type DetectionLimitsResponse = DetectionLimitsRecord & BaseSystemFields
 export type ElementsResponse = ElementsRecord & BaseSystemFields
+export type InstrumentsResponse = InstrumentsRecord & BaseSystemFields
 export type MethodsResponse = MethodsRecord & BaseSystemFields
 export type ReferenceMaterialsResponse = ReferenceMaterialsRecord & BaseSystemFields
 export type ReferenceMaterialsRangesResponse = ReferenceMaterialsRangesRecord & BaseSystemFields
@@ -121,6 +130,7 @@ export type CollectionRecords = {
 	checkValues: CheckValuesRecord
 	detectionLimits: DetectionLimitsRecord
 	elements: ElementsRecord
+	instruments: InstrumentsRecord
 	methods: MethodsRecord
 	referenceMaterials: ReferenceMaterialsRecord
 	referenceMaterialsRanges: ReferenceMaterialsRangesRecord

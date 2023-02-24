@@ -1,27 +1,33 @@
 <script lang="ts">
-	import { instrument } from '$lib/stores';
+	import { browser } from '$app/environment';
+	import type { InstrumentsResponse } from '$lib/pocketbase-types';
+	import { instrument, instruments } from '$lib/stores';
+	import { onMount } from 'svelte';
 
-	const instruments: Instrument[] = [
-		{ name: 'Agilent 7900-1', serial: 'JP20174833' },
-		{ name: 'Agilent 7900-2', serial: 'SG20174834' }
-	];
+	$: selectedInstrument = $instrument;
+
+	onMount(() => {
+		const savedInstrument = localStorage.getItem('instrument') || '';
+		if (savedInstrument) {
+			$instrument = $instruments.find((i) => i.serial === savedInstrument) ?? $instruments[0];
+		}
+	});
 
 	const saveInstrument = async (index: number) => {
-		console.log('saving instrument as', index);
-		$instrument = instruments[index];
-		selectedInstrument = index;
+		$instrument = $instruments[index];
+		if (browser) {
+			localStorage.setItem('instrument', $instrument.serial);
+		}
 	};
-
-	let selectedInstrument = 0;
 </script>
 
 <div class="border border-gray-500 rounded w-52 py-2">
 	<h2 class="mb-2 text-center">Select Instrument</h2>
 
 	<div class="flex flex-col items-center">
-		{#each instruments as instrument, index (instrument.serial)}
+		{#each $instruments || [] as instrument, index (instrument.id)}
 			<button
-				class="btn my-2 {selectedInstrument === index ? 'selected-button' : 'method-button'}"
+				class="btn my-2 {selectedInstrument === instrument ? 'selected-button' : 'method-button'}"
 				on:click={() => saveInstrument(index)}
 			>
 				{instrument.name}
