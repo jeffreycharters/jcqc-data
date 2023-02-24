@@ -2,6 +2,7 @@
 	import { method } from '$lib/stores';
 
 	export let firstColumnLabel = '';
+	export let allPpb = false;
 	$: elementCount = $method?.elements?.length || 0;
 </script>
 
@@ -18,7 +19,9 @@
 					<div class="leading-[0.5rem]">
 						<sup>{element.mass}</sup>{element.symbol}
 					</div>
-					<div class="text-gray-500 font-normal text-[0.7rem]">{element.units}</div>
+					<div class="text-gray-500 font-normal text-[0.7rem]">
+						{allPpb ? 'ppb' : element.units}
+					</div>
 				</div>
 			</th>
 		{/each}

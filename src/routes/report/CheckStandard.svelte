@@ -13,15 +13,17 @@
 
 <div>
 	<table class="results">
-		<HeaderRow firstColumnLabel="Check Standard" />
+		<HeaderRow firstColumnLabel="Check Standard" allPpb={true} />
 
 		<tbody>
 			<tr class="border-b border-b-gray-400">
 				<td class="firstCol">{sample.name}</td>
 
-				{#each values as [_, value]}
+				{#each values as [mass, value]}
+					{@const units = $method?.elements?.find((e) => e.mass === mass)?.units || 'ppm'}
+					{@const prettyValue = units === 'ppb' ? value : value * 1000}
 					<td class="text-center">
-						{roundToSigFigs(value, 3)}
+						{roundToSigFigs(prettyValue, 3)}
 					</td>
 				{/each}
 			</tr>
