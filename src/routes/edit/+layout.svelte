@@ -1,7 +1,8 @@
 <script lang="ts">
 	const menuLinks = [
 		{ text: 'JCQC Main', href: '/' },
-		{ text: 'Edit Methods', href: '/edit' }
+		{ text: 'Edit Methods', href: '/edit' },
+		{ text: 'Admin Area', href: '/_' }
 	];
 </script>
 
