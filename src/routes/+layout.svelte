@@ -16,7 +16,7 @@
 
 <slot />
 
-<div class="fixed bottom-4 right-4">
+<div class="fixed bottom-4 right-4 no-print">
 	{#if $currentUser}
 		Logged in as {$currentUser.username}.
 		<button class="btn" on:click={logoutAndRedirect}>Log out</button>
