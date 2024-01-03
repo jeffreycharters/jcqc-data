@@ -9,17 +9,17 @@
 	export let referenceMaterialName: string;
 	const dispatch = createEventDispatcher();
 
-	let allRanges: ReferenceMaterialsRangesResponse[] =
-		$method?.referenceMaterials?.get(referenceMaterialName)?.expand?.ranges;
+	let allRanges =
+		$method?.referenceMaterials?.get(referenceMaterialName)?.expand?.ranges as ReferenceMaterialsRangesResponse[] ;
 
 	const range = allRanges?.find((dl) => dl.element === element.id) ?? undefined;
 
 	let lowerBase = allRanges?.find(
-		(range: ReferenceMaterialsRangesResponse) => range.element === element.id
+		(range) => range.element === element.id
 	)?.lower;
 	let lower = !lowerBase || lowerBase === 0 ? '- -' : lowerBase;
 	let upperBase = allRanges?.find(
-		(range: ReferenceMaterialsRangesResponse) => range.element === element.id
+		(range) => range.element === element.id
 	)?.upper;
 	let upper = !upperBase || upperBase === 0 ? '- -' : upperBase;
 

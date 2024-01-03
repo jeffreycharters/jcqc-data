@@ -32,7 +32,7 @@
 	};
 </script>
 
-<div class="basic-border py-4 px-8 mt-4">
+<div class="basic-border py-4 px-8 mt-4 bg-stone-100">
 	<div class="flex items-end gap-4">
 		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
 			<svg
@@ -74,7 +74,7 @@
 				{/each}
 			{/if}
 
-			<div class="basic-border py-2 px-4 w-fit transition-all">
+			<div class="basic-border py-2 px-4 w-fit transition-all bg-white">
 				<button
 					class="flex items-center gap-2"
 					on:click={() => (addFormOpen = !addFormOpen)}

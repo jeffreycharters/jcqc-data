@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { method } from '$lib/stores';
-	import { fade } from 'svelte/transition';
+	import { fade, slide } from 'svelte/transition';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import ReferenceMaterialList from './ReferenceMaterialList.svelte';
-
-	$: referenceMaterials = $method?.referenceMaterials;
 
 	let newReferenceMaterialName = '';
 	let formMessage: string;
@@ -18,11 +16,10 @@
 		$method = $method;
 		newReferenceMaterialName = '';
 		addFormOpen = false;
-		contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
 	};
 </script>
 
-<div class="basic-border py-4 px-8 mt-4">
+<div class="basic-border py-4 px-8 mt-4 bg-stone-100">
 	<div class="flex items-end gap-4">
 		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
 			<svg
@@ -52,19 +49,15 @@
 		{/if}
 	</div>
 
-	<div
-		class="overflow-hidden transition-all"
-		style="max-height: {open ? `${contentDiv.scrollHeight}px` : '0'}"
-		bind:this={contentDiv}
-	>
-		<div class="flex flex-col gap-4">
-			{#if referenceMaterials && referenceMaterials?.size > 0}
-				{#each Array.from(referenceMaterials).sort() as [_, referenceMaterial] (referenceMaterial.id)}
+	{#if open}
+		<div class="flex flex-col gap-4 mt-4" transition:slide={{ duration: 200}}>
+			{#if $method?.referenceMaterials && $method.referenceMaterials?.size > 0}
+				{#each Array.from($method.referenceMaterials).sort() as [_, referenceMaterial] (referenceMaterial.id)}
 					<ReferenceMaterialList {referenceMaterial} />
 				{/each}
 			{/if}
 
-			<div class="basic-border py-2 px-4 w-fit transition-all">
+			<div class="basic-border py-2 px-4 w-fit transition-all bg-white">
 				<button
 					class="flex items-center gap-2"
 					on:click={() => (addFormOpen = !addFormOpen)}
@@ -113,5 +106,5 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	{/if}
 </div>

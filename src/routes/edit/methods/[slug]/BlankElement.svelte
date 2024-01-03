@@ -9,17 +9,17 @@
 	export let blankName: string;
 	const dispatch = createEventDispatcher();
 
-	let allDetectionLimits: DetectionLimitsResponse[] =
-		$method?.blanks?.get(blankName)?.expand?.detectionLimits;
+	let allDetectionLimits =
+		$method?.blanks?.get(blankName)?.expand?.detectionLimits as DetectionLimitsResponse[];
 
 	const detectionLimits = allDetectionLimits?.find((dl) => dl.element === element.id) ?? undefined;
 
 	let mdlBase = allDetectionLimits?.find(
-		(detectionLimit: DetectionLimitsResponse) => detectionLimit.element === element.id
+		(detectionLimit) => detectionLimit.element === element.id
 	)?.mdl;
 	let mdl = !mdlBase || mdlBase === 0 ? '- -' : mdlBase;
 	let loqBase = allDetectionLimits?.find(
-		(detectionLimit: DetectionLimitsResponse) => detectionLimit.element === element.id
+		(detectionLimit) => detectionLimit.element === element.id
 	)?.loq;
 	let loq = !loqBase || loqBase === 0 ? '- -' : loqBase;
 

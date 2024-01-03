@@ -51,7 +51,7 @@
 	const processUpdate = () => debounce(editMethod);
 </script>
 
-<div class="basic-border my-4 px-8 py-4 w-full">
+<div class="basic-border my-4 px-8 py-4 w-full bg-stone-100">
 	<div class="flex items-end gap-4">
 		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
 			<svg
@@ -74,7 +74,7 @@
 			<div
 				class="text-sm text-amber-600 italic tracking-wide w-36 text-center"
 				in:fade={{ duration: 200 }}
-				out:fade={{ duration: 100 }}
+				out:fade={{ duration: 150 }}
 			>
 				{formMessage}
 			</div>

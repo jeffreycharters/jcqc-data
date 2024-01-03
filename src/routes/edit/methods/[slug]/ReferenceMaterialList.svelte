@@ -33,7 +33,7 @@
 	};
 </script>
 
-<div class="basic-border w-full h-full p-4">
+<div class="basic-border w-full h-full p-4 bg-white">
 	<div class="flex justify-between items-center mb-4">
 		<div class="flex items-baseline gap-2">
 			<form

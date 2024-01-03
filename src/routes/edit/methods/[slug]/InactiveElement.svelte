@@ -12,7 +12,7 @@
 	};
 </script>
 
-<div class="basic-border h-full w-full flex justify-center items-center inactive-element">
+<div class="basic-border h-full w-full flex justify-center items-center inactive-element bg-white">
 	<ElementWithMass symbol={element.symbol} mass={element.mass} />
 	<button class="inactivate-button" on:click={addElement}>Add</button>
 </div>

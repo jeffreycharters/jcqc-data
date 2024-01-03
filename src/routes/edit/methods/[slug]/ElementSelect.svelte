@@ -20,7 +20,6 @@
 
 	const addElement = async (elementId: string) => {
 		await $method?.addElement(elementId);
-		$method = $method;
 		contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`;
 	};
 
@@ -49,7 +48,7 @@
 	});
 </script>
 
-<div class="basic-border my-4 px-8 py-4 w-full">
+<div class="basic-border my-4 px-8 py-4 w-full bg-stone-100">
 	<div class="flex items-end gap-4">
 		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
 			<svg
@@ -69,26 +68,8 @@
 			<h2 class="inline-flex whitespace-nowrap gap-4">
 				Add/Remove elements
 				<span class="text-gray-400 flex items-center font-semibold">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-6 w-6 stroke-gray-400"
-						viewBox="0 0 24 24"
-						stroke-width="2"
-						stroke="currentColor"
-						fill="none"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-						<path d="M12 12v.01" />
-						<path
-							d="M19.071 4.929c-1.562 -1.562 -6 .337 -9.9 4.243c-3.905 3.905 -5.804 8.337 -4.242 9.9c1.562 1.561 6 -.338 9.9 -4.244c3.905 -3.905 5.804 -8.337 4.242 -9.9"
-						/>
-						<path
-							d="M4.929 4.929c-1.562 1.562 .337 6 4.243 9.9c3.905 3.905 8.337 5.804 9.9 4.242c1.561 -1.562 -.338 -6 -4.244 -9.9c-3.905 -3.905 -8.337 -5.804 -9.9 -4.242"
-						/>
-					</svg>
-					x{$method?.elements?.length ?? 'Unknown'}</span
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 stroke-gray-400"  viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 8a4 4 0 1 1 -3.995 4.2l-.005 -.2l.005 -.2a4 4 0 0 1 3.995 -3.8z" stroke-width="0" fill="currentColor" /><path d="M12 20a1 1 0 0 1 .993 .883l.007 .127a1 1 0 0 1 -1.993 .117l-.007 -.127a1 1 0 0 1 1 -1z" stroke-width="0" fill="currentColor" /><path d="M3 8a1 1 0 0 1 .993 .883l.007 .127a1 1 0 0 1 -1.993 .117l-.007 -.127a1 1 0 0 1 1 -1z" stroke-width="0" fill="currentColor" /><path d="M21 8a1 1 0 0 1 .993 .883l.007 .127a1 1 0 0 1 -1.993 .117l-.007 -.127a1 1 0 0 1 1 -1z" stroke-width="0" fill="currentColor" /><path d="M2.89 12.006a1 1 0 0 1 1.104 .884a8 8 0 0 0 4.444 6.311a1 1 0 1 1 -.876 1.799a10 10 0 0 1 -5.556 -7.89a1 1 0 0 1 .884 -1.103z" stroke-width="0" fill="currentColor" /><path d="M20.993 12l.117 .006a1 1 0 0 1 .884 1.104a10 10 0 0 1 -5.556 7.889a1 1 0 1 1 -.876 -1.798a8 8 0 0 0 4.444 -6.31a1 1 0 0 1 .987 -.891z" stroke-width="0" fill="currentColor" /><path d="M5.567 4.226a10 10 0 0 1 12.666 0a1 1 0 1 1 -1.266 1.548a8 8 0 0 0 -10.134 0a1 1 0 1 1 -1.266 -1.548z" stroke-width="0" fill="currentColor" /></svg>
+					&nbsp;x {$method?.elements?.length ?? 'Unknown'}</span
 				>
 			</h2>
 		</button>

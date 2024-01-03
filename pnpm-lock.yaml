@@ -6,6 +6,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.45.0
   '@typescript-eslint/parser': ^5.45.0
   autoprefixer: ^10.4.7
+  cuid: ^2.1.8
   eslint: ^8.28.0
   eslint-config-prettier: ^8.5.0
   eslint-plugin-svelte3: ^4.0.0
@@ -14,6 +15,7 @@ specifiers:
   postcss-load-config: ^4.0.1
   prettier: ^2.8.0
   prettier-plugin-svelte: ^2.8.1
+  slugify: ^1.6.5
   svelte: ^3.54.0
   svelte-check: ^2.9.2
   svelte-preprocess: ^4.10.7
@@ -23,7 +25,9 @@ specifiers:
   vite: ^4.0.0
 
 dependencies:
+  cuid: 2.1.8
   pocketbase: 0.9.1
+  slugify: 1.6.6
 
 devDependencies:
   '@sveltejs/adapter-static': 1.0.0_@sveltejs+kit@1.0.1
@@ -741,6 +745,11 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
     dev: true
+
+  /cuid/2.1.8:
+    resolution: {integrity: sha512-xiEMER6E7TlTPnDxrM4eRiC6TRgjNX9xzEZ5U/Se2YJKr7Mq4pJn/2XEHjl3STcSh96GmkHPcBXLES8M29wyyg==}
+    deprecated: Cuid and other k-sortable and non-cryptographic ids (Ulid, ObjectId, KSUID, all UUIDs) are all insecure. Use @paralleldrive/cuid2 instead.
+    dev: false
 
   /debug/4.3.4:
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
@@ -1701,6 +1710,11 @@ packages:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
     dev: true
+
+  /slugify/1.6.6:
+    resolution: {integrity: sha512-h+z7HKHYXj6wJU+AnS/+IH8Uh9fdcX1Lrhg1/VMdf9PwoBQXFcXiAdsy2tSK0P6gKwJLXp02r90ahUCqHk9rrw==}
+    engines: {node: '>=8.0.0'}
+    dev: false
 
   /sorcery/0.10.0:
     resolution: {integrity: sha512-R5ocFmKZQFfSTstfOtHjJuAwbpGyf9qjQa1egyhvXSbM7emjrtLXtGdZsDJDABC85YBfVvrOiGWKSYXPKdvP1g==}

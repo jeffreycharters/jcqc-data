@@ -26,8 +26,6 @@
 
 	let editing = false;
 
-	$: divClass = element.active ? 'active-element' : 'inactive-element';
-
 	async function saveChanges() {
 		if (!name || !symbol || !mass) {
 			addFormMessage('Input missing data');
@@ -48,7 +46,7 @@
 	};
 </script>
 
-<div class="{divClass} {editing ? 'row-span-2' : ''} relative">
+<div class="element {editing ? 'row-span-2' : ''} {element.active ? 'active' : 'inactive'} relative">
 	{#if editing}
 		<form on:submit|preventDefault={saveChanges}>
 			<TextInput name="name" label="Element Name" bind:value={name} />
@@ -93,10 +91,13 @@
 </div>
 
 <style lang="postcss">
-	.active-element {
-		@apply border border-gray-800 rounded shadow py-2 px-4 flex items-center justify-around;
+	.element {
+		@apply border rounded shadow py-2 px-4 flex items-center justify-around;
 	}
-	.inactive-element {
-		@apply border border-gray-300 rounded shadow py-2 px-4 flex items-center justify-around text-gray-400;
+	.active {
+		@apply  border-gray-800;
+	}
+	.inactive {
+		@apply  border-gray-300 text-gray-400;
 	}
 </style>

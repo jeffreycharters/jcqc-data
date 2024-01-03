@@ -22,7 +22,7 @@
 	};
 </script>
 
-<div class="col-span-2">
+<div class="col-span-2 bg-white">
 	<div class="active-element relative h-full">
 		<div class="flex flex-col h-full items-center">
 			<ElementWithMass symbol={element.symbol} mass={element.mass} />
