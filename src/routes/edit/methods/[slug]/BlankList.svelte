@@ -12,7 +12,7 @@
 	let { name } = blank;
 	let editing = false;
 
-	let timer: NodeJS.Timeout;
+	let timer: number;
 	const statusUpdate = (message: string, timeout = 3000) => {
 		if (timer) clearTimeout(timer);
 

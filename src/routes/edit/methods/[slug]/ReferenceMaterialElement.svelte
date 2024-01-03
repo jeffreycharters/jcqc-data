@@ -9,22 +9,18 @@
 	export let referenceMaterialName: string;
 	const dispatch = createEventDispatcher();
 
-	let allRanges =
-		$method?.referenceMaterials?.get(referenceMaterialName)?.expand?.ranges as ReferenceMaterialsRangesResponse[] ;
+	let allRanges = $method?.referenceMaterials?.get(referenceMaterialName)?.expand
+		?.ranges as ReferenceMaterialsRangesResponse[];
 
 	const range = allRanges?.find((dl) => dl.element === element.id) ?? undefined;
 
-	let lowerBase = allRanges?.find(
-		(range) => range.element === element.id
-	)?.lower;
+	let lowerBase = allRanges?.find((range) => range.element === element.id)?.lower;
 	let lower = !lowerBase || lowerBase === 0 ? '- -' : lowerBase;
-	let upperBase = allRanges?.find(
-		(range) => range.element === element.id
-	)?.upper;
+	let upperBase = allRanges?.find((range) => range.element === element.id)?.upper;
 	let upper = !upperBase || upperBase === 0 ? '- -' : upperBase;
 
 	function debounce(callback: () => void, timeout = 1000) {
-		let timer: NodeJS.Timer;
+		let timer: number;
 		return (...args: any) => {
 			dispatch('updateStatus', 'Pending...');
 			clearTimeout(timer);

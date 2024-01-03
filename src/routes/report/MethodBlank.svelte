@@ -10,7 +10,7 @@
 
 	let methodBlanks = [...($method?.blanks?.values() ?? [])];
 	let methodBlank = methodBlanks.find((b) => b.name.toLowerCase() === sample.name.toLowerCase());
-	let detectionLimits: DetectionLimitsResponse[] = methodBlank?.expand?.detectionLimits;
+	let detectionLimits = methodBlank?.expand?.detectionLimits as DetectionLimitsResponse[];
 </script>
 
 <div>

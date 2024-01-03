@@ -9,8 +9,8 @@
 	export let blankName: string;
 	const dispatch = createEventDispatcher();
 
-	let allDetectionLimits =
-		$method?.blanks?.get(blankName)?.expand?.detectionLimits as DetectionLimitsResponse[];
+	let allDetectionLimits = $method?.blanks?.get(blankName)?.expand
+		?.detectionLimits as DetectionLimitsResponse[];
 
 	const detectionLimits = allDetectionLimits?.find((dl) => dl.element === element.id) ?? undefined;
 
@@ -24,7 +24,7 @@
 	let loq = !loqBase || loqBase === 0 ? '- -' : loqBase;
 
 	function debounce(callback: () => void, timeout = 1000) {
-		let timer: NodeJS.Timer;
+		let timer: number;
 		return (...args: any) => {
 			dispatch('updateStatus', 'Pending...');
 			clearTimeout(timer);

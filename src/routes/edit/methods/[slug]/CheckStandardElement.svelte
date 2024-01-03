@@ -9,8 +9,8 @@
 	export let checkStandardName: string;
 	const dispatch = createEventDispatcher();
 
-	let allCheckValues: CheckValuesResponse[] =
-		$method?.checkStandards?.get(checkStandardName)?.expand?.checkValues;
+	let allCheckValues = $method?.checkStandards?.get(checkStandardName)?.expand
+		?.checkValues as CheckValuesResponse[];
 
 	const checkValues =
 		allCheckValues?.find((checkValue) => checkValue.element === element.id) ?? undefined;
@@ -19,7 +19,7 @@
 	let value = !valueBase || valueBase === 0 ? '- -' : valueBase;
 
 	function debounce(callback: () => void, timeout = 1000) {
-		let timer: NodeJS.Timer;
+		let timer: number;
 		return (...args: any) => {
 			dispatch('updateStatus', 'Pending...');
 			clearTimeout(timer);

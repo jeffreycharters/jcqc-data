@@ -31,22 +31,24 @@
 			addFormMessage('Input missing data');
 			return;
 		}
-		await pb.collection('elements').update(element.id, JSON.stringify(data));
+		await pb.collection('elements').update(element.id, data);
 		editing = false;
 		addFormMessage('Saved!');
 	}
 
 	const toggleElementActive = async () => {
-		const data = JSON.stringify({
+		const data = {
 			active: !element.active
-		});
+		};
 		const updatedElement = await pb.collection('elements').update(element.id, data);
 		element.active = updatedElement.active;
 		dispatch('toggleActive', { id: updatedElement.id, state: updatedElement.active });
 	};
 </script>
 
-<div class="element {editing ? 'row-span-2' : ''} {element.active ? 'active' : 'inactive'} relative">
+<div
+	class="element {editing ? 'row-span-2' : ''} {element.active ? 'active' : 'inactive'} relative"
+>
 	{#if editing}
 		<form on:submit|preventDefault={saveChanges}>
 			<TextInput name="name" label="Element Name" bind:value={name} />
@@ -95,9 +97,9 @@
 		@apply border rounded shadow py-2 px-4 flex items-center justify-around;
 	}
 	.active {
-		@apply  border-gray-800;
+		@apply border-gray-800;
 	}
 	.inactive {
-		@apply  border-gray-300 text-gray-400;
+		@apply border-gray-300 text-gray-400;
 	}
 </style>

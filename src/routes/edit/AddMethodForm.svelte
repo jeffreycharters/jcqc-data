@@ -23,7 +23,7 @@
 	const addMethod = async () => {
 		if (!name || !calibrationCount) formError = 'Missing something';
 
-		const methodData = JSON.stringify({
+		const methodData = {
 			name,
 			slug: slugify(name, { lower: true }),
 			rpdLimit,
@@ -31,7 +31,7 @@
 			calibrationCount,
 			description,
 			checkStandardTolerance
-		});
+		};
 		try {
 			const newMethod: MethodsResponse = await pb.collection('methods').create(methodData);
 			methods.update((n) => {

@@ -14,12 +14,12 @@
 
 	const addElement = async () => {
 		if (!name || !symbol || !mass) formError = 'Please complete all fields.';
-		const data = JSON.stringify({
+		const data = {
 			name,
 			symbol,
 			mass,
 			active: true
-		});
+		};
 		try {
 			const newElement: ElementsResponse = await pb.collection('elements').create(data);
 			dispatch('addElement', newElement);

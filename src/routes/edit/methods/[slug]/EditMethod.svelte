@@ -5,7 +5,7 @@
 	import { fade } from 'svelte/transition';
 
 	let formMessage = '';
-	let timer: NodeJS.Timer;
+	let timer: number;
 
 	let open = false;
 	let contentDiv: HTMLElement;
