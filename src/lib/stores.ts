@@ -1,17 +1,25 @@
-import { writable, type Writable } from "svelte/store";
-import type { InstrumentsResponse, MethodsResponse, ReferenceMaterialsResponse } from "./pocketbase-types";
-import type { Method } from "./classes";
+import { writable, type Writable } from "svelte/store"
+import type {
+	ElementsResponse,
+	InstrumentsResponse,
+	MethodsResponse,
+	ReferenceMaterialsResponse
+} from "./pocketbase-types"
+import type { RunListEntry } from "../app"
+import type { ElementsExpanded, Units } from "./types"
 
-export const methods: Writable<MethodsResponse[]> = writable([]);
+export const methods: Writable<MethodsResponse[]> = writable([])
 
-export const method: Writable<Method | null> = writable()
+export const method: Writable<MethodsResponse<Units, ElementsExpanded> | null> = writable()
 
-export const showAddForm: Writable<boolean> = writable(false);
+export const allElements: Writable<ElementsResponse[]> = writable([])
 
-export const instrument: Writable<InstrumentsResponse> = writable();
+export const showAddForm: Writable<boolean> = writable(false)
 
-export const referenceMaterials: Writable<ReferenceMaterialsResponse[]> = writable([]);
+export const instrument: Writable<InstrumentsResponse> = writable()
 
-export const reportData: Writable<RunListEntry[]> = writable();
+export const referenceMaterials: Writable<ReferenceMaterialsResponse[]> = writable([])
 
-export const instruments: Writable<InstrumentsResponse[]> = writable();
+export const reportData: Writable<RunListEntry[]> = writable()
+
+export const instruments: Writable<InstrumentsResponse[]> = writable()

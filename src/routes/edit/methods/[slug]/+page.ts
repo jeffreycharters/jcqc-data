@@ -1,26 +1,28 @@
-import { Method } from '$lib/classes';
-import { getMethodBySlug } from '$lib/methods';
-import { redirect } from '@sveltejs/kit';
-import type { PageLoad } from './$types';
-import { method } from '$lib/stores';
-import { pb } from '$lib/pocketbase';
-import type { ElementsResponse } from '$lib/pocketbase-types';
-
+import { redirect } from "@sveltejs/kit"
+import type { PageLoad } from "./$types"
+import { allElements, method } from "$lib/stores"
+import { pb } from "$lib/pocketbase"
+import type { ElementsResponse, MethodsResponse } from "$lib/pocketbase-types"
+import type { ElementsExpanded, Units } from "../../../../app"
 
 export const load = (async ({ params }) => {
-    const slug = params.slug;
-    const methodResponse = await getMethodBySlug(slug);
-    if (!methodResponse) {
-        throw redirect(302, '/edit');
-    }
-    const currentMethod = new Method(methodResponse.id);
-    await currentMethod.init({ blanks: true, elements: true, referenceMaterials: true, checkStandards: true });
-    method.set(currentMethod)
+	if (!params.slug) throw redirect(302, "/edit")
+	const slug = params.slug
 
-    const elementList: ElementsResponse[] = await pb.collection('elements').getFullList(undefined, { filter: 'active = true' });
+	const methodResponse: MethodsResponse<Units, ElementsExpanded> = await pb
+		.collection("methods")
+		.getFirstListItem(`slug = "${slug}"`, { expand: "elements,checkStandards" })
+	if (!methodResponse) {
+		throw redirect(302, "/edit")
+	}
 
-    return {
-        title: currentMethod.title,
-        elementList,
-    }
-}) satisfies PageLoad;
+	method.set(methodResponse)
+
+	pb.collection("elements")
+		.getFullList(undefined, { filter: "active = true" })
+		.then((list) => allElements.set(list as ElementsResponse[]))
+
+	return {
+		title: methodResponse.description
+	}
+}) satisfies PageLoad

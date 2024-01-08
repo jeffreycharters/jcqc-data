@@ -1,49 +1,59 @@
 <script lang="ts">
-	import NumberInput from '$lib/components/NumberInput.svelte';
-	import TextInput from '$lib/components/TextInput.svelte';
-	import { pb } from '$lib/pocketbase';
-	import type { ElementsResponse } from '$lib/pocketbase-types';
-	import { createEventDispatcher } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import NumberInput from "$lib/components/NumberInput.svelte"
+	import TextInput from "$lib/components/TextInput.svelte"
+	import { pb } from "$lib/pocketbase"
+	import type { ElementsResponse } from "$lib/pocketbase-types"
+	import { createEventDispatcher, type EventDispatcher } from "svelte"
+	import { fade } from "svelte/transition"
 
-	export let element: ElementsResponse;
-	let { name, symbol, mass } = element;
+	export let element: ElementsResponse
+	let { name, symbol, mass } = element
 
-	let formMessage: string;
+	let formMessage: string
 
-	const dispatch = createEventDispatcher();
+	const dispatch: EventDispatcher<{ toggleActive: ElementsResponse }> = createEventDispatcher()
 
 	const addFormMessage = (message: string, timeout: number = 2000) => {
-		formMessage = message;
-		setTimeout(() => (formMessage = ''), timeout);
-	};
+		formMessage = message
+		setTimeout(() => (formMessage = ""), timeout)
+	}
 
-	$: data = {
-		name,
-		symbol,
-		mass
-	} satisfies Record<string, string | number>;
-
-	let editing = false;
+	let editing = false
 
 	async function saveChanges() {
 		if (!name || !symbol || !mass) {
-			addFormMessage('Input missing data');
-			return;
+			addFormMessage("Input missing data")
+			return
 		}
-		await pb.collection('elements').update(element.id, data);
-		editing = false;
-		addFormMessage('Saved!');
+
+		pb.collection("elements")
+			.update(element.id, {
+				name,
+				symbol,
+				mass
+			})
+			.then(() => {
+				editing = false
+				addFormMessage("Saved!")
+			})
+			.catch((err) => {
+				addFormMessage("Save failed")
+				console.error((err as Error).message)
+			})
 	}
 
-	const toggleElementActive = async () => {
-		const data = {
-			active: !element.active
-		};
-		const updatedElement = await pb.collection('elements').update(element.id, data);
-		element.active = updatedElement.active;
-		dispatch('toggleActive', { id: updatedElement.id, state: updatedElement.active });
-	};
+	async function toggleElementActive() {
+		pb.collection("elements")
+			.update(element.id, {
+				active: !element.active
+			})
+			.then((updated) => {
+				dispatch("toggleActive", updated as ElementsResponse)
+			})
+			.catch((err) => {
+				throw new Error(err)
+			})
+	}
 </script>
 
 <div
@@ -62,7 +72,7 @@
 			</div>
 
 			<div class="ml-1 text-sm text-red-600">
-				{formMessage ?? ''}
+				{formMessage ?? ""}
 			</div>
 		</form>
 	{:else}
@@ -71,7 +81,7 @@
 				<sup>{mass}</sup>{symbol}
 			</div>
 			<button class="inactivate-button" on:click={toggleElementActive}
-				>{element.active ? 'Inactivate' : 'Activate'}</button
+				>{element.active ? "Inactivate" : "Activate"}</button
 			>
 		</div>
 		{#if !element.active}

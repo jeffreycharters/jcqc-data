@@ -1,25 +1,37 @@
 <script lang="ts">
-	import type { Analyte } from '$lib/classes';
-	import ElementWithMass from '$lib/components/ElementWithMass.svelte';
-	import { method } from '$lib/stores';
-	import { createEventDispatcher } from 'svelte';
-	export let element: Analyte;
+	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
+	import { method } from "$lib/stores"
+	import { pb } from "$lib/pocketbase"
+	import type { ElementsResponse, MethodsResponse } from "$lib/pocketbase-types"
+	import { UnitTypes, type ElementsExpanded, type Units } from "$lib/types"
+	import { expandedCollections } from "$lib/methods"
+	export let element: ElementsResponse
 
-	const dispatch = createEventDispatcher();
+	$: units = $method?.units?.[element.id]
 
-	const removeElement = async () => {
-		if (!element || !element.id) return;
-		dispatch('removeElement', element);
-		$method = $method;
-	};
+	async function removeElement() {
+		const currentUnits = $method?.units
+		delete currentUnits?.[element.id]
+		pb.collection("methods")
+			.update($method?.id!, {
+				"elements-": element.id,
+				units: currentUnits
+			})
+			.then((updatedMethod) => {
+				$method = updatedMethod as MethodsResponse<Units, ElementsExpanded>
+			})
+	}
 
-	const setUnits = async (newUnits: Units) => {
-		const updatedUnits = await $method?.updateElementUnits(element.unitsId, newUnits);
-		element.units = updatedUnits?.units || 'unknown';
-		dispatch('setMethodElementUnits', newUnits);
-		if (!$method) return;
-		$method.elements = $method?.elements;
-	};
+	const setUnits = async (newUnits: UnitTypes) => {
+		pb.collection("methods")
+			.update($method?.id!, {
+				units: { ...$method?.units, [element.id]: newUnits },
+				expand: expandedCollections
+			})
+			.then((updatedMethod) => {
+				$method = updatedMethod as MethodsResponse<Units, ElementsExpanded>
+			})
+	}
 </script>
 
 <div class="col-span-2 bg-white">
@@ -32,15 +44,15 @@
 		<div class="flex flex-col gap-2 items-end">
 			<div class="flex gap-1 items-baseline">
 				<button
-					class={element.units === 'ppb' ? 'active-units' : 'inactive-units'}
-					on:click={() => setUnits('ppb')}
-					disabled={element.units === 'ppb'}>ppb</button
+					class={units === "ppb" ? "active-units" : "inactive-units"}
+					on:click={() => setUnits(UnitTypes.PPB)}
+					disabled={units === "ppb"}>ppb</button
 				>
 
 				<button
-					class={element.units === 'ppm' ? 'active-units' : 'inactive-units'}
-					on:click={() => setUnits('ppm')}
-					disabled={element.units === 'ppm'}>ppm</button
+					class={units === "ppm" ? "active-units" : "inactive-units"}
+					on:click={() => setUnits(UnitTypes.PPM)}
+					disabled={units === "ppm"}>ppm</button
 				>
 			</div>
 		</div>

@@ -1,36 +1,36 @@
 <script lang="ts">
-	import NumberInput from '$lib/components/NumberInput.svelte';
-	import TextInput from '$lib/components/TextInput.svelte';
-	import type { ElementsResponse } from '$lib/pocketbase-types';
-	import { pb } from '$lib/pocketbase';
-	import { createEventDispatcher } from 'svelte';
+	import NumberInput from "$lib/components/NumberInput.svelte"
+	import TextInput from "$lib/components/TextInput.svelte"
+	import type { ElementsResponse } from "$lib/pocketbase-types"
+	import { pb } from "$lib/pocketbase"
+	import { createEventDispatcher, type EventDispatcher } from "svelte"
 
-	let name: string;
-	let symbol: string;
-	let mass: number;
-	let formError = '';
+	let name: string
+	let symbol: string
+	let mass: number
+	let formError = ""
 
-	const dispatch = createEventDispatcher();
+	const dispatch: EventDispatcher<{ addElement: ElementsResponse }> = createEventDispatcher()
 
 	const addElement = async () => {
-		if (!name || !symbol || !mass) formError = 'Please complete all fields.';
-		const data = {
-			name,
-			symbol,
-			mass,
-			active: true
-		};
-		try {
-			const newElement: ElementsResponse = await pb.collection('elements').create(data);
-			dispatch('addElement', newElement);
-		} catch (err) {
-			const error = err as Error;
-			return console.log(error);
-		}
-		name = '';
-		symbol = '';
-		mass = 0;
-	};
+		if (!name || !symbol || !mass) formError = "Please complete all fields."
+		pb.collection("elements")
+			.create({
+				name,
+				symbol,
+				mass,
+				active: true
+			})
+			.then((newElement) => {
+				dispatch("addElement", newElement as ElementsResponse)
+			})
+			.catch((err) => {
+				throw new Error((err as Error).message)
+			})
+		name = ""
+		symbol = ""
+		mass = 0
+	}
 </script>
 
 <div class="border border-gray-800 rounded shadow w-fit p-4">

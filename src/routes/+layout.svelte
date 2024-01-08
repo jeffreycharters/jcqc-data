@@ -2,7 +2,8 @@
 	import '../app.postcss';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { currentUser, logout } from '$lib/pocketbase';
+	import { logout } from '$lib/pocketbase';
+	import { currentUser } from '$lib/pocketbase';
 
 	function logoutAndRedirect() {
 		logout();
@@ -18,7 +19,7 @@
 
 <div class="fixed bottom-4 right-4 no-print">
 	{#if $currentUser}
-		Logged in as {$currentUser.username}.
+		Logged in as {$currentUser?.username}.
 		<button class="btn" on:click={logoutAndRedirect}>Log out</button>
 	{:else}
 		Not logged in.

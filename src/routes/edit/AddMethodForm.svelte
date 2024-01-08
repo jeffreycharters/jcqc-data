@@ -6,6 +6,8 @@
 	import { methods, showAddForm } from '$lib/stores';
 	import { createEventDispatcher } from 'svelte';
 	import slugify from 'slugify';
+	import { IconSquareX } from '@tabler/icons-svelte';
+	import { slide } from 'svelte/transition';
 
 	let formError = '';
 	let name: string;
@@ -13,10 +15,6 @@
 	let calibrationCount = 1;
 	let description: string;
 	let checkStandardTolerance: number;
-
-	let addFormDiv: HTMLElement;
-
-	$: formHeight = !addFormDiv || !$showAddForm ? '0' : `${addFormDiv.scrollHeight}px`;
 
 	const dispatch = createEventDispatcher();
 
@@ -42,35 +40,20 @@
 				return newList;
 			});
 		} catch (err) {
-			const error = err as Error;
-			formError = error.message;
+			formError = (err as Error).message;
 		}
 	};
 </script>
 
-<div
-	bind:this={addFormDiv}
-	class="overflow-y-hidden transition-all w-fit mx-auto"
-	style="max-height: {formHeight}"
->
-	<div class="border border-gray-900 w-fit p-4 rounded shadow my-4 bg-white mb-8">
+{#if $showAddForm}
+	<div
+		class="border border-gray-900 w-fit p-4 rounded shadow my-4 bg-white mb-8"
+		transition:slide={{ duration: 200 }}
+	>
 		<div class="flex justify-between items-center">
 			<h2>Add new</h2>
 			<button on:click={() => dispatch('close')}>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-6 w-6"
-					viewBox="0 0 24 24"
-					stroke-width="2"
-					stroke="currentColor"
-					fill="none"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-					<rect x="4" y="4" width="16" height="16" rx="2" />
-					<path d="M10 10l4 4m0 -4l-4 4" />
-				</svg>
+				<IconSquareX size={24} stroke={1.5} class="stroke-stone-500" />
 			</button>
 		</div>
 		<form on:submit|preventDefault={addMethod}>
@@ -112,4 +95,4 @@
 			</div>
 		</form>
 	</div>
-</div>
+{/if}

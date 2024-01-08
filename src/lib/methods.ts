@@ -1,18 +1,12 @@
-import { pb } from './pocketbase';
-import type { MethodsResponse } from './pocketbase-types';
+import { pb } from "./pocketbase"
+import type { MethodsResponse } from "./pocketbase-types"
 
-export const getMethodList = async (sort = "name") => {
-    const methodList: MethodsResponse[] = await pb.collection('methods').getFullList(undefined, { sort });
-    return methodList;
+export const getMethodList = async (sort = "name"): Promise<MethodsResponse[]> => {
+	return await pb.collection("methods").getFullList(undefined, { sort })
 }
 
-export const getActiveMethods = async () => {
-    const activeMethods: MethodsResponse[] = await pb.collection('methods').getFullList(200, { filter: 'active = true' });
-    return activeMethods;
+export const getActiveMethods = async (): Promise<MethodsResponse[]> => {
+	return pb.collection("methods").getFullList(200, { filter: "active = true" })
 }
 
-
-export const getMethodBySlug = async (slug: string) => {
-    const method: MethodsResponse = await pb.collection('methods').getFirstListItem(`slug = "${slug}"`);
-    return method;
-}
+export const expandedCollections = "blanks,checkStandards,referenceMaterials"

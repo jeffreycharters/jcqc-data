@@ -1,54 +1,52 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import TextInput from '$lib/components/TextInput.svelte';
-	import { method } from '$lib/stores';
-	import { fade } from 'svelte/transition';
-	import CheckStandardList from './CheckStandardList.svelte';
+	import { goto } from "$app/navigation"
+	import TextInput from "$lib/components/TextInput.svelte"
+	import { method } from "$lib/stores"
+	import { fade, slide } from "svelte/transition"
+	import CheckStandardList from "./CheckStandardList.svelte"
+	import { pb } from "$lib/pocketbase"
+	import { IconChevronsRight } from "@tabler/icons-svelte"
+	import type { CheckStandardsResponse } from "$lib/pocketbase-types"
+	import ActiveElement from "./ActiveElement.svelte"
 
-	let newCalName = '';
-	let calMessage = '';
-	let open = false;
-	let addFormOpen = false;
-	let addFormDiv: HTMLDivElement;
-	let contentDiv: HTMLElement;
+	let newCalName = ""
+	let calMessage = ""
+	let open = false
+	let addFormOpen = false
 
-	if (!$method) goto('/', { invalidateAll: true });
+	if (!$method) goto("/", { invalidateAll: true })
 
 	const createNewCheckStandard = async () => {
 		if (!newCalName) {
-			calMessage = 'Please add a blank name';
-			return;
+			calMessage = "Please add a name"
+			return
 		}
-		try {
-			await $method?.createNewCheckStandard(newCalName);
-			$method = $method;
-		} catch (err) {
-			const error = err as Error;
-			calMessage = error.message;
-			return;
-		}
-		newCalName = '';
-		addFormOpen = false;
-	};
+		pb.collection("checkStandards")
+			.create({
+				name: newCalName
+			})
+			.then((newCheckStd) => {
+				pb.collection("methods").update($method!.id, {
+					"checkStandards+": newCheckStd.id
+				})
+				$method!.expand!.checkStandards = [
+					...($method?.expand?.checkStandards ?? []),
+					newCheckStd as CheckStandardsResponse
+				].flat()
+				newCalName = ""
+				addFormOpen = false
+			})
+			.catch((err) => {
+				calMessage = (err as Error).message
+				return
+			})
+	}
 </script>
 
 <div class="basic-border py-4 px-8 mt-4 bg-stone-100">
 	<div class="flex items-end gap-4">
 		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				stroke="currentColor"
-				fill="none"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-				<path d="M7 7l5 5l-5 5" />
-				<path d="M13 7l5 5l-5 5" />
-			</svg>
+			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
 			<h2 class="inline-flex gap-4">Check Standard Targets</h2>
 		</button>
 		{#if calMessage}
@@ -62,47 +60,24 @@
 		{/if}
 	</div>
 
-	<div
-		class="overflow-hidden transition-all"
-		style="max-height: {open ? `${contentDiv.scrollHeight}px` : '0'}"
-		bind:this={contentDiv}
-	>
-		<div class="flex flex-col gap-4 mt-4">
-			{#if $method?.checkStandards && $method.checkStandards?.size > 0}
-				{#each Array.from($method.checkStandards).sort() as [_, checkStandard] (checkStandard.id)}
+	{#if open}
+		<div class="flex flex-col gap-4 mt-4" transition:slide={{ duration: 200 }}>
+			{#if $method?.expand?.checkStandards && $method.expand.checkStandards?.length > 0}
+				{#each ($method.expand?.checkStandards ?? []).sort( (a, b) => (a.name > b.name ? 1 : -1) ) as checkStandard (checkStandard.id)}
 					<CheckStandardList {checkStandard} />
 				{/each}
 			{/if}
 
 			<div class="basic-border py-2 px-4 w-fit transition-all bg-white">
-				<button
-					class="flex items-center gap-2"
-					on:click={() => (addFormOpen = !addFormOpen)}
-					on:click={() => (contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`)}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
+				<button class="flex items-center gap-2" on:click={() => (addFormOpen = !addFormOpen)}>
+					<IconChevronsRight
 						class="h-5 w-5 stroke-gray-400 transition-all {addFormOpen ? 'rotate-90' : ''}"
-						viewBox="0 0 24 24"
-						stroke-width="2"
-						stroke="currentColor"
-						fill="none"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-						<path d="M7 7l5 5l-5 5" />
-						<path d="M13 7l5 5l-5 5" />
-					</svg>
+					/>
 					<h3>Add New Check Standard</h3>
 				</button>
 
-				<div
-					class="overflow-hidden"
-					style="max-height: {addFormOpen ? `${addFormDiv.scrollHeight}px` : '0'}"
-					bind:this={addFormDiv}
-				>
-					<form class="w-48">
+				{#if addFormOpen}
+					<form class="w-48" transition:slide={{ duration: 200 }}>
 						<TextInput
 							label="Check Standard Name"
 							placeholder="e.g. Calibration Check"
@@ -111,7 +86,7 @@
 						/>
 
 						<div class="flex flex-col gap-2 items-start">
-							<div class="text-sm text-red-500">{calMessage ?? ''}</div>
+							<div class="text-sm text-red-500">{calMessage ?? ""}</div>
 							<input
 								type="submit"
 								value="+Add"
@@ -120,8 +95,8 @@
 							/>
 						</div>
 					</form>
-				</div>
+				{/if}
 			</div>
 		</div>
-	</div>
+	{/if}
 </div>

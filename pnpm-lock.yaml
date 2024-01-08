@@ -8,6 +8,9 @@ dependencies:
   '@sveltejs/vite-plugin-svelte':
     specifier: ^3.0.1
     version: 3.0.1(svelte@4.2.8)(vite@5.0.10)
+  '@tabler/icons-svelte':
+    specifier: ^2.45.0
+    version: 2.45.0(svelte@4.2.8)
   cuid:
     specifier: ^3.0.0
     version: 3.0.0
@@ -564,6 +567,19 @@ packages:
       vitefu: 0.2.5(vite@5.0.10)
     transitivePeerDependencies:
       - supports-color
+
+  /@tabler/icons-svelte@2.45.0(svelte@4.2.8):
+    resolution: {integrity: sha512-NfPuOWyBhqDQr4wweg89nM8KEvwQIBjJwENoaQOjals1GpH3C9rshkNEFFk5mrnYlUZERuwg2qm29B7aNnbQ9A==}
+    peerDependencies:
+      svelte: '>=3 <5'
+    dependencies:
+      '@tabler/icons': 2.45.0
+      svelte: 4.2.8
+    dev: false
+
+  /@tabler/icons@2.45.0:
+    resolution: {integrity: sha512-J10UDghOni9wlrj5CpKAzychDCABCKYq897mGg0wGFsd+tYLaUdz0dt/HZeGnV8gZJo0hIiTPLGwBp5EW42Qsg==}
+    dev: false
 
   /@types/cookie@0.6.0:
     resolution: {integrity: sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA==}

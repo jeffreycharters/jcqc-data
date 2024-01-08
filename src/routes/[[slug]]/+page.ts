@@ -1,41 +1,36 @@
-import { Method } from '$lib/classes';
-import { getActiveMethods, getMethodBySlug } from '$lib/methods';
-import { pb } from '$lib/pocketbase';
-import type { InstrumentsResponse } from '$lib/pocketbase-types';
-import { method, instruments } from '$lib/stores';
-import { redirect } from '@sveltejs/kit';
-import type { PageLoad } from './$types';
+import { getActiveMethods } from "$lib/methods"
+import { pb } from "$lib/pocketbase"
+import type { ElementsResponse, InstrumentsResponse, MethodsResponse } from "$lib/pocketbase-types"
+import { method, instruments } from "$lib/stores"
+import { redirect } from "@sveltejs/kit"
+import type { PageLoad } from "./$types"
 
 export const load: PageLoad = (async ({ params }) => {
-	const slug = params.slug;
-	const methods = await getActiveMethods();
+	const slug = params.slug
+	const methods = await getActiveMethods()
 
-	const instrumentList: InstrumentsResponse[] = await pb.collection('instruments').getFullList();
-	instruments.set(instrumentList);
+	const instrumentList: InstrumentsResponse[] = await pb.collection("instruments").getFullList()
+	instruments.set(instrumentList)
 
 	if (!slug) {
-		method.set(null);
+		method.set(null)
 		return {
-			title: 'JCQC Data Processor',
+			title: "JCQC Data Processor",
 			methods
-		};
+		}
 	}
 
-	const methodResponse = await getMethodBySlug(slug);
+	const methodResponse: MethodsResponse<unknown, { elements: ElementsResponse[] }> = await pb
+		.collection("methods")
+		.getFirstListItem(`slug = "${slug}"`, { expand: "elements" })
 	if (!methodResponse) {
-		throw redirect(302, '/');
+		throw redirect(302, "/")
 	}
-	const currentMethod = new Method(methodResponse.id);
-	await currentMethod.init({
-		blanks: true,
-		elements: true,
-		referenceMaterials: true,
-		checkStandards: true
-	});
-	method.set(currentMethod);
+
+	method.set(methodResponse)
 
 	return {
-		title: currentMethod.title,
+		title: `${methodResponse.name}: ${methodResponse.description}`,
 		methods
-	};
-}) satisfies PageLoad;
+	}
+}) satisfies PageLoad

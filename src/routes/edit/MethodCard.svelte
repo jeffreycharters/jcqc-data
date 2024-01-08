@@ -31,7 +31,7 @@
 </script>
 
 <div
-	class="border border-{accentColour} w-full p-4 rounded shadow-lg flex items-center justify-around"
+	class="border border-{accentColour} w-full p-4 rounded shadow flex items-center justify-around"
 	in:receive={{ key: method.id }}
 	out:send={{ key: method.id }}
 >

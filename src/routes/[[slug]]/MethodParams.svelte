@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { method } from '$lib/stores';
+	import { method } from "$lib/stores"
+	import ReferenceMaterial from "../report/ReferenceMaterial.svelte"
 
-	$: elements = $method?.elements?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? [];
-	$: lowElementCount = elements && elements?.length < 15;
+	$: elements = $method?.elements?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? []
+	$: lowElementCount = elements && elements?.length < 15
 
-	$: methodHasCheckStandards = $method?.checkStandards && $method?.checkStandards.size > 0;
-	$: methodHasBlanks = $method?.blanks && $method?.blanks.size > 0;
+	$: methodHasCheckStandards = $method?.checkStandards && $method?.checkStandards.size > 0
+	$: methodHasBlanks = $method?.blanks && $method?.blanks.size > 0
 	$: methodHasReferenceMaterials =
-		$method?.referenceMaterials && $method?.referenceMaterials.size > 0;
+		$method?.referenceMaterials && $method?.referenceMaterials.size > 0
 </script>
 
 {#if $method}
@@ -18,7 +19,7 @@
 				: 'justify-between gap-8'} items-end flex-wrap my-8"
 		>
 			<h2 class="text-2xl flex-grow border-b {lowElementCount ? 'self-start' : 'self-end'}">
-				{$method.title}
+				{$method.name}: {$method.description}
 			</h2>
 
 			<div class="flex items-stretch gap-4">
@@ -96,9 +97,9 @@
 							<td class="first-column">{checkStandard.name}</td>
 							{#each elements as element}
 								{@const values = $method?.getValue(
-									'checkStandards',
+									"checkStandards",
 									checkStandard.name,
-									'checkValues',
+									"checkValues",
 									element.id
 								)}
 								<td class="text-center">{values?.value}</td>
@@ -121,20 +122,20 @@
 							</td>
 							{#each elements as element}
 								{@const values = $method?.getValue(
-									'blanks',
+									"blanks",
 									blank.name,
-									'detectionLimits',
+									"detectionLimits",
 									element.id
 								)}
 								<td class="text-center">
 									<div class="table mx-auto">
 										<div class="table-row">
 											<div class="table-cell text-center">
-												{values.mdl === 0 ? '- -' : values.mdl}
+												{values.mdl === 0 ? "- -" : values.mdl}
 											</div>
 										</div>
 										<div>
-											{values.loq === 0 ? '- -' : values.loq}
+											{values.loq === 0 ? "- -" : values.loq}
 										</div>
 									</div>
 								</td>
@@ -157,20 +158,20 @@
 							</td>
 							{#each elements as element}
 								{@const values = $method?.getValue(
-									'referenceMaterials',
+									"referenceMaterials",
 									referenceMaterial.name,
-									'ranges',
+									"ranges",
 									element.id
 								)}
 								<td class="text-center">
 									<div class="table mx-auto">
 										<div class="table-row">
 											<div class="table-cell text-center">
-												{values?.lower === 0 ? '- -' : values?.lower}
+												{values?.lower === 0 ? "- -" : values?.lower}
 											</div>
 										</div>
 										<div>
-											{values?.upper === 0 ? '- -' : values?.upper}
+											{values?.upper === 0 ? "- -" : values?.upper}
 										</div>
 									</div>
 								</td>

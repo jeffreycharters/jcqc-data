@@ -36,6 +36,7 @@
 	"type": "module",
 	"dependencies": {
 		"@sveltejs/vite-plugin-svelte": "^3.0.1",
+		"@tabler/icons-svelte": "^2.45.0",
 		"cuid": "^3.0.0",
 		"pocketbase": "^0.20.1",
 		"slugify": "^1.6.6"

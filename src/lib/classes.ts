@@ -705,9 +705,12 @@
 // 		const targetSample = this[sampleType]?.get(name);
 
 // 		if (!targetSample?.expand || !targetSample.expand[expandType]) return null;
-// 		const targetElements = (targetSample.expand[expandType] as CheckValuesResponse[] | ReferenceMaterialsRangesResponse[] | DetectionLimitsResponse[]).find(
-// 			(x) => x.element === element
-// 		);
+// 		const targetElements = (
+// 			targetSample.expand[expandType] as
+// 				| CheckValuesResponse[]
+// 				| ReferenceMaterialsRangesResponse[]
+// 				| DetectionLimitsResponse[]
+// 		).find((x) => x.element === element);
 // 		return targetElements;
 // 	}
 
