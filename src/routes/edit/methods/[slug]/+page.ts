@@ -4,8 +4,7 @@ import { allElements, methodStore } from "$lib/stores"
 import { pb } from "$lib/pocketbase"
 import type { ElementsResponse, MethodsResponse } from "$lib/pocketbase-types"
 import type { ExpandedMethod } from "$lib/types"
-import { setMethodElements } from "$lib/elements"
-import { setBlanks, setCheckStandards, setReferenceMaterials } from "$lib/methods"
+import { setMethodStores } from "$lib/methods"
 
 export const load = (async ({ params }) => {
 	if (!params.slug) throw redirect(302, "/edit")
@@ -13,11 +12,7 @@ export const load = (async ({ params }) => {
 
 	const method = await pb.collection("methods").getFirstListItem(`slug = "${slug}"`)
 	methodStore.set(method as MethodsResponse<ExpandedMethod>)
-
-	await setMethodElements(method.id)
-	await setCheckStandards(method.id)
-	await setBlanks(method.id)
-	await setReferenceMaterials(method.id)
+	await setMethodStores(method.id)
 
 	pb.collection("elements")
 		.getFullList({ filter: "active = true" })

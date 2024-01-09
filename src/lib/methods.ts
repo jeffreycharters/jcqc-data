@@ -48,3 +48,9 @@ export async function setReferenceMaterials(methodID: string) {
 
 	referenceMaterialsStore.set(referenceMaterials)
 }
+
+export async function setMethodStores(methodID: string) {
+	await setCheckStandards(methodID)
+	await setBlanks(methodID)
+	await setReferenceMaterials(methodID)
+}
