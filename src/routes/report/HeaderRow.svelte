@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { method } from '$lib/stores';
+	import { methodStore } from "$lib/stores"
 
-	export let firstColumnLabel = '';
-	export let allPpb = false;
-	$: elementCount = $method?.elements?.length || 0;
+	export let firstColumnLabel = ""
+	export let allPpb = false
+	$: elementCount = $methodStore?.elements?.length || 0
 </script>
 
 <thead>
@@ -11,7 +11,7 @@
 		<th class="min-w-[175px] border-b-2 border-b-gray-900 p-[3px] w-[105px] text-left align-bottom"
 			>{firstColumnLabel}</th
 		>
-		{#each [...($method?.elements ?? [])] as element (element.id)}
+		{#each [...($methodStore?.elements ?? [])] as element (element.id)}
 			<th class="heading font-semibold">
 				<div
 					class="flex {elementCount > 10 ? 'flex-col gap-0' : 'gap-1 items-center justify-center'}"
@@ -20,7 +20,7 @@
 						<sup>{element.mass}</sup>{element.symbol}
 					</div>
 					<div class="text-gray-500 font-normal text-[0.7rem]">
-						{allPpb ? 'ppb' : element.units}
+						{allPpb ? "ppb" : element.units}
 					</div>
 				</div>
 			</th>

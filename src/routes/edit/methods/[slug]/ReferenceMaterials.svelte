@@ -1,22 +1,22 @@
 <script lang="ts">
-	import { method } from '$lib/stores';
-	import { fade, slide } from 'svelte/transition';
-	import TextInput from '$lib/components/TextInput.svelte';
-	import ReferenceMaterialList from './ReferenceMaterialList.svelte';
+	import { methodStore } from "$lib/stores"
+	import { fade, slide } from "svelte/transition"
+	import TextInput from "$lib/components/TextInput.svelte"
+	import ReferenceMaterialList from "./ReferenceMaterialList.svelte"
 
-	let newReferenceMaterialName = '';
-	let formMessage: string;
-	let open = false;
-	let addFormOpen = false;
-	let addFormDiv: HTMLDivElement;
-	let contentDiv: HTMLElement;
+	let newReferenceMaterialName = ""
+	let formMessage: string
+	let open = false
+	let addFormOpen = false
+	let addFormDiv: HTMLDivElement
+	let contentDiv: HTMLElement
 
 	const createNewReferenceMaterial = async () => {
-		await $method?.createNewReferenceMaterial(newReferenceMaterialName);
-		$method = $method;
-		newReferenceMaterialName = '';
-		addFormOpen = false;
-	};
+		// await $methodStore?.createNewReferenceMaterial(newReferenceMaterialName)
+		// $methodStore = $methodStore
+		// newReferenceMaterialName = ""
+		// addFormOpen = false
+	}
 </script>
 
 <div class="basic-border py-4 px-8 mt-4 bg-stone-100">
@@ -50,9 +50,9 @@
 	</div>
 
 	{#if open}
-		<div class="flex flex-col gap-4 mt-4" transition:slide={{ duration: 200}}>
-			{#if $method?.referenceMaterials && $method.referenceMaterials?.size > 0}
-				{#each Array.from($method.referenceMaterials).sort() as [_, referenceMaterial] (referenceMaterial.id)}
+		<div class="flex flex-col gap-4 mt-4" transition:slide={{ duration: 200 }}>
+			{#if $methodStore?.referenceMaterials && $methodStore.referenceMaterials?.size > 0}
+				{#each Array.from($methodStore.referenceMaterials).sort() as [_, referenceMaterial] (referenceMaterial.id)}
 					<ReferenceMaterialList {referenceMaterial} />
 				{/each}
 			{/if}
@@ -94,7 +94,7 @@
 						/>
 
 						<div class="flex flex-col gap-2 items-start">
-							<div class="text-sm text-red-500">{formMessage ?? ''}</div>
+							<div class="text-sm text-red-500">{formMessage ?? ""}</div>
 							<input
 								type="submit"
 								value="+Add"

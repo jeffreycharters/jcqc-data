@@ -1,27 +1,27 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
-	import { method } from '$lib/stores';
-	import HeaderRow from './HeaderRow.svelte';
+	import { goto } from "$app/navigation"
+	import { roundToSigFigs, sortedArrayFromMap } from "$lib/data"
+	import { methodStore } from "$lib/stores"
+	import HeaderRow from "./HeaderRow.svelte"
 
-	export let sample: RunListEntry;
-	let values = sortedArrayFromMap(sample?.results?.values);
-	let dupValues = sortedArrayFromMap(sample?.results.dupValues ?? new Map());
-	$: rpdLimit = $method?.rpdLimit ?? 0;
-	let lowestLoqs = $method?.getLowestLoqs();
+	export let sample: RunListEntry
+	let values = sortedArrayFromMap(sample?.results?.values)
+	let dupValues = sortedArrayFromMap(sample?.results.dupValues ?? new Map())
+	$: rpdLimit = $methodStore?.rpdLimit ?? 0
+	let lowestLoqs = $methodStore?.getLowestLoqs()
 
-	if (dupValues.length === 0) goto('/');
+	if (dupValues.length === 0) goto("/")
 
 	const calculateRPD = (value: number, dupValue: number) => {
-		if (!value || !dupValue) return undefined;
-		return (Math.abs(value - dupValue) / (value + dupValue / 2)) * 100;
-	};
+		if (!value || !dupValue) return undefined
+		return (Math.abs(value - dupValue) / (value + dupValue / 2)) * 100
+	}
 
 	const checkIfDupPassing = (average: number, rpd: number | undefined, loq: number | undefined) => {
-		if (!rpd || !loq || !rpdLimit || average < 2 * loq) return 'neutral';
-		if (rpd > rpdLimit) return 'fails';
-		if (rpd < rpdLimit) return 'passes';
-	};
+		if (!rpd || !loq || !rpdLimit || average < 2 * loq) return "neutral"
+		if (rpd > rpdLimit) return "fails"
+		if (rpd < rpdLimit) return "passes"
+	}
 </script>
 
 <div>
@@ -68,7 +68,7 @@
 						{@const passing = checkIfDupPassing(average, rpd, loq)}
 						<td class={passing}>
 							{#if !rpd || !loq || average < loq * 2}
-								{rpd?.toFixed(1) ?? '- -'}
+								{rpd?.toFixed(1) ?? "- -"}
 							{:else}
 								{parseFloat(rpd.toPrecision(2))}
 							{/if}

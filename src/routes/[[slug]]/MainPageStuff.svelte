@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { method, methods } from '$lib/stores';
-	import SelectInstrument from './SelectInstrument.svelte';
+	import { page } from "$app/stores"
+	import { methodStore, methods } from "$lib/stores"
+	import SelectInstrument from "./SelectInstrument.svelte"
 </script>
 
 <div class="absolute bottom-4 left-4">
@@ -13,7 +13,7 @@
 		<h1 class="text-2xl w-fit mx-auto">JCQC Reporting Application</h1>
 		<hr class="w-[36rem] my-4 mx-auto" />
 		<div
-			class="flex w-[800px] mx-auto justify-between place-items-stretch 
+			class="flex w-[800px] mx-auto justify-between place-items-stretch
         "
 		>
 			<SelectInstrument />
@@ -34,7 +34,7 @@
 						href="/"
 						data-sveltekit-preload-data="tap"
 						class="btn my-2 method-button no-underline"
-						on:click={() => ($method = null)}>Clear</a
+						on:click={() => ($methodStore = null)}>Clear</a
 					>
 				</div>
 			</div>
@@ -51,7 +51,7 @@
 <style lang="postcss">
 	.selected-button {
 		@apply text-teal-600 border-teal-700 shadow-sm shadow-teal-700/50 font-semibold;
-		box-shadow: '0 0 5px #086077';
+		box-shadow: "0 0 5px #086077";
 	}
 	.method-button {
 		@apply text-gray-600 border-gray-700 scale-95 transition-all;

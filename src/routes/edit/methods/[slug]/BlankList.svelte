@@ -1,35 +1,35 @@
 <script lang="ts">
-	import EditIcon from '$lib/components/EditIcon.svelte';
-	import type { BlanksResponse } from '$lib/pocketbase-types';
-	import { method } from '$lib/stores';
-	import BlankElement from './BlankElement.svelte';
+	import EditIcon from "$lib/components/EditIcon.svelte"
+	import type { BlanksResponse } from "$lib/pocketbase-types"
+	import { methodStore } from "$lib/stores"
+	import BlankElement from "./BlankElement.svelte"
 
-	export let blank: BlanksResponse;
+	export let blank: BlanksResponse
 
-	$: elementList = $method?.elements;
-	let statusMessage = '';
+	$: elementList = $methodStore?.elements
+	let statusMessage = ""
 
-	let { name } = blank;
-	let editing = false;
+	let { name } = blank
+	let editing = false
 
-	let timer: number;
+	let timer: number
 	const statusUpdate = (message: string, timeout = 3000) => {
-		if (timer) clearTimeout(timer);
+		if (timer) clearTimeout(timer)
 
-		statusMessage = message;
-		timer = setTimeout(() => (statusMessage = ''), timeout);
-	};
+		statusMessage = message
+		timer = setTimeout(() => (statusMessage = ""), timeout)
+	}
 
 	const deleteBlank = async () => {
-		await $method?.deleteBlank(blank.name);
-		$method = $method;
-	};
+		await$methodStore?.deleteBlank(blank.name)
+		$methodStore = $methodStore
+	}
 
 	const updateName = async () => {
-		await $method?.updateBlankName(blank.id, name);
-		$method = $method;
-		editing = false;
-	};
+		await$methodStore?.updateBlankName(blank.id, name)
+		$methodStore = $methodStore
+		editing = false
+	}
 </script>
 
 <div class="basic-border w-full h-full p-4 bg-white">
@@ -46,7 +46,7 @@
 				{:else}
 					<h3>{blank.name}</h3>
 				{/if}
-				<button type="button" on:click={() => (editing = !editing)} class={editing ? 'btn' : ''}>
+				<button type="button" on:click={() => (editing = !editing)} class={editing ? "btn" : ""}>
 					{#if editing}
 						Cancel
 					{:else}
@@ -54,7 +54,7 @@
 					{/if}
 				</button>
 			</form>
-			<div class="italic font-bold text-amber-600">{statusMessage ?? ''}</div>
+			<div class="italic font-bold text-amber-600">{statusMessage ?? ""}</div>
 		</div>
 		<button on:click={deleteBlank}>
 			<svg

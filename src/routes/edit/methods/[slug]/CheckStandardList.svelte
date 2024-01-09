@@ -1,35 +1,40 @@
 <script lang="ts">
-	import EditIcon from '$lib/components/EditIcon.svelte';
-	import type { CheckStandardsResponse } from '$lib/pocketbase-types';
-	import { method } from '$lib/stores';
-	import CheckStandardElement from './CheckStandardElement.svelte';
+	import EditIcon from "$lib/components/EditIcon.svelte"
+	import type { CheckStandardsResponse, ElementsResponse } from "$lib/pocketbase-types"
+	import { checkStandardsStore, methodElementsStore, methodStore } from "$lib/stores"
+	import { crossfade } from "svelte/transition"
+	import CheckStandardElement from "./CheckStandardElement.svelte"
+	import { flip } from "svelte/animate"
+	import { IconTrash } from "@tabler/icons-svelte"
+	import type { ExpandedCheckStandard } from "$lib/types"
 
-	export let checkStandard: CheckStandardsResponse;
-	let { name } = checkStandard;
+	export let checkStandard: CheckStandardsResponse<ExpandedCheckStandard>
+	let { name } = checkStandard
 
-	$: elementList = $method?.elements;
-	let statusMessage = '';
-	let editing = false;
+	const [send, receive] = crossfade({ duration: 200 })
 
-	let timer: number;
+	let statusMessage = ""
+	let editing = false
+
+	let timer: number
 	const statusUpdate = (message: string, timeout = 3000) => {
-		if (timer) clearTimeout(timer);
+		if (timer) clearTimeout(timer)
 
-		statusMessage = message;
-		timer = setTimeout(() => (statusMessage = ''), timeout);
-	};
+		statusMessage = message
+		timer = setTimeout(() => (statusMessage = ""), timeout)
+	}
 
 	const deleteCheckStandard = async () => {
-		await $method?.deleteCheckStandard(checkStandard.name);
-		$method = $method;
-	};
+		// await $methodStore?.deleteCheckStandard(checkStandard.name)
+		$methodStore = $methodStore
+	}
 
 	const updateName = async () => {
-		console.log('updating name!');
-		await $method?.updateCheckStandardName(checkStandard.id, name);
-		$method = $method;
-		editing = false;
-	};
+		console.log("updating name!")
+		// await $methodStore?.updateCheckStandardName(checkStandard.id, name)
+		$methodStore = $methodStore
+		editing = false
+	}
 </script>
 
 <div class="basic-border w-full h-full p-4 bg-white">
@@ -46,7 +51,7 @@
 				{:else}
 					<h3>{checkStandard.name}</h3>
 				{/if}
-				<button type="button" on:click={() => (editing = !editing)} class={editing ? 'btn' : ''}>
+				<button type="button" on:click={() => (editing = !editing)} class={editing ? "btn" : ""}>
 					{#if editing}
 						Cancel
 					{:else}
@@ -54,37 +59,26 @@
 					{/if}
 				</button>
 			</form>
-			<div class="italic font-bold text-amber-600">{statusMessage ?? ''}</div>
+			<div class="italic font-bold text-amber-600">{statusMessage ?? ""}</div>
 		</div>
 		<button on:click={deleteCheckStandard}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-8 w-8 stroke-red-700 hover:bg-red-100 py-[6px] rounded-full transition-colors"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				fill="none"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-				<path d="M4 7l16 0" />
-				<path d="M10 11l0 6" />
-				<path d="M14 11l0 6" />
-				<path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-				<path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-			</svg>
+			<IconTrash class="stroke-red-700 h-8 w-8 p-1" />
 		</button>
 	</div>
 
-	{#if elementList && elementList.length > 0}
-		<div class="grid grid-cols-6 gap-4 text-center">
-			{#each elementList.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
+	<div class="grid grid-cols-6 gap-4 text-center">
+		{#each $methodElementsStore.sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
+			<div
+				in:receive|local={{ key: methodElement.id }}
+				out:send|local={{ key: methodElement.id }}
+				animate:flip={{ duration: 200 }}
+			>
 				<CheckStandardElement
-					{element}
-					checkStandardName={checkStandard.name}
+					{checkStandard}
+					element={methodElement}
 					on:updateStatus={(event) => statusUpdate(event.detail)}
 				/>
-			{/each}
-		</div>
-	{/if}
+			</div>
+		{/each}
+	</div>
 </div>

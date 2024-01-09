@@ -1,9 +1,9 @@
 /**
-* This file was @generated using pocketbase-typegen
-*/
+ * This file was @generated using pocketbase-typegen
+ */
 
-import type PocketBase from 'pocketbase'
-import type { RecordService } from 'pocketbase'
+import type PocketBase from "pocketbase"
+import type { RecordService } from "pocketbase"
 
 export enum Collections {
 	Blanks = "blanks",
@@ -12,10 +12,11 @@ export enum Collections {
 	DetectionLimits = "detectionLimits",
 	Elements = "elements",
 	Instruments = "instruments",
+	MethodElements = "methodElements",
 	Methods = "methods",
 	ReferenceMaterials = "referenceMaterials",
 	ReferenceMaterialsRanges = "referenceMaterialsRanges",
-	Users = "users",
+	Users = "users"
 }
 
 // Alias types for improved usability
@@ -43,7 +44,6 @@ export type AuthSystemFields<T = never> = {
 // Record types for each collection
 
 export type BlanksRecord = {
-	detectionLimits?: RecordIdString[]
 	method: RecordIdString
 	name?: string
 }
@@ -51,15 +51,16 @@ export type BlanksRecord = {
 export type CheckStandardsRecord = {
 	method: RecordIdString
 	name?: string
-	values?: RecordIdString[]
 }
 
 export type CheckValuesRecord = {
+	checkStandard: RecordIdString
 	element?: RecordIdString
 	value?: number
 }
 
 export type DetectionLimitsRecord = {
+	blank: RecordIdString
 	element?: RecordIdString
 	loq?: number
 	mdl?: number
@@ -79,26 +80,30 @@ export type InstrumentsRecord = {
 	softwareVersion?: string
 }
 
-export type MethodsRecord<Tunits = unknown> = {
+export enum MethodElementsUnitsOptions {
+	"ppb" = "ppb",
+	"ppm" = "ppm"
+}
+export type MethodElementsRecord = {
+	element: RecordIdString
+	method: RecordIdString
+	units: MethodElementsUnitsOptions
+}
+
+export type MethodsRecord = {
 	active?: boolean
-	blanks?: RecordIdString[]
 	calibrationCount?: number
 	checkStandardTolerance?: number
-	checkStandards?: RecordIdString[]
 	description?: string
-	elements?: RecordIdString[]
 	name?: string
-	referenceMaterials?: RecordIdString[]
 	rpdLimit?: number
 	slug?: string
-	units?: null | Tunits
 }
 
 export type ReferenceMaterialsRecord = {
 	active?: boolean
 	method: RecordIdString
 	name?: string
-	ranges?: RecordIdString[]
 }
 
 export type ReferenceMaterialsRangesRecord = {
@@ -114,14 +119,23 @@ export type UsersRecord = {
 
 // Response types include system fields and match responses from the PocketBase API
 export type BlanksResponse<Texpand = unknown> = Required<BlanksRecord> & BaseSystemFields<Texpand>
-export type CheckStandardsResponse<Texpand = unknown> = Required<CheckStandardsRecord> & BaseSystemFields<Texpand>
-export type CheckValuesResponse<Texpand = unknown> = Required<CheckValuesRecord> & BaseSystemFields<Texpand>
-export type DetectionLimitsResponse<Texpand = unknown> = Required<DetectionLimitsRecord> & BaseSystemFields<Texpand>
-export type ElementsResponse<Texpand = unknown> = Required<ElementsRecord> & BaseSystemFields<Texpand>
-export type InstrumentsResponse<Texpand = unknown> = Required<InstrumentsRecord> & BaseSystemFields<Texpand>
-export type MethodsResponse<Tunits = unknown, Texpand = unknown> = Required<MethodsRecord<Tunits>> & BaseSystemFields<Texpand>
-export type ReferenceMaterialsResponse<Texpand = unknown> = Required<ReferenceMaterialsRecord> & BaseSystemFields<Texpand>
-export type ReferenceMaterialsRangesResponse<Texpand = unknown> = Required<ReferenceMaterialsRangesRecord> & BaseSystemFields<Texpand>
+export type CheckStandardsResponse<Texpand = unknown> = Required<CheckStandardsRecord> &
+	BaseSystemFields<Texpand>
+export type CheckValuesResponse<Texpand = unknown> = Required<CheckValuesRecord> &
+	BaseSystemFields<Texpand>
+export type DetectionLimitsResponse<Texpand = unknown> = Required<DetectionLimitsRecord> &
+	BaseSystemFields<Texpand>
+export type ElementsResponse<Texpand = unknown> = Required<ElementsRecord> &
+	BaseSystemFields<Texpand>
+export type InstrumentsResponse<Texpand = unknown> = Required<InstrumentsRecord> &
+	BaseSystemFields<Texpand>
+export type MethodElementsResponse<Texpand = unknown> = Required<MethodElementsRecord> &
+	BaseSystemFields<Texpand>
+export type MethodsResponse<Texpand = unknown> = Required<MethodsRecord> & BaseSystemFields<Texpand>
+export type ReferenceMaterialsResponse<Texpand = unknown> = Required<ReferenceMaterialsRecord> &
+	BaseSystemFields<Texpand>
+export type ReferenceMaterialsRangesResponse<Texpand = unknown> =
+	Required<ReferenceMaterialsRangesRecord> & BaseSystemFields<Texpand>
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & AuthSystemFields<Texpand>
 
 // Types containing all Records and Responses, useful for creating typing helper functions
@@ -133,6 +147,7 @@ export type CollectionRecords = {
 	detectionLimits: DetectionLimitsRecord
 	elements: ElementsRecord
 	instruments: InstrumentsRecord
+	methodElements: MethodElementsRecord
 	methods: MethodsRecord
 	referenceMaterials: ReferenceMaterialsRecord
 	referenceMaterialsRanges: ReferenceMaterialsRangesRecord
@@ -146,6 +161,7 @@ export type CollectionResponses = {
 	detectionLimits: DetectionLimitsResponse
 	elements: ElementsResponse
 	instruments: InstrumentsResponse
+	methodElements: MethodElementsResponse
 	methods: MethodsResponse
 	referenceMaterials: ReferenceMaterialsResponse
 	referenceMaterialsRanges: ReferenceMaterialsRangesResponse
@@ -156,14 +172,15 @@ export type CollectionResponses = {
 // https://github.com/pocketbase/js-sdk#specify-typescript-definitions
 
 export type TypedPocketBase = PocketBase & {
-	collection(idOrName: 'blanks'): RecordService<BlanksResponse>
-	collection(idOrName: 'checkStandards'): RecordService<CheckStandardsResponse>
-	collection(idOrName: 'checkValues'): RecordService<CheckValuesResponse>
-	collection(idOrName: 'detectionLimits'): RecordService<DetectionLimitsResponse>
-	collection(idOrName: 'elements'): RecordService<ElementsResponse>
-	collection(idOrName: 'instruments'): RecordService<InstrumentsResponse>
-	collection(idOrName: 'methods'): RecordService<MethodsResponse>
-	collection(idOrName: 'referenceMaterials'): RecordService<ReferenceMaterialsResponse>
-	collection(idOrName: 'referenceMaterialsRanges'): RecordService<ReferenceMaterialsRangesResponse>
-	collection(idOrName: 'users'): RecordService<UsersResponse>
+	collection(idOrName: "blanks"): RecordService<BlanksResponse>
+	collection(idOrName: "checkStandards"): RecordService<CheckStandardsResponse>
+	collection(idOrName: "checkValues"): RecordService<CheckValuesResponse>
+	collection(idOrName: "detectionLimits"): RecordService<DetectionLimitsResponse>
+	collection(idOrName: "elements"): RecordService<ElementsResponse>
+	collection(idOrName: "instruments"): RecordService<InstrumentsResponse>
+	collection(idOrName: "methodElements"): RecordService<MethodElementsResponse>
+	collection(idOrName: "methods"): RecordService<MethodsResponse>
+	collection(idOrName: "referenceMaterials"): RecordService<ReferenceMaterialsResponse>
+	collection(idOrName: "referenceMaterialsRanges"): RecordService<ReferenceMaterialsRangesResponse>
+	collection(idOrName: "users"): RecordService<UsersResponse>
 }

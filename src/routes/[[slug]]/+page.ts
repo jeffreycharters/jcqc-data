@@ -1,7 +1,7 @@
 import { getActiveMethods } from "$lib/methods"
 import { pb } from "$lib/pocketbase"
 import type { ElementsResponse, InstrumentsResponse, MethodsResponse } from "$lib/pocketbase-types"
-import { method, instruments } from "$lib/stores"
+import { methodStore, instruments } from "$lib/stores"
 import { redirect } from "@sveltejs/kit"
 import type { PageLoad } from "./$types"
 
@@ -13,7 +13,7 @@ export const load: PageLoad = (async ({ params }) => {
 	instruments.set(instrumentList)
 
 	if (!slug) {
-		method.set(null)
+		methodStore.set(null)
 		return {
 			title: "JCQC Data Processor",
 			methods
@@ -27,7 +27,7 @@ export const load: PageLoad = (async ({ params }) => {
 		throw redirect(302, "/")
 	}
 
-	method.set(methodResponse)
+	methodStore.set(methodResponse)
 
 	return {
 		title: `${methodResponse.name}: ${methodResponse.description}`,

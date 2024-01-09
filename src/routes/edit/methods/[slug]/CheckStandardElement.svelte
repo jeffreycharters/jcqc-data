@@ -1,41 +1,57 @@
 <script lang="ts">
-	import type { Analyte } from '$lib/classes';
-	import ElementWithMass from '$lib/components/ElementWithMass.svelte';
-	import type { CheckValuesResponse } from '$lib/pocketbase-types';
-	import { method } from '$lib/stores';
-	import { createEventDispatcher } from 'svelte';
+	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
+	import { pb } from "$lib/pocketbase"
+	import type {
+		CheckStandardsResponse,
+		CheckValuesRecord,
+		CheckValuesResponse
+	} from "$lib/pocketbase-types"
+	import { checkStandardsStore } from "$lib/stores"
+	import type { ExpandedCheckStandard, MethodElement } from "$lib/types"
+	import { createEventDispatcher, type EventDispatcher } from "svelte"
 
-	export let element: Analyte;
-	export let checkStandardName: string;
-	const dispatch = createEventDispatcher();
+	export let checkStandard: CheckStandardsResponse<ExpandedCheckStandard>
+	export let element: MethodElement
 
-	let allCheckValues = $method?.checkStandards?.get(checkStandardName)?.expand
-		?.checkValues as CheckValuesResponse[];
+	const dispatch: EventDispatcher<{ updateStatus: string }> = createEventDispatcher()
 
-	const checkValues =
-		allCheckValues?.find((checkValue) => checkValue.element === element.id) ?? undefined;
+	let checkValue = checkStandard.expand?.["checkValues(checkStandard)"].find(
+		(cv) => cv.element === element.elementID
+	)
 
-	let valueBase = checkValues?.value;
-	let value = !valueBase || valueBase === 0 ? '- -' : valueBase;
+	let rawValue = checkValue?.value
+	let value = rawValue ?? "- -"
 
 	function debounce(callback: () => void, timeout = 1000) {
-		let timer: number;
+		let timer: number
 		return (...args: any) => {
-			dispatch('updateStatus', 'Pending...');
-			clearTimeout(timer);
+			dispatch("updateStatus", "Pending...")
+			clearTimeout(timer)
 			timer = setTimeout(() => {
-				callback.apply(debounce, args);
-			}, timeout);
-		};
+				callback.apply(debounce, args)
+			}, timeout)
+		}
 	}
 
 	const updateCalCheck = async () => {
-		// update database
-		await $method?.updateCheckStandardValue(checkValues?.id ?? '', Number(value));
-		dispatch('updateStatus', 'Saved!');
-	};
+		let updatedCheckStandard: CheckValuesResponse<ExpandedCheckStandard>
+		if (checkValue) {
+			updatedCheckStandard = await pb
+				.collection("checkValues")
+				.update(checkValue.id, { value: value, expand: "checkValues(checkStandard)" })
+		} else {
+			updatedCheckStandard = await pb.collection("checkValues").create({
+				value: value,
+				element: element.elementID,
+				checkStandard: checkStandard.id
+			})
+		}
 
-	const processUpdate = () => debounce(() => updateCalCheck());
+		checkValue = updatedCheckStandard
+		dispatch("updateStatus", "Saved!")
+	}
+
+	const processUpdate = () => debounce(() => updateCalCheck())
 </script>
 
 <form class="basic-border flex flex-col pt-2">
@@ -51,8 +67,8 @@
 				name={`${element.id}-value`}
 				bind:value
 				on:keypress={processUpdate()}
-				on:focus={() => (value = value === '- -' ? '' : value)}
-				on:blur={() => (value = value === '' ? '- -' : value)}
+				on:focus={() => (value = value === "- -" ? "" : value)}
+				on:blur={() => (value = value === "" ? "- -" : value)}
 				class="number-input mt-1 mb-2 text-sm text-center {value === '- -' ? 'text-gray-500' : ''}"
 			/>
 		</div>

@@ -1,73 +1,69 @@
 <script lang="ts">
-	import NumberInput from '$lib/components/NumberInput.svelte';
-	import TextInput from '$lib/components/TextInput.svelte';
-	import { method } from '$lib/stores';
-	import { fade } from 'svelte/transition';
+	import NumberInput from "$lib/components/NumberInput.svelte"
+	import TextInput from "$lib/components/TextInput.svelte"
+	import { expandMethod } from "$lib/methods"
+	import { pb } from "$lib/pocketbase"
+	import type { MethodsResponse } from "$lib/pocketbase-types"
+	import { methodStore } from "$lib/stores"
+	import type { ExpandedMethod } from "$lib/types"
+	import { IconChevronsRight } from "@tabler/icons-svelte"
+	import { fade, slide } from "svelte/transition"
 
-	let formMessage = '';
-	let timer: number;
+	let formMessage = ""
+	let timer: number
 
-	let open = false;
-	let contentDiv: HTMLElement;
+	let open = false
 
-	let { name, calibrationCount, description, checkStandardTolerance, rpdLimit } = $method || {};
+	let { name, calibrationCount, description, checkStandardTolerance, rpdLimit } = $methodStore || {}
 
 	const addFormMessage = (message: string, timeout: number = 3000) => {
-		if (timer) clearTimeout(timer);
-		formMessage = message;
-		timer = setTimeout(() => (formMessage = ''), timeout);
-	};
+		if (timer) clearTimeout(timer)
+		formMessage = message
+		timer = setTimeout(() => (formMessage = ""), timeout)
+	}
 
 	const editMethod = async () => {
-		if (!$method?.name || !$method?.calibrationCount) {
-			addFormMessage('Missing something');
-			return;
+		if (!$methodStore?.name || !$methodStore?.calibrationCount) {
+			addFormMessage("Missing something")
+			return
 		}
-		try {
-			$method?.updateProperties({
+
+		pb.collection("methods")
+			.update($methodStore.id, {
 				name,
 				calibrationCount,
 				description,
 				checkStandardTolerance,
-				rpdLimit
-			});
-			addFormMessage('Saved!');
-		} catch (err) {
-			const error = err as Error;
-			addFormMessage(error.message);
-		}
-	};
+				rpdLimit,
+				expand: expandMethod
+			})
+			.then((updatedMethod) => {
+				$methodStore = updatedMethod as MethodsResponse<ExpandedMethod>
+				addFormMessage("Saved!")
+			})
+			.catch((err) => {
+				addFormMessage((err as Error).message)
+			})
+	}
 
 	function debounce(callback: () => void, timeout = 1000) {
 		return (...args: any) => {
-			addFormMessage('Changes pending...');
-			clearTimeout(timer);
+			addFormMessage("Changes pending...")
+			clearTimeout(timer)
 			timer = setTimeout(() => {
-				callback.apply(debounce, args);
-			}, timeout);
-		};
+				callback.apply(debounce, args)
+			}, timeout)
+		}
 	}
 
-	const processUpdate = () => debounce(editMethod);
+	const processUpdate = () => debounce(editMethod)
 </script>
 
-<div class="basic-border my-4 px-8 py-4 w-full bg-stone-100">
+<div class="basic-border my-4 w-full bg-stone-100">
 	<div class="flex items-end gap-4">
-		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				stroke="currentColor"
-				fill="none"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-				<path d="M7 7l5 5l-5 5" />
-				<path d="M13 7l5 5l-5 5" />
-			</svg>
+		<button class="flex gap-2 items-center px-8 py-4 w-full" on:click={() => (open = !open)}>
+			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
+
 			<h2>Edit Method</h2>
 		</button>
 		{#if formMessage}
@@ -81,12 +77,13 @@
 		{/if}
 	</div>
 
-	<div
-		class="overflow-hidden transition-all"
-		style="max-height: {open ? `${contentDiv.scrollHeight}px` : '0'} "
-		bind:this={contentDiv}
-	>
-		<form on:input={processUpdate()} on:submit|preventDefault>
+	{#if open}
+		<form
+			on:input={processUpdate()}
+			on:submit|preventDefault
+			transition:slide={{ duration: 200 }}
+			class="mb-8 mx-8"
+		>
 			<div class="grid grid-cols-2">
 				<TextInput
 					name="method-name"
@@ -120,5 +117,5 @@
 				/>
 			</div>
 		</form>
-	</div>
+	{/if}
 </div>

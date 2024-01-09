@@ -1,28 +1,27 @@
 import { redirect } from "@sveltejs/kit"
 import type { PageLoad } from "./$types"
-import { allElements, method } from "$lib/stores"
+import { allElements, methodStore } from "$lib/stores"
 import { pb } from "$lib/pocketbase"
 import type { ElementsResponse, MethodsResponse } from "$lib/pocketbase-types"
-import type { ElementsExpanded, Units } from "../../../../app"
+import type { ExpandedMethod } from "$lib/types"
+import { setMethodElements } from "$lib/elements"
+import { setCheckStandards } from "$lib/methods"
 
 export const load = (async ({ params }) => {
 	if (!params.slug) throw redirect(302, "/edit")
 	const slug = params.slug
 
-	const methodResponse: MethodsResponse<Units, ElementsExpanded> = await pb
-		.collection("methods")
-		.getFirstListItem(`slug = "${slug}"`, { expand: "elements,checkStandards" })
-	if (!methodResponse) {
-		throw redirect(302, "/edit")
-	}
+	const method = await pb.collection("methods").getFirstListItem(`slug = "${slug}"`)
+	methodStore.set(method as MethodsResponse<ExpandedMethod>)
 
-	method.set(methodResponse)
+	await setMethodElements(method.id)
+	await setCheckStandards(method.id)
 
 	pb.collection("elements")
-		.getFullList(undefined, { filter: "active = true" })
+		.getFullList({ filter: "active = true" })
 		.then((list) => allElements.set(list as ElementsResponse[]))
 
 	return {
-		title: methodResponse.description
+		title: `${method.name}: ${method.description}`
 	}
 }) satisfies PageLoad

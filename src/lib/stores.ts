@@ -1,16 +1,20 @@
 import { writable, type Writable } from "svelte/store"
 import type {
+	CheckStandardsResponse,
 	ElementsResponse,
 	InstrumentsResponse,
 	MethodsResponse,
 	ReferenceMaterialsResponse
 } from "./pocketbase-types"
 import type { RunListEntry } from "../app"
-import type { ElementsExpanded, Units } from "./types"
+import type { ExpandedCheckStandard, ExpandedMethod, MethodElement } from "./types"
 
 export const methods: Writable<MethodsResponse[]> = writable([])
 
-export const method: Writable<MethodsResponse<Units, ElementsExpanded> | null> = writable()
+export const methodStore: Writable<MethodsResponse<ExpandedMethod> | null> = writable()
+export const methodElementsStore: Writable<MethodElement[]> = writable()
+export const checkStandardsStore: Writable<CheckStandardsResponse<ExpandedCheckStandard>[]> =
+	writable()
 
 export const allElements: Writable<ElementsResponse[]> = writable([])
 

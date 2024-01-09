@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { instrument, method } from '$lib/stores';
+	import { instrument, methodStore } from "$lib/stores"
 </script>
 
 <div class="mb-4">
-	<h1>Sequence Information - {$method?.name}</h1>
+	<h1>Sequence Information - {$methodStore?.name}</h1>
 	<div class="headerItem">Analyst: _________________________</div>
 	<div class="headerItem">Analysis Date: _________________________</div>
 	<div class="headerItem">Sequence ID: ______________________________________</div>

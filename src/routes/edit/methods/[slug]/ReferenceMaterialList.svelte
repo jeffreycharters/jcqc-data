@@ -1,36 +1,36 @@
 <script lang="ts">
-	import EditIcon from '$lib/components/EditIcon.svelte';
-	import type { ReferenceMaterialsResponse } from '$lib/pocketbase-types';
-	import { method } from '$lib/stores';
-	import ReferenceMaterialElement from './ReferenceMaterialElement.svelte';
+	import EditIcon from "$lib/components/EditIcon.svelte"
+	import type { ReferenceMaterialsResponse } from "$lib/pocketbase-types"
+	import { methodStore } from "$lib/stores"
+	import ReferenceMaterialElement from "./ReferenceMaterialElement.svelte"
 
-	export let referenceMaterial: ReferenceMaterialsResponse;
-	let { name } = referenceMaterial;
+	export let referenceMaterial: ReferenceMaterialsResponse
+	let { name } = referenceMaterial
 
 	// TODO: Make this about RMs and not check standards
 
-	$: elementList = $method?.elements;
-	let statusMessage = '';
-	let editing = false;
+	$: elementList = $methodStore?.elements
+	let statusMessage = ""
+	let editing = false
 
-	let timer: number;
+	let timer: number
 	const statusUpdate = (message: string, timeout = 3000) => {
-		if (timer) clearTimeout(timer);
+		if (timer) clearTimeout(timer)
 
-		statusMessage = message;
-		timer = setTimeout(() => (statusMessage = ''), timeout);
-	};
+		statusMessage = message
+		timer = setTimeout(() => (statusMessage = ""), timeout)
+	}
 
 	const deleteCheckStandard = async () => {
-		await $method?.deleteReferenceMaterial(referenceMaterial.name);
-		$method = $method;
-	};
+		await$methodStore?.deleteReferenceMaterial(referenceMaterial.name)
+		$methodStore = $methodStore
+	}
 
 	const updateName = async () => {
-		console.log('updating name!');
-		await $method?.updateReferenceMaterialName(referenceMaterial.id, name);
-		editing = false;
-	};
+		console.log("updating name!")
+		await$methodStore?.updateReferenceMaterialName(referenceMaterial.id, name)
+		editing = false
+	}
 </script>
 
 <div class="basic-border w-full h-full p-4 bg-white">
@@ -47,7 +47,7 @@
 				{:else}
 					<h3>{name}</h3>
 				{/if}
-				<button type="button" on:click={() => (editing = !editing)} class={editing ? 'btn' : ''}>
+				<button type="button" on:click={() => (editing = !editing)} class={editing ? "btn" : ""}>
 					{#if editing}
 						Cancel
 					{:else}
@@ -55,7 +55,7 @@
 					{/if}
 				</button>
 			</form>
-			<div class="italic font-bold text-amber-600">{statusMessage ?? ''}</div>
+			<div class="italic font-bold text-amber-600">{statusMessage ?? ""}</div>
 		</div>
 		<button on:click={deleteCheckStandard}>
 			<svg

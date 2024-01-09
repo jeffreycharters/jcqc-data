@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { parseFileAndUpdateStore } from '$lib/data';
-	import { method } from '$lib/stores';
+	import { goto } from "$app/navigation"
+	import { parseFileAndUpdateStore } from "$lib/data"
+	import { methodStore } from "$lib/stores"
 
-	let files: HTMLInputElement['files'];
-	let errorMessage: string = '';
+	let files: HTMLInputElement["files"]
+	let errorMessage: string = ""
 
-	const parseInput = (files: HTMLInputElement['files']) => {
-		if (!files || !files[0]) return;
-		const inputFile = files[0];
+	const parseInput = (files: HTMLInputElement["files"]) => {
+		if (!files || !files[0]) return
+		const inputFile = files[0]
 
-		if (inputFile.type != 'text/plain') {
-			errorMessage = 'Incorrect file type';
-			return;
+		if (inputFile.type != "text/plain") {
+			errorMessage = "Incorrect file type"
+			return
 		}
 
-		if (!$method) throw new Error('no method set!');
-		parseFileAndUpdateStore(inputFile, $method);
-		goto('/report');
-	};
+		if (!$methodStore) throw new Error("no method set!")
+		parseFileAndUpdateStore(inputFile, $methodStore)
+		goto("/report")
+	}
 
-	$: parseInput(files);
+	$: parseInput(files)
 </script>
 
 <div class="w-fit mx-auto flex gap-4">
@@ -52,6 +52,6 @@
 	</label>
 
 	<div class="text-red-600 mt-2 rounded italic whitespace-nowrap">
-		{errorMessage ?? ''}
+		{errorMessage ?? ""}
 	</div>
 </div>

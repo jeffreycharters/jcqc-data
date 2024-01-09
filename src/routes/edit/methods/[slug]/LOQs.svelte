@@ -1,32 +1,32 @@
 <script lang="ts">
-	import TextInput from '$lib/components/TextInput.svelte';
-	import { method } from '$lib/stores';
-	import { fade } from 'svelte/transition';
-	import BlankList from './BlankList.svelte';
+	import TextInput from "$lib/components/TextInput.svelte"
+	import { methodStore } from "$lib/stores"
+	import { fade } from "svelte/transition"
+	import BlankList from "./BlankList.svelte"
 
-	let newBlankName = '';
-	let blankMessage = '';
-	let open = false;
-	let addFormOpen = false;
-	let addFormDiv: HTMLDivElement;
-	let contentDiv: HTMLDivElement;
+	let newBlankName = ""
+	let blankMessage = ""
+	let open = false
+	let addFormOpen = false
+	let addFormDiv: HTMLDivElement
+	let contentDiv: HTMLDivElement
 
 	const createNewBlank = async () => {
 		if (!newBlankName) {
-			blankMessage = 'Please add a blank name';
-			return;
+			blankMessage = "Please add a blank name"
+			return
 		}
 		try {
-			await $method?.createNewBlank(newBlankName);
-			$method = $method;
+			await $methodStore?.createNewBlank(newBlankName)
+			$methodStore = $methodStore
 		} catch (err) {
-			const error = err as Error;
-			blankMessage = error.message;
-			return;
+			const error = err as Error
+			blankMessage = error.message
+			return
 		}
-		newBlankName = '';
-		addFormOpen = false;
-	};
+		newBlankName = ""
+		addFormOpen = false
+	}
 </script>
 
 <div class="basic-border py-4 px-8 mt-4 bg-stone-100">
@@ -66,8 +66,8 @@
 		bind:this={contentDiv}
 	>
 		<div class="flex flex-col gap-4 mt-4">
-			{#if $method?.blanks && $method.blanks?.size > 0}
-				{#each Array.from($method.blanks).sort() as [_, blank] (blank.id)}
+			{#if $methodStore?.blanks && $methodStore.blanks?.size > 0}
+				{#each Array.from($methodStore.blanks).sort() as [_, blank] (blank.id)}
 					<BlankList {blank} />
 				{/each}
 			{/if}
@@ -109,7 +109,7 @@
 						/>
 
 						<div class="flex flex-col gap-2 items-start">
-							<div class="text-sm text-red-500">{blankMessage ?? ''}</div>
+							<div class="text-sm text-red-500">{blankMessage ?? ""}</div>
 							<input
 								type="submit"
 								value="+Add"

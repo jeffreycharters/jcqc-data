@@ -1,51 +1,42 @@
 <script lang="ts">
-	import { goto } from "$app/navigation"
 	import TextInput from "$lib/components/TextInput.svelte"
-	import { method } from "$lib/stores"
+	import { checkStandardsStore, methodStore } from "$lib/stores"
 	import { fade, slide } from "svelte/transition"
 	import CheckStandardList from "./CheckStandardList.svelte"
 	import { pb } from "$lib/pocketbase"
 	import { IconChevronsRight } from "@tabler/icons-svelte"
-	import type { CheckStandardsResponse } from "$lib/pocketbase-types"
-	import ActiveElement from "./ActiveElement.svelte"
+	import { setCheckStandards } from "$lib/methods"
 
 	let newCalName = ""
 	let calMessage = ""
-	let open = false
+	let open = true
 	let addFormOpen = false
 
-	if (!$method) goto("/", { invalidateAll: true })
-
-	const createNewCheckStandard = async () => {
+	async function createNewCheckStandard() {
 		if (!newCalName) {
 			calMessage = "Please add a name"
 			return
 		}
+
 		pb.collection("checkStandards")
 			.create({
-				name: newCalName
+				name: newCalName,
+				method: $methodStore!.id
 			})
-			.then((newCheckStd) => {
-				pb.collection("methods").update($method!.id, {
-					"checkStandards+": newCheckStd.id
-				})
-				$method!.expand!.checkStandards = [
-					...($method?.expand?.checkStandards ?? []),
-					newCheckStd as CheckStandardsResponse
-				].flat()
+			.then(async () => {
+				await setCheckStandards($methodStore!.id)
 				newCalName = ""
 				addFormOpen = false
 			})
 			.catch((err) => {
 				calMessage = (err as Error).message
-				return
 			})
 	}
 </script>
 
-<div class="basic-border py-4 px-8 mt-4 bg-stone-100">
+<div class="basic-border my-4 w-full bg-stone-100">
 	<div class="flex items-end gap-4">
-		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
+		<button class="flex gap-2 items-center px-8 py-4 w-full" on:click={() => (open = !open)}>
 			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
 			<h2 class="inline-flex gap-4">Check Standard Targets</h2>
 		</button>
@@ -61,12 +52,10 @@
 	</div>
 
 	{#if open}
-		<div class="flex flex-col gap-4 mt-4" transition:slide={{ duration: 200 }}>
-			{#if $method?.expand?.checkStandards && $method.expand.checkStandards?.length > 0}
-				{#each ($method.expand?.checkStandards ?? []).sort( (a, b) => (a.name > b.name ? 1 : -1) ) as checkStandard (checkStandard.id)}
-					<CheckStandardList {checkStandard} />
-				{/each}
-			{/if}
+		<div class="flex flex-col gap-4 mb-8 mx-8" transition:slide={{ duration: 200 }}>
+			{#each ($checkStandardsStore ?? []).sort( (a, b) => (a.name > b.name ? 1 : -1) ) as checkStandard (checkStandard.id)}
+				<CheckStandardList {checkStandard} />
+			{/each}
 
 			<div class="basic-border py-2 px-4 w-fit transition-all bg-white">
 				<button class="flex items-center gap-2" on:click={() => (addFormOpen = !addFormOpen)}>

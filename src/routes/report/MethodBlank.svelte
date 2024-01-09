@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
-	import type { DetectionLimitsResponse } from '$lib/pocketbase-types';
-	import { method } from '$lib/stores';
-	import HeaderRow from './HeaderRow.svelte';
+	import { roundToSigFigs, sortedArrayFromMap } from "$lib/data"
+	import type { DetectionLimitsResponse } from "$lib/pocketbase-types"
+	import { methodStore } from "$lib/stores"
+	import HeaderRow from "./HeaderRow.svelte"
 
-	export let sample: RunListEntry;
+	export let sample: RunListEntry
 
-	let values = sortedArrayFromMap(sample.results.values);
+	let values = sortedArrayFromMap(sample.results.values)
 
-	let methodBlanks = [...($method?.blanks?.values() ?? [])];
-	let methodBlank = methodBlanks.find((b) => b.name.toLowerCase() === sample.name.toLowerCase());
-	let detectionLimits = methodBlank?.expand?.detectionLimits as DetectionLimitsResponse[];
+	let methodBlanks = [...($methodStore?.blanks?.values() ?? [])]
+	let methodBlank = methodBlanks.find((b) => b.name.toLowerCase() === sample.name.toLowerCase())
+	let detectionLimits = methodBlank?.expand?.detectionLimits as DetectionLimitsResponse[]
 </script>
 
 <div>
@@ -29,11 +29,11 @@
 				<td class="firstCol">Below LOQ</td>
 				{#each [...values] as [key, value]}
 					{@const loq =
-						detectionLimits.find((dl) => dl.element === $method?.getElementIdFromMass(key))?.loq ??
-						0}
-					{@const tdClass = loq != 0 && value ? (value < loq ? 'passes' : 'fails') : 'neutral'}
+						detectionLimits.find((dl) => dl.element === $methodStore?.getElementIdFromMass(key))
+							?.loq ?? 0}
+					{@const tdClass = loq != 0 && value ? (value < loq ? "passes" : "fails") : "neutral"}
 					<td class={tdClass}>
-						{loq != 0 ? loq : '- -'}
+						{loq != 0 ? loq : "- -"}
 					</td>
 				{/each}
 			</tr>

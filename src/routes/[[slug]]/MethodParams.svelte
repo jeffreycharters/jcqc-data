@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { method } from "$lib/stores"
+	import { methodStore } from "$lib/stores"
 	import ReferenceMaterial from "../report/ReferenceMaterial.svelte"
 
-	$: elements = $method?.elements?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? []
+	$: elements = $methodStore?.elements?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? []
 	$: lowElementCount = elements && elements?.length < 15
 
-	$: methodHasCheckStandards = $method?.checkStandards && $method?.checkStandards.size > 0
-	$: methodHasBlanks = $method?.blanks && $method?.blanks.size > 0
+	$: methodHasCheckStandards = $methodStore?.checkStandards && $methodStore?.checkStandards.size > 0
+	$: methodHasBlanks = $methodStore?.blanks && $methodStore?.blanks.size > 0
 	$: methodHasReferenceMaterials =
-		$method?.referenceMaterials && $method?.referenceMaterials.size > 0
+		$methodStore?.referenceMaterials && $methodStore?.referenceMaterials.size > 0
 </script>
 
-{#if $method}
+{#if $methodStore}
 	<div class="w-fit mx-auto">
 		<div
 			class="flex {lowElementCount
@@ -19,14 +19,14 @@
 				: 'justify-between gap-8'} items-end flex-wrap my-8"
 		>
 			<h2 class="text-2xl flex-grow border-b {lowElementCount ? 'self-start' : 'self-end'}">
-				{$method.name}: {$method.description}
+				{$methodStore.name}: {$methodStore.description}
 			</h2>
 
 			<div class="flex items-stretch gap-4">
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
-						{#if $method.checkStandardTolerance}
-							{$method.checkStandardTolerance}%
+						{#if $methodStore.checkStandardTolerance}
+							{$methodStore.checkStandardTolerance}%
 						{:else}
 							- -
 						{/if}
@@ -38,8 +38,8 @@
 
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
-						{#if $method.rpdLimit}
-							{$method.rpdLimit}%
+						{#if $methodStore.rpdLimit}
+							{$methodStore.rpdLimit}%
 						{:else}
 							- -
 						{/if}
@@ -49,8 +49,8 @@
 
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
-						{#if $method.calibrationCount}
-							{$method.calibrationCount}
+						{#if $methodStore.calibrationCount}
+							{$methodStore.calibrationCount}
 						{:else}
 							- -
 						{/if}
@@ -60,7 +60,7 @@
 
 				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
 					<div class="text-xl font-bold text-gray-500">
-						{#if $method}
+						{#if $methodStore}
 							3
 						{:else}
 							??
@@ -92,11 +92,11 @@
 					</tr>
 				{/if}
 				{#if methodHasCheckStandards}
-					{#each Array.from($method.checkStandards?.values() ?? []) as checkStandard (checkStandard.id)}
+					{#each Array.from($methodStore.checkStandards?.values() ?? []) as checkStandard (checkStandard.id)}
 						<tr class="border-b border-gray-400">
 							<td class="first-column">{checkStandard.name}</td>
 							{#each elements as element}
-								{@const values = $method?.getValue(
+								{@const values = $methodStore?.getValue(
 									"checkStandards",
 									checkStandard.name,
 									"checkValues",
@@ -109,7 +109,7 @@
 				{/if}
 
 				{#if methodHasBlanks}
-					{#each Array.from($method?.blanks?.values() ?? []) as blank (blank.id)}
+					{#each Array.from($methodStore?.blanks?.values() ?? []) as blank (blank.id)}
 						<tr class="border-b border-gray-400">
 							<td class="first-column items-center gap-2 flex justify-between">
 								<div>
@@ -121,7 +121,7 @@
 								</div>
 							</td>
 							{#each elements as element}
-								{@const values = $method?.getValue(
+								{@const values = $methodStore?.getValue(
 									"blanks",
 									blank.name,
 									"detectionLimits",
@@ -145,7 +145,7 @@
 				{/if}
 
 				{#if methodHasReferenceMaterials}
-					{#each Array.from($method.referenceMaterials?.values() ?? []) as referenceMaterial (referenceMaterial.id)}
+					{#each Array.from($methodStore.referenceMaterials?.values() ?? []) as referenceMaterial (referenceMaterial.id)}
 						<tr class="border-b border-gray-400">
 							<td class="first-column items-center gap-2 flex justify-between">
 								<div>
@@ -157,7 +157,7 @@
 								</div>
 							</td>
 							{#each elements as element}
-								{@const values = $method?.getValue(
+								{@const values = $methodStore?.getValue(
 									"referenceMaterials",
 									referenceMaterial.name,
 									"ranges",

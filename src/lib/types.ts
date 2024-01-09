@@ -1,13 +1,24 @@
-import type { CheckStandardsResponse, ElementsResponse } from "./pocketbase-types"
+import type {
+	CheckValuesResponse,
+	ElementsResponse,
+	MethodElementsResponse
+} from "./pocketbase-types"
 
-export type Units = Record<string, UnitTypes>
-
-export interface ElementsExpanded {
-	elements: ElementsResponse[]
-	checkStandards: CheckStandardsResponse[]
+export type ExpandedMethod = {
+	"methodElements(method)": MethodElementsResponse<ExpandedMethodElement>[]
 }
 
-export enum UnitTypes {
-	PPB = "ppb",
-	PPM = "ppm"
+export type ExpandedMethodElement = { element: ElementsResponse }
+export type ExpandedCheckStandard = { "checkValues(checkStandard)": CheckValuesResponse[] }
+
+export type Units = "ppb" | "ppm"
+
+export type MethodElement = {
+	id: string
+	elementID: string
+	name: string
+	symbol: string
+	mass: number
+	active: boolean
+	units: Units
 }

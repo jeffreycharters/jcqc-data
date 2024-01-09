@@ -1,24 +1,20 @@
 <script lang="ts">
 	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
+	import { setMethodElements } from "$lib/elements"
 	import { pb } from "$lib/pocketbase"
 	import type { ElementsResponse, MethodsResponse } from "$lib/pocketbase-types"
-	import { method } from "$lib/stores"
-	import { UnitTypes, type ElementsExpanded, type Units } from "$lib/types"
+	import { methodStore } from "$lib/stores"
 
 	export let element: ElementsResponse
 
-	const addElement = () => {
-		const newUnits = { ...$method?.units, [element.id]: UnitTypes.PPM }
-		pb.collection("methods")
-			.update($method?.id!, {
-				"elements+": element.id,
-				units: newUnits,
-				expand: "elements,checkStandards"
-			})
-			.then((updatedMethod) => {
-				$method = updatedMethod as MethodsResponse<Units, ElementsExpanded>
-			})
-			.catch((err) => console.log(err))
+	async function addElement() {
+		await pb.collection("methodElements").create({
+			element: element.id,
+			method: $methodStore!.id,
+			units: "ppm"
+		})
+
+		await setMethodElements($methodStore!.id)
 	}
 </script>
 

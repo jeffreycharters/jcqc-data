@@ -1,25 +1,25 @@
 <script lang="ts">
-	import { methods, showAddForm } from '$lib/stores';
-	import { onDestroy } from 'svelte';
-	import AddMethodCard from './AddMethodCard.svelte';
-	import AddMethodForm from './AddMethodForm.svelte';
-	import MethodCard from './MethodCard.svelte';
-	import { flip } from 'svelte/animate';
-	import { quintOut } from 'svelte/easing';
-	import { crossfade } from 'svelte/transition';
+	import { methods, showAddForm } from "$lib/stores"
+	import { onDestroy } from "svelte"
+	import AddMethodCard from "./AddMethodCard.svelte"
+	import AddMethodForm from "./AddMethodForm.svelte"
+	import MethodCard from "./MethodCard.svelte"
+	import { flip } from "svelte/animate"
+	import { quintOut } from "svelte/easing"
+	import { crossfade } from "svelte/transition"
 
 	const [send, receive] = crossfade({
 		duration: 250,
 		easing: quintOut
-	});
+	})
 
 	const closeAddFormIfNecessary = (event: KeyboardEvent) => {
-		if (showAddForm && event.code === 'Escape') $showAddForm = false;
-	};
+		if (showAddForm && event.code === "Escape") $showAddForm = false
+	}
 
 	onDestroy(() => {
-		$showAddForm = false;
-	});
+		$showAddForm = false
+	})
 </script>
 
 <svelte:window on:keydown={closeAddFormIfNecessary} />

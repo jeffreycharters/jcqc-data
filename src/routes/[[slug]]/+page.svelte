@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { method, methods } from '$lib/stores';
-	import FilePicker from './FilePicker.svelte';
-	import MainPageStuff from './MainPageStuff.svelte';
-	import type { PageData } from './$types';
-	import MethodParams from './MethodParams.svelte';
-	import { fly } from 'svelte/transition';
+	import { methodStore, methods } from "$lib/stores"
+	import FilePicker from "./FilePicker.svelte"
+	import MainPageStuff from "./MainPageStuff.svelte"
+	import type { PageData } from "./$types"
+	import MethodParams from "./MethodParams.svelte"
+	import { fly } from "svelte/transition"
 
-	export let data: PageData;
-	const methodList = data.methods;
+	export let data: PageData
+	const methodList = data.methods
 
 	if (methodList) {
-		$methods = methodList;
+		$methods = methodList
 	}
 
-	const transitionDuration = 200;
+	const transitionDuration = 200
 </script>
 
 <MainPageStuff>
-	{#if $method}
+	{#if $methodStore}
 		<FilePicker />
 	{/if}
-	{#key $method}
+	{#key $methodStore}
 		<div in:fly|local={{ x: -20, duration: transitionDuration }}>
 			<MethodParams />
 		</div>

@@ -1,15 +1,18 @@
 <script lang="ts">
-	import type { ElementsResponse } from "$lib/pocketbase-types"
-	import { allElements, method } from "$lib/stores"
+	import { allElements, methodStore, methodElementsStore } from "$lib/stores"
 	import { flip } from "svelte/animate"
-	import { quintOut } from "svelte/easing"
 	import { crossfade, fade, slide } from "svelte/transition"
 	import ActiveElement from "./ActiveElement.svelte"
 	import InactiveElement from "./InactiveElement.svelte"
 	import { IconAtom2Filled, IconChevronsRight, IconX } from "@tabler/icons-svelte"
+	import { derived } from "svelte/store"
 
 	let formMessage: string | undefined = undefined
 	let open = false
+
+	const usedElementIDs = derived(methodElementsStore, ($methodElementsStore) =>
+		$methodElementsStore.map((methodElement) => methodElement.elementID)
+	)
 
 	const [send, receive] = crossfade({ duration: 200 })
 </script>
@@ -24,7 +27,7 @@
 				<span class="text-gray-400 flex items-center font-semibold">
 					<IconAtom2Filled class="w-6 h-6" />
 					<IconX class="w-3 h-3 mx-1"></IconX>
-					{$method?.elements?.length != undefined ? $method?.elements?.length : 0}</span
+					{$methodElementsStore.length != undefined ? $methodElementsStore?.length : 0}</span
 				>
 			</h2>
 		</button>
@@ -40,22 +43,20 @@
 	</div>
 
 	{#if open}
-		<div class="grid grid-cols-8 gap-4 my-4 mx-8" transition:slide={{ duration: 200 }}>
-			{#each $allElements
-				.filter((e) => $method?.elements.includes(e.id))
-				.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
+		<div class="grid grid-cols-8 gap-4 mb-8 mx-8" transition:slide={{ duration: 200 }}>
+			{#each $methodElementsStore.sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
 				<div
 					class="col-span-2"
-					in:receive|local={{ key: element.id }}
-					out:send|local={{ key: element.id }}
+					in:receive|local={{ key: methodElement.elementID }}
+					out:send|local={{ key: methodElement.elementID }}
 					animate:flip={{ duration: 200 }}
 				>
-					<ActiveElement {element} />
+					<ActiveElement {methodElement} />
 				</div>
 			{/each}
 
 			{#each $allElements
-				.filter((e) => !$method?.elements.includes(e.id))
+				.filter((e) => !$usedElementIDs.includes(e.id))
 				.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
 				<div
 					in:receive|local={{ key: element.id }}
