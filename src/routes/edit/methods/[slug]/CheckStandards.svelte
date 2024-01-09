@@ -4,12 +4,12 @@
 	import { fade, slide } from "svelte/transition"
 	import CheckStandardList from "./CheckStandardList.svelte"
 	import { pb } from "$lib/pocketbase"
-	import { IconChevronsRight } from "@tabler/icons-svelte"
+	import { IconChevronsRight, IconPlus } from "@tabler/icons-svelte"
 	import { setCheckStandards } from "$lib/methods"
 
 	let newCalName = ""
 	let calMessage = ""
-	let open = true
+	let open = false
 	let addFormOpen = false
 
 	async function createNewCheckStandard() {
@@ -75,13 +75,18 @@
 						/>
 
 						<div class="flex flex-col gap-2 items-start">
-							<div class="text-sm text-red-500">{calMessage ?? ""}</div>
-							<input
-								type="submit"
-								value="+Add"
+							<div class="text-sm text-red-700">{calMessage ?? ""}</div>
+
+							<button
+								type="button"
 								class="btn font-semibold w-full"
-								on:click|preventDefault={createNewCheckStandard}
-							/>
+								on:click={createNewCheckStandard}
+							>
+								<div class="flex items-center justify-center py-[2px]">
+									<IconPlus class="h-4 w-4 mr-1" />
+									Add
+								</div>
+							</button>
 						</div>
 					</form>
 				{/if}

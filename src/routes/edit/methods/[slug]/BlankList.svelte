@@ -1,33 +1,42 @@
 <script lang="ts">
 	import EditIcon from "$lib/components/EditIcon.svelte"
 	import type { BlanksResponse } from "$lib/pocketbase-types"
-	import { methodStore } from "$lib/stores"
+	import { methodElementsStore, methodStore } from "$lib/stores"
+	import { IconTrash } from "@tabler/icons-svelte"
 	import BlankElement from "./BlankElement.svelte"
+	import { pb } from "$lib/pocketbase"
+	import { setBlanks } from "$lib/methods"
+	import type { ExpandedBlank } from "$lib/types"
+	import { crossfade, fade } from "svelte/transition"
+	import { flip } from "svelte/animate"
 
-	export let blank: BlanksResponse
+	export let blank: BlanksResponse<ExpandedBlank>
 
-	$: elementList = $methodStore?.elements
+	const [send, receive] = crossfade({
+		duration: 250
+	})
+
 	let statusMessage = ""
 
 	let { name } = blank
 	let editing = false
 
 	let timer: number
-	const statusUpdate = (message: string, timeout = 3000) => {
+	const statusUpdate = ({ detail }: CustomEvent<string>, timeout = 1500) => {
 		if (timer) clearTimeout(timer)
 
-		statusMessage = message
+		statusMessage = detail
 		timer = setTimeout(() => (statusMessage = ""), timeout)
 	}
 
 	const deleteBlank = async () => {
-		await$methodStore?.deleteBlank(blank.name)
-		$methodStore = $methodStore
+		await pb.collection("blanks").delete(blank.id)
+		await setBlanks($methodStore!.id)
 	}
 
 	const updateName = async () => {
-		await$methodStore?.updateBlankName(blank.id, name)
-		$methodStore = $methodStore
+		await pb.collection("blanks").update(blank.id, { name })
+		await setBlanks($methodStore!.id)
 		editing = false
 	}
 </script>
@@ -54,37 +63,30 @@
 					{/if}
 				</button>
 			</form>
-			<div class="italic font-bold text-amber-600">{statusMessage ?? ""}</div>
+			{#if statusMessage}
+				<div
+					class="italic font-bold text-amber-700"
+					in:fade={{ duration: 200 }}
+					out:fade={{ duration: 500 }}
+				>
+					{statusMessage ?? ""}
+				</div>
+			{/if}
 		</div>
 		<button on:click={deleteBlank}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-8 w-8 stroke-red-700 hover:bg-red-100 py-[6px] rounded-full transition-colors"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				fill="none"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-				<path d="M4 7l16 0" />
-				<path d="M10 11l0 6" />
-				<path d="M14 11l0 6" />
-				<path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-				<path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-			</svg>
+			<IconTrash class="stroke-red-700 h-8 w-8 p-1" />
 		</button>
 	</div>
 
-	{#if elementList && elementList.length > 0}
-		<div class="grid grid-cols-6 gap-4 text-center">
-			{#each elementList.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
-				<BlankElement
-					{element}
-					blankName={blank.name}
-					on:updateStatus={(event) => statusUpdate(event.detail)}
-				/>
-			{/each}
-		</div>
-	{/if}
+	<div class="grid grid-cols-6 gap-4 text-center">
+		{#each $methodElementsStore.sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
+			<div
+				in:receive|local={{ key: methodElement.id }}
+				out:send|local={{ key: methodElement.id }}
+				animate:flip={{ duration: 200 }}
+			>
+				<BlankElement {blank} element={methodElement} on:updateStatus={statusUpdate} />
+			</div>
+		{/each}
+	</div>
 </div>

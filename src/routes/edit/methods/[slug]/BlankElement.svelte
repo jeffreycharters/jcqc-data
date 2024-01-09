@@ -1,32 +1,30 @@
 <script lang="ts">
-	import type { Analyte } from "$lib/classes"
 	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
-	import type { DetectionLimitsResponse } from "$lib/pocketbase-types"
+	import { setBlanks } from "$lib/methods"
+	import { pb } from "$lib/pocketbase"
+	import type { BlanksResponse, DetectionLimitsResponse } from "$lib/pocketbase-types"
 	import { methodStore } from "$lib/stores"
-	import { createEventDispatcher } from "svelte"
+	import type { ExpandedBlank, ExpandedDetectionLimit, MethodElement } from "$lib/types"
+	import { createEventDispatcher, type EventDispatcher } from "svelte"
 
-	export let element: Analyte
-	export let blankName: string
-	const dispatch = createEventDispatcher()
+	export let element: MethodElement
+	export let blank: BlanksResponse<ExpandedBlank>
 
-	let allDetectionLimits = $methodStore?.blanks?.get(blankName)?.expand
-		?.detectionLimits as DetectionLimitsResponse[]
+	const dispatch: EventDispatcher<{ updateStatus: string }> = createEventDispatcher()
 
-	const detectionLimits = allDetectionLimits?.find((dl) => dl.element === element.id) ?? undefined
+	let detectionLimits = blank.expand?.["detectionLimits(blank)"]?.find(
+		(detectionLimit) => detectionLimit.element === element.elementID
+	)
 
-	let mdlBase = allDetectionLimits?.find(
-		(detectionLimit) => detectionLimit.element === element.id
-	)?.mdl
+	let mdlBase = detectionLimits?.mdl
 	let mdl = !mdlBase || mdlBase === 0 ? "- -" : mdlBase
-	let loqBase = allDetectionLimits?.find(
-		(detectionLimit) => detectionLimit.element === element.id
-	)?.loq
+
+	let loqBase = detectionLimits?.loq
 	let loq = !loqBase || loqBase === 0 ? "- -" : loqBase
 
-	function debounce(callback: () => void, timeout = 1000) {
+	function debounce(callback: () => void, timeout = 250) {
 		let timer: number
 		return (...args: any) => {
-			dispatch("updateStatus", "Pending...")
 			clearTimeout(timer)
 			timer = setTimeout(() => {
 				callback.apply(debounce, args)
@@ -34,18 +32,27 @@
 		}
 	}
 
-	const updateCalCheck = async (toUpdate: "mdl" | "loq") => {
-		// update database
-		await$methodStore?.updateDetectionLimits(
-			detectionLimits?.id ?? "",
-			toUpdate,
-			Number(toUpdate === "mdl" ? mdl : loq)
-		)
-		$methodStore = $methodStore
+	const updatedDetectionLimits = async (toUpdate: "mdl" | "loq") => {
+		let updatedLimit: DetectionLimitsResponse<ExpandedDetectionLimit>
+		if (detectionLimits) {
+			updatedLimit = await pb.collection("detectionLimits").update(detectionLimits.id, {
+				[toUpdate]: Number(toUpdate === "mdl" ? mdl : loq)
+			})
+		} else {
+			updatedLimit = await pb.collection("detectionLimits").create({
+				blank: blank.id,
+				element: element.elementID,
+				[toUpdate]: Number(toUpdate === "mdl" ? mdl : loq)
+			})
+		}
+
+		detectionLimits = updatedLimit
+		await setBlanks($methodStore!.id)
 		dispatch("updateStatus", "Saved!")
 	}
 
-	const processUpdate = (toUpdate: "mdl" | "loq") => debounce(() => updateCalCheck(toUpdate))
+	const processUpdate = (toUpdate: "mdl" | "loq") =>
+		debounce(() => updatedDetectionLimits(toUpdate))
 </script>
 
 <form class="basic-border flex flex-col pt-2">

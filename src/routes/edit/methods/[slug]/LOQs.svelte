@@ -1,51 +1,37 @@
 <script lang="ts">
 	import TextInput from "$lib/components/TextInput.svelte"
-	import { methodStore } from "$lib/stores"
-	import { fade } from "svelte/transition"
+	import { blanksStore, methodStore } from "$lib/stores"
+	import { fade, slide } from "svelte/transition"
 	import BlankList from "./BlankList.svelte"
+	import { pb } from "$lib/pocketbase"
+	import { setBlanks } from "$lib/methods"
+	import { IconChevronsRight } from "@tabler/icons-svelte"
 
 	let newBlankName = ""
 	let blankMessage = ""
-	let open = false
+	let open = true
 	let addFormOpen = false
-	let addFormDiv: HTMLDivElement
-	let contentDiv: HTMLDivElement
 
 	const createNewBlank = async () => {
 		if (!newBlankName) {
 			blankMessage = "Please add a blank name"
 			return
 		}
-		try {
-			await $methodStore?.createNewBlank(newBlankName)
-			$methodStore = $methodStore
-		} catch (err) {
-			const error = err as Error
-			blankMessage = error.message
-			return
-		}
+
+		await pb.collection("blanks").create({
+			name: newBlankName,
+			method: $methodStore!.id
+		})
+		await setBlanks($methodStore!.id)
 		newBlankName = ""
 		addFormOpen = false
 	}
 </script>
 
-<div class="basic-border py-4 px-8 mt-4 bg-stone-100">
+<div class="basic-border my-4 w-full bg-stone-100">
 	<div class="flex items-end gap-4">
-		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				stroke="currentColor"
-				fill="none"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-				<path d="M7 7l5 5l-5 5" />
-				<path d="M13 7l5 5l-5 5" />
-			</svg>
+		<button class="flex gap-2 items-center px-8 py-4 w-full" on:click={() => (open = !open)}>
+			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
 			<h2 class="inline-flex gap-4">Blanks and Detection Limits</h2>
 		</button>
 
@@ -60,47 +46,22 @@
 		{/if}
 	</div>
 
-	<div
-		class="overflow-hidden transition-all"
-		style="max-height: {open ? `${contentDiv.scrollHeight}px` : '0'}"
-		bind:this={contentDiv}
-	>
-		<div class="flex flex-col gap-4 mt-4">
-			{#if $methodStore?.blanks && $methodStore.blanks?.size > 0}
-				{#each Array.from($methodStore.blanks).sort() as [_, blank] (blank.id)}
-					<BlankList {blank} />
-				{/each}
-			{/if}
+	{#if open}
+		<div class="flex flex-col gap-4 mx-8" transition:slide={{ duration: 200 }}>
+			{#each $blanksStore as blank (blank.id)}
+				<BlankList {blank} />
+			{/each}
 
-			<div class="basic-border py-2 px-4 w-fit transition-all bg-white">
-				<button
-					class="flex items-center gap-2"
-					on:click={() => (addFormOpen = !addFormOpen)}
-					on:click={() => (contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`)}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
+			<div class="basic-border py-2 px-4 w-fit transition-all bg-white mb-8">
+				<button class="flex items-center gap-2" on:click={() => (addFormOpen = !addFormOpen)}>
+					<IconChevronsRight
 						class="h-5 w-5 stroke-gray-400 transition-all {addFormOpen ? 'rotate-90' : ''}"
-						viewBox="0 0 24 24"
-						stroke-width="2"
-						stroke="currentColor"
-						fill="none"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-						<path d="M7 7l5 5l-5 5" />
-						<path d="M13 7l5 5l-5 5" />
-					</svg>
+					/>
 					<h3>Add New Blank Type</h3>
 				</button>
 
-				<div
-					class="overflow-hidden"
-					style="max-height: {addFormOpen ? `${addFormDiv.scrollHeight}px` : '0'}"
-					bind:this={addFormDiv}
-				>
-					<form class="w-48">
+				{#if addFormOpen}
+					<form class="w-48" transition:slide={{ duration: 200 }}>
 						<TextInput
 							label="Blank Name"
 							placeholder="e.g. Method Blank"
@@ -118,8 +79,8 @@
 							/>
 						</div>
 					</form>
-				</div>
+				{/if}
 			</div>
 		</div>
-	</div>
+	{/if}
 </div>

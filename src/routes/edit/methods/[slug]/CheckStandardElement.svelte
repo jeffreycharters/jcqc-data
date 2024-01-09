@@ -1,12 +1,7 @@
 <script lang="ts">
 	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
 	import { pb } from "$lib/pocketbase"
-	import type {
-		CheckStandardsResponse,
-		CheckValuesRecord,
-		CheckValuesResponse
-	} from "$lib/pocketbase-types"
-	import { checkStandardsStore } from "$lib/stores"
+	import type { CheckStandardsResponse, CheckValuesResponse } from "$lib/pocketbase-types"
 	import type { ExpandedCheckStandard, MethodElement } from "$lib/types"
 	import { createEventDispatcher, type EventDispatcher } from "svelte"
 
@@ -20,7 +15,7 @@
 	)
 
 	let rawValue = checkValue?.value
-	let value = rawValue ?? "- -"
+	let value = !rawValue || rawValue === 0 ? "- -" : rawValue
 
 	function debounce(callback: () => void, timeout = 1000) {
 		let timer: number
@@ -34,20 +29,20 @@
 	}
 
 	const updateCalCheck = async () => {
-		let updatedCheckStandard: CheckValuesResponse<ExpandedCheckStandard>
+		let updatedCheckValue: CheckValuesResponse<ExpandedCheckStandard>
 		if (checkValue) {
-			updatedCheckStandard = await pb
+			updatedCheckValue = await pb
 				.collection("checkValues")
 				.update(checkValue.id, { value: value, expand: "checkValues(checkStandard)" })
 		} else {
-			updatedCheckStandard = await pb.collection("checkValues").create({
-				value: value,
+			updatedCheckValue = await pb.collection("checkValues").create({
+				value,
 				element: element.elementID,
 				checkStandard: checkStandard.id
 			})
 		}
 
-		checkValue = updatedCheckStandard
+		checkValue = updatedCheckValue
 		dispatch("updateStatus", "Saved!")
 	}
 

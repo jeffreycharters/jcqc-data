@@ -3,90 +3,90 @@
 @tailwind components;
 @tailwind utilities;
 
-
 a {
-    @apply underline decoration-dotted underline-offset-2 decoration-teal-600 decoration-2
+	@apply underline decoration-dotted underline-offset-2 decoration-teal-600 decoration-2;
 }
 
 h1 {
-    @apply text-2xl font-bold tracking-wide;
+	@apply text-2xl font-bold tracking-wide;
 }
 
 h2 {
-    @apply text-lg font-bold tracking-wide;
+	@apply text-lg font-bold tracking-wide;
 }
 
 h3 {
-    @apply text-lg font-bold
+	@apply text-lg font-bold;
 }
 
-.text-input, .number-input {
-    @apply border border-gray-600 py-1 px-2 rounded max-w-xs shadow-inner;
+.text-input,
+.number-input {
+	@apply border border-gray-600 py-1 px-2 rounded max-w-xs shadow-inner;
 }
 
 .number-input {
-    @apply w-full;
+	@apply w-full;
 }
 
 .basic-border {
-    @apply border border-gray-800 rounded shadow
+	@apply border border-gray-800 rounded shadow;
 }
 
 .btn {
-    @apply border border-gray-900 rounded px-2 pb-1 bg-gray-100 shadow hover:bg-gray-200;
+	@apply border border-gray-900 rounded px-2 mb-1 bg-gray-100 shadow hover:bg-gray-200;
 }
 
 .list-grid-container {
-    @apply grid grid-cols-4 gap-4;
+	@apply grid grid-cols-4 gap-4;
 }
 
 .inactivate-button {
-    @apply text-sm border border-gray-400 text-gray-400 px-1 rounded-sm border-dotted
+	@apply text-sm border border-gray-400 text-gray-400 px-1 rounded-sm border-dotted;
 }
 
 table.results {
-    @apply border-collapse mx-2 border-b border-b-gray-600;
+	@apply border-collapse mx-2 border-b border-b-gray-600;
 }
 
 table.results td {
-    @apply text-center;
+	@apply text-center;
 }
 
 table.results td:first-child {
-    @apply text-left;
+	@apply text-left;
 }
 
 td.passes {
-    @apply text-center;
-    background-color: honeydew;
-    color: darkgreen;
+	@apply text-center;
+	background-color: honeydew;
+	color: darkgreen;
 }
 
 td.fails {
-    @apply text-center;
-    background-color: mistyrose;
-    color: firebrick;
+	@apply text-center;
+	background-color: mistyrose;
+	color: firebrick;
 }
 
 td.neutral {
-    background-color: ghostwhite;
-    color: gray;
+	background-color: ghostwhite;
+	color: gray;
 }
 
 .text-neutral {
-    @apply text-gray-700;
+	@apply text-gray-700;
 }
 
 .text-error {
-    @apply text-red-600;
+	@apply text-red-600;
 }
 
 .text-success {
-    @apply text-green-600;
+	@apply text-green-600;
 }
 
 @media print {
-    .no-print {
-        display: none !important;
-    }
+	.no-print {
+		display: none !important;
+	}
 }

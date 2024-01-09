@@ -1,7 +1,7 @@
 import { pb } from "./pocketbase"
-import type { CheckStandardsResponse, MethodsResponse } from "./pocketbase-types"
-import { checkStandardsStore } from "./stores"
-import type { ExpandedCheckStandard } from "./types"
+import type { BlanksResponse, CheckStandardsResponse, MethodsResponse } from "./pocketbase-types"
+import { blanksStore, checkStandardsStore } from "./stores"
+import type { ExpandedBlank, ExpandedCheckStandard } from "./types"
 
 export const expandMethod = "methodElements(method).element"
 
@@ -22,4 +22,13 @@ export async function setCheckStandards(methodID: string) {
 		})
 
 	checkStandardsStore.set(checkStandards)
+}
+
+export async function setBlanks(methodID: string) {
+	const blanks = await pb.collection("blanks").getFullList<BlanksResponse<ExpandedBlank>>({
+		filter: `method = "${methodID}"`,
+		expand: "detectionLimits(blank)"
+	})
+
+	blanksStore.set(blanks)
 }

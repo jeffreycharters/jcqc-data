@@ -7,6 +7,8 @@
 	import { flip } from "svelte/animate"
 	import { IconTrash } from "@tabler/icons-svelte"
 	import type { ExpandedCheckStandard } from "$lib/types"
+	import { pb } from "$lib/pocketbase"
+	import { setCheckStandards } from "$lib/methods"
 
 	export let checkStandard: CheckStandardsResponse<ExpandedCheckStandard>
 	let { name } = checkStandard
@@ -25,14 +27,13 @@
 	}
 
 	const deleteCheckStandard = async () => {
-		// await $methodStore?.deleteCheckStandard(checkStandard.name)
-		$methodStore = $methodStore
+		await pb.collection("checkStandards").delete(checkStandard.id)
+		await setCheckStandards($methodStore!.id)
 	}
 
 	const updateName = async () => {
-		console.log("updating name!")
-		// await $methodStore?.updateCheckStandardName(checkStandard.id, name)
-		$methodStore = $methodStore
+		await pb.collection("checkStandards").update(checkStandard.id, { name: name })
+		await setCheckStandards($methodStore!.id)
 		editing = false
 	}
 </script>
