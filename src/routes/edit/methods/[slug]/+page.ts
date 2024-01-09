@@ -5,7 +5,7 @@ import { pb } from "$lib/pocketbase"
 import type { ElementsResponse, MethodsResponse } from "$lib/pocketbase-types"
 import type { ExpandedMethod } from "$lib/types"
 import { setMethodElements } from "$lib/elements"
-import { setBlanks, setCheckStandards } from "$lib/methods"
+import { setBlanks, setCheckStandards, setReferenceMaterials } from "$lib/methods"
 
 export const load = (async ({ params }) => {
 	if (!params.slug) throw redirect(302, "/edit")
@@ -17,6 +17,7 @@ export const load = (async ({ params }) => {
 	await setMethodElements(method.id)
 	await setCheckStandards(method.id)
 	await setBlanks(method.id)
+	await setReferenceMaterials(method.id)
 
 	pb.collection("elements")
 		.getFullList({ filter: "active = true" })

@@ -1,25 +1,28 @@
 <script lang="ts">
-	import type { Analyte } from "$lib/classes"
 	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
-	import type { ReferenceMaterialsRangesResponse } from "$lib/pocketbase-types"
-	import { methodStore } from "$lib/stores"
-	import { createEventDispatcher } from "svelte"
+	import { pb } from "$lib/pocketbase"
+	import type {
+		ReferenceMaterialsRangesResponse,
+		ReferenceMaterialsResponse
+	} from "$lib/pocketbase-types"
+	import type { ExpandedReferenceMaterial, MethodElement } from "$lib/types"
+	import { createEventDispatcher, type EventDispatcher } from "svelte"
 
-	export let element: Analyte
-	export let referenceMaterialName: string
-	const dispatch = createEventDispatcher()
+	export let referenceMaterial: ReferenceMaterialsResponse<ExpandedReferenceMaterial>
+	export let methodElement: MethodElement
 
-	let allRanges = $methodStore?.referenceMaterials?.get(referenceMaterialName)?.expand
-		?.ranges as ReferenceMaterialsRangesResponse[]
+	const dispatch: EventDispatcher<{ updateStatus: string }> = createEventDispatcher()
 
-	const range = allRanges?.find((dl) => dl.element === element.id) ?? undefined
+	let range = referenceMaterial?.expand?.["referenceMaterialsRanges(referenceMaterial)"].find(
+		(rm) => rm.element === methodElement.elementID
+	)
 
-	let lowerBase = allRanges?.find((range) => range.element === element.id)?.lower
+	let lowerBase = range?.lower
 	let lower = !lowerBase || lowerBase === 0 ? "- -" : lowerBase
-	let upperBase = allRanges?.find((range) => range.element === element.id)?.upper
+	let upperBase = range?.upper
 	let upper = !upperBase || upperBase === 0 ? "- -" : upperBase
 
-	function debounce(callback: () => void, timeout = 1000) {
+	function debounce(callback: () => void, timeout = 250) {
 		let timer: number
 		return (...args: any) => {
 			dispatch("updateStatus", "Pending...")
@@ -30,35 +33,52 @@
 		}
 	}
 
-	const updateCalCheck = async (toUpdate: "lower" | "upper") => {
-		// update database
-		await$methodStore?.updateReferenceRanges(
-			range?.id ?? "",
-			toUpdate,
-			Number(toUpdate === "lower" ? lower : upper)
-		)
-		$methodStore = $methodStore
+	const updateReferenceMaterial = async (toUpdate: "lower" | "upper") => {
+		let updatedReferenceMaterial: ReferenceMaterialsRangesResponse<ExpandedReferenceMaterial>
+		if (range && toUpdate === "lower" && lower === 0) {
+			updatedReferenceMaterial = await pb
+				.collection("referenceMaterialsRanges")
+				.update(range.id, { lower: 0 })
+		} else if (range && toUpdate === "upper" && lower === 0) {
+			updatedReferenceMaterial = await pb
+				.collection("referenceMaterialsRanges")
+				.update(range.id, { upper: 0 })
+		} else if (range) {
+			updatedReferenceMaterial = await pb.collection("referenceMaterialsRanges").update(range.id, {
+				[toUpdate]: Number(toUpdate === "lower" ? lower : upper),
+				expand: "checkValues(checkStandard)"
+			})
+		} else {
+			updatedReferenceMaterial = await pb.collection("referenceMaterialsRanges").create({
+				[toUpdate]: Number(toUpdate === "lower" ? lower : upper),
+				element: methodElement.elementID,
+				referenceMaterial: referenceMaterial.id
+			})
+		}
+
+		range = updatedReferenceMaterial
 		dispatch("updateStatus", "Saved!")
 	}
 
-	const processUpdate = (toUpdate: "lower" | "upper") => debounce(() => updateCalCheck(toUpdate))
+	const processUpdate = (toUpdate: "lower" | "upper") =>
+		debounce(() => updateReferenceMaterial(toUpdate))
 </script>
 
 <form class="basic-border flex flex-col pt-2">
 	<div class="flex items-center justify-center h-full gap-4">
-		<ElementWithMass symbol={element.symbol} mass={element.mass} />
-		<span class="text-gray-500">{element.units}</span>
+		<ElementWithMass symbol={methodElement.symbol} mass={methodElement.mass} />
+		<span class="text-gray-500">{methodElement.units}</span>
 	</div>
 	<table class="border-collapse">
 		<tr>
 			<td class="text-right pr-2 pb-1">
-				<label for={`${element.id}-lower`}>Low:</label>
+				<label for={`${methodElement.id}-lower`}>Low:</label>
 			</td>
 			<td>
 				<div class="w-16">
 					<input
 						type="text"
-						name={`${element.id}-lower`}
+						name={`${methodElement.id}-lower`}
 						bind:value={lower}
 						on:keypress={processUpdate("lower")}
 						on:focus={() => (lower = lower === "- -" ? "" : lower)}
@@ -72,13 +92,13 @@
 		</tr>
 		<tr>
 			<td class="text-right pr-2 pb-1">
-				<label for={`${element.id}-upper`}>High:</label>
+				<label for={`${methodElement.id}-upper`}>High:</label>
 			</td>
 			<td>
 				<div class="w-16">
 					<input
 						type="text"
-						name={`${element.id}-upper`}
+						name={`${methodElement.id}-upper`}
 						bind:value={upper}
 						on:keypress={processUpdate("upper")}
 						on:focus={() => (upper = upper === "- -" ? "" : upper)}

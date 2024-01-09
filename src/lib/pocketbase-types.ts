@@ -107,7 +107,8 @@ export type ReferenceMaterialsRecord = {
 }
 
 export type ReferenceMaterialsRangesRecord = {
-	element?: RecordIdString
+	referenceMaterial: RecordIdString
+	element: RecordIdString
 	lower?: number
 	upper?: number
 }

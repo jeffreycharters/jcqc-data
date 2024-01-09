@@ -6,7 +6,13 @@ import type {
 	ReferenceMaterialsResponse
 } from "./pocketbase-types"
 import type { RunListEntry } from "../app"
-import type { BlanksStore, CheckStandardStore, ExpandedMethod, MethodElement } from "./types"
+import type {
+	BlanksStore,
+	CheckStandardStore,
+	ExpandedMethod,
+	MethodElement,
+	ReferenceMaterialsStore
+} from "./types"
 
 export const methods: Writable<MethodsResponse[]> = writable([])
 
@@ -14,6 +20,7 @@ export const methodStore: Writable<MethodsResponse<ExpandedMethod> | null> = wri
 export const methodElementsStore: Writable<MethodElement[]> = writable()
 export const checkStandardsStore: Writable<CheckStandardStore> = writable()
 export const blanksStore: Writable<BlanksStore> = writable()
+export const referenceMaterialsStore: Writable<ReferenceMaterialsStore> = writable()
 
 export const allElements: Writable<ElementsResponse[]> = writable([])
 

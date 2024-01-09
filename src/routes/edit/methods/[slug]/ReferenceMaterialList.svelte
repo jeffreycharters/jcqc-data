@@ -1,34 +1,36 @@
 <script lang="ts">
 	import EditIcon from "$lib/components/EditIcon.svelte"
 	import type { ReferenceMaterialsResponse } from "$lib/pocketbase-types"
-	import { methodStore } from "$lib/stores"
+	import { methodElementsStore, methodStore } from "$lib/stores"
+	import { IconTrash } from "@tabler/icons-svelte"
 	import ReferenceMaterialElement from "./ReferenceMaterialElement.svelte"
+	import type { ExpandedReferenceMaterial } from "$lib/types"
+	import { pb } from "$lib/pocketbase"
+	import { setReferenceMaterials } from "$lib/methods"
+	import { fade } from "svelte/transition"
 
-	export let referenceMaterial: ReferenceMaterialsResponse
+	export let referenceMaterial: ReferenceMaterialsResponse<ExpandedReferenceMaterial>
 	let { name } = referenceMaterial
 
-	// TODO: Make this about RMs and not check standards
-
-	$: elementList = $methodStore?.elements
 	let statusMessage = ""
 	let editing = false
 
 	let timer: number
-	const statusUpdate = (message: string, timeout = 3000) => {
+	const statusUpdate = ({ detail }: CustomEvent<string>, timeout = 1500) => {
 		if (timer) clearTimeout(timer)
 
-		statusMessage = message
+		statusMessage = detail
 		timer = setTimeout(() => (statusMessage = ""), timeout)
 	}
 
 	const deleteCheckStandard = async () => {
-		await$methodStore?.deleteReferenceMaterial(referenceMaterial.name)
-		$methodStore = $methodStore
+		await pb.collection("referenceMaterials").delete(referenceMaterial.id)
+		await setReferenceMaterials($methodStore!.id)
 	}
 
 	const updateName = async () => {
-		console.log("updating name!")
-		await$methodStore?.updateReferenceMaterialName(referenceMaterial.id, name)
+		await pb.collection("referenceMaterials").update(referenceMaterial.id, { name })
+		await setReferenceMaterials($methodStore!.id)
 		editing = false
 	}
 </script>
@@ -55,37 +57,28 @@
 					{/if}
 				</button>
 			</form>
-			<div class="italic font-bold text-amber-600">{statusMessage ?? ""}</div>
+			{#if statusMessage}
+				<div
+					class="italic font-bold text-amber-600"
+					in:fade={{ duration: 200 }}
+					out:fade={{ duration: 500 }}
+				>
+					{statusMessage ?? ""}
+				</div>
+			{/if}
 		</div>
 		<button on:click={deleteCheckStandard}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-8 w-8 stroke-red-700 hover:bg-red-100 py-[6px] rounded-full transition-colors"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				fill="none"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-				<path d="M4 7l16 0" />
-				<path d="M10 11l0 6" />
-				<path d="M14 11l0 6" />
-				<path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-				<path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-			</svg>
+			<IconTrash class="stroke-red-700 h-8 w-8 p-1" />
 		</button>
 	</div>
 
-	{#if elementList && elementList.length > 0}
-		<div class="grid grid-cols-6 gap-4 text-center">
-			{#each elementList.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
-				<ReferenceMaterialElement
-					{element}
-					referenceMaterialName={referenceMaterial.name}
-					on:updateStatus={(event) => statusUpdate(event.detail)}
-				/>
-			{/each}
-		</div>
-	{/if}
+	<div class="grid grid-cols-6 gap-4 text-center">
+		{#each $methodElementsStore.sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
+			<ReferenceMaterialElement
+				{referenceMaterial}
+				{methodElement}
+				on:updateStatus={statusUpdate}
+			/>
+		{/each}
+	</div>
 </div>

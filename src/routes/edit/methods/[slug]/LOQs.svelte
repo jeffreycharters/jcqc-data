@@ -5,11 +5,11 @@
 	import BlankList from "./BlankList.svelte"
 	import { pb } from "$lib/pocketbase"
 	import { setBlanks } from "$lib/methods"
-	import { IconChevronsRight } from "@tabler/icons-svelte"
+	import { IconChevronsRight, IconPlus } from "@tabler/icons-svelte"
 
 	let newBlankName = ""
 	let blankMessage = ""
-	let open = true
+	let open = false
 	let addFormOpen = false
 
 	const createNewBlank = async () => {
@@ -71,12 +71,12 @@
 
 						<div class="flex flex-col gap-2 items-start">
 							<div class="text-sm text-red-500">{blankMessage ?? ""}</div>
-							<input
-								type="submit"
-								value="+Add"
-								class="btn font-semibold w-full"
-								on:click|preventDefault={createNewBlank}
-							/>
+							<button type="button" class="btn font-semibold w-full" on:click={createNewBlank}>
+								<div class="flex items-center justify-center py-[2px]">
+									<IconPlus class="h-4 w-4 mr-1" />
+									Add
+								</div>
+							</button>
 						</div>
 					</form>
 				{/if}

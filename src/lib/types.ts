@@ -4,17 +4,24 @@ import type {
 	CheckValuesResponse,
 	DetectionLimitsResponse,
 	ElementsResponse,
-	MethodElementsResponse
+	MethodElementsResponse,
+	ReferenceMaterialsRangesResponse,
+	ReferenceMaterialsResponse
 } from "./pocketbase-types"
 
+export type ExpandedBlank = { "detectionLimits(blank)": DetectionLimitsResponse[] }
+export type ExpandedCheckStandard = { "checkValues(checkStandard)": CheckValuesResponse[] }
+export type ExpandedDetectionLimit = { "detectionLimits(checkStandard)": DetectionLimitsResponse[] }
 export type ExpandedMethod = {
 	"methodElements(method)": MethodElementsResponse<ExpandedMethodElement>[]
 }
-
 export type ExpandedMethodElement = { element: ElementsResponse }
-export type ExpandedCheckStandard = { "checkValues(checkStandard)": CheckValuesResponse[] }
-export type ExpandedDetectionLimit = { "detectionLimits(checkStandard)": DetectionLimitsResponse[] }
-export type ExpandedBlank = { "detectionLimits(blank)": DetectionLimitsResponse[] }
+export type ExpandedReferenceMaterial = {
+	"referenceMaterialsRanges(referenceMaterial)": ReferenceMaterialsRangesResponse[]
+}
+export type ExpandedRMRange = {
+	"referenceMaterialsRanges(checkStandard)": ReferenceMaterialsRangesResponse[]
+}
 
 export type Units = "ppb" | "ppm"
 
@@ -29,5 +36,5 @@ export type MethodElement = {
 }
 
 export type CheckStandardStore = CheckStandardsResponse<ExpandedCheckStandard>[]
-
 export type BlanksStore = BlanksResponse<ExpandedBlank>[]
+export type ReferenceMaterialsStore = ReferenceMaterialsResponse<ExpandedReferenceMaterial>[]

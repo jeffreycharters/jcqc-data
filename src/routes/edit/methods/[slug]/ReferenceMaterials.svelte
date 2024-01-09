@@ -1,48 +1,39 @@
 <script lang="ts">
-	import { methodStore } from "$lib/stores"
+	import { methodStore, referenceMaterialsStore } from "$lib/stores"
 	import { fade, slide } from "svelte/transition"
 	import TextInput from "$lib/components/TextInput.svelte"
 	import ReferenceMaterialList from "./ReferenceMaterialList.svelte"
+	import { IconChevronsRight, IconPlus } from "@tabler/icons-svelte"
+	import { pb } from "$lib/pocketbase"
+	import { setReferenceMaterials } from "$lib/methods"
 
 	let newReferenceMaterialName = ""
 	let formMessage: string
-	let open = false
+	let open = true
 	let addFormOpen = false
-	let addFormDiv: HTMLDivElement
-	let contentDiv: HTMLElement
 
-	const createNewReferenceMaterial = async () => {
-		// await $methodStore?.createNewReferenceMaterial(newReferenceMaterialName)
-		// $methodStore = $methodStore
-		// newReferenceMaterialName = ""
-		// addFormOpen = false
+	async function createNewReferenceMaterial() {
+		await pb.collection("referenceMaterials").create({
+			name: newReferenceMaterialName,
+			method: $methodStore!.id,
+			active: true
+		})
+
+		await setReferenceMaterials($methodStore!.id)
 	}
 </script>
 
-<div class="basic-border py-4 px-8 mt-4 bg-stone-100">
+<div class="basic-border my-4 w-full bg-stone-100">
 	<div class="flex items-end gap-4">
-		<button class="flex gap-2 items-center" on:click={() => (open = !open)}>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}"
-				viewBox="0 0 24 24"
-				stroke-width="2"
-				stroke="currentColor"
-				fill="none"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-				<path d="M7 7l5 5l-5 5" />
-				<path d="M13 7l5 5l-5 5" />
-			</svg>
+		<button class="flex gap-2 items-center px-8 py-4 w-full" on:click={() => (open = !open)}>
+			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
 			<h2 class="inline-flex gap-4">Reference Materials</h2>
 		</button>
 		{#if formMessage}
 			<div
 				class="text-sm text-amber-600 italic tracking-wide w-36 text-center"
-				in:fade={{ duration: 200 }}
-				out:fade={{ duration: 100 }}
+				in:fade={{ duration: 400 }}
+				out:fade={{ duration: 500 }}
 			>
 				{formMessage}
 			</div>
@@ -50,42 +41,21 @@
 	</div>
 
 	{#if open}
-		<div class="flex flex-col gap-4 mt-4" transition:slide={{ duration: 200 }}>
-			{#if $methodStore?.referenceMaterials && $methodStore.referenceMaterials?.size > 0}
-				{#each Array.from($methodStore.referenceMaterials).sort() as [_, referenceMaterial] (referenceMaterial.id)}
-					<ReferenceMaterialList {referenceMaterial} />
-				{/each}
-			{/if}
+		<div class="flex flex-col gap-4 mx-8 mb-8" transition:slide={{ duration: 200 }}>
+			{#each $referenceMaterialsStore as referenceMaterial (referenceMaterial.id)}
+				<ReferenceMaterialList {referenceMaterial} />
+			{/each}
 
 			<div class="basic-border py-2 px-4 w-fit transition-all bg-white">
-				<button
-					class="flex items-center gap-2"
-					on:click={() => (addFormOpen = !addFormOpen)}
-					on:click={() => (contentDiv.style.maxHeight = `${contentDiv.scrollHeight}px`)}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
+				<button class="flex items-center gap-2" on:click={() => (addFormOpen = !addFormOpen)}>
+					<IconChevronsRight
 						class="h-5 w-5 stroke-gray-400 transition-all {addFormOpen ? 'rotate-90' : ''}"
-						viewBox="0 0 24 24"
-						stroke-width="2"
-						stroke="currentColor"
-						fill="none"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-						<path d="M7 7l5 5l-5 5" />
-						<path d="M13 7l5 5l-5 5" />
-					</svg>
+					/>
 					<h3>Add New Reference</h3>
 				</button>
 
-				<div
-					class="overflow-hidden"
-					style="max-height: {addFormOpen ? `${addFormDiv.scrollHeight}px` : '0'}"
-					bind:this={addFormDiv}
-				>
-					<form class="w-48">
+				{#if addFormOpen}
+					<form class="w-48" transition:slide={{ duration: 200 }}>
 						<TextInput
 							label="Reference Material Name"
 							placeholder="e.g. Bovine Liver"
@@ -95,15 +65,19 @@
 
 						<div class="flex flex-col gap-2 items-start">
 							<div class="text-sm text-red-500">{formMessage ?? ""}</div>
-							<input
+							<button
 								type="submit"
-								value="+Add"
 								class="btn font-semibold w-full"
 								on:click|preventDefault={createNewReferenceMaterial}
-							/>
+							>
+								<div class="flex items-center justify-center py-[2px]">
+									<IconPlus class="h-4 w-4 mr-1" />
+									Add
+								</div>
+							</button>
 						</div>
 					</form>
-				</div>
+				{/if}
 			</div>
 		</div>
 	{/if}
