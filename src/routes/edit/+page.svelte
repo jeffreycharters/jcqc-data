@@ -13,7 +13,6 @@
 	})
 
 	let showAddForm = true
-	$: console.log(showAddForm)
 </script>
 
 <h1 class="my-8">Select Method</h1>
