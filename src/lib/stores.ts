@@ -18,7 +18,7 @@ export const checkStandardsStore: Writable<CheckStandardStore | null> = writable
 export const blanksStore: Writable<BlanksStore | null> = writable()
 export const referenceMaterialsStore: Writable<ReferenceMaterialsStore | null> = writable()
 
-export const instrument: Writable<InstrumentsResponse> = writable()
+export const instrumentStore: Writable<InstrumentsResponse> = writable()
 export const instruments: Writable<InstrumentsResponse[]> = writable()
 
 export const reportData: Writable<RunListEntry[]> = writable()

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { instrument, methodStore } from "$lib/stores"
+	import { instrumentStore, methodStore } from "$lib/stores"
 </script>
 
 <div class="mb-4">

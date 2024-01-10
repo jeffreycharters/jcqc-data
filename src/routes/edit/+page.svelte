@@ -12,7 +12,7 @@
 		easing: quintOut
 	})
 
-	let showAddForm = true
+	let showAddForm = false
 </script>
 
 <h1 class="my-8">Select Method</h1>

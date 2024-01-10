@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { methodStore, methods } from "$lib/stores"
+	import { instrumentStore, methodStore, methods } from "$lib/stores"
 	import FilePicker from "./FilePicker.svelte"
 	import MainPageStuff from "./MainPageStuff.svelte"
 	import type { PageData } from "./$types"
 	import MethodParams from "./MethodParams.svelte"
-	import { fly } from "svelte/transition"
+	import { fade } from "svelte/transition"
+	import { IconArrowUpLeftCircle } from "@tabler/icons-svelte"
 
 	export let data: PageData
 	const methodList = data.methods
@@ -13,15 +14,23 @@
 		$methods = methodList
 	}
 
-	const transitionDuration = 200
+	const transitionDuration = 100
 </script>
 
 <MainPageStuff>
-	{#if $methodStore}
+	{#if $methodStore && !$instrumentStore}
+		<div
+			class="mx-auto w-fit flex gap-2 border-teal-500 border py-1 px-2 rounded bg-teal-50 text-teal-800"
+		>
+			<IconArrowUpLeftCircle class="-rotate-12 stroke-[1.5] relative -top-1 stroke-teal-800" />
+			<div>Select an instrument!</div>
+		</div>
+	{/if}
+	{#if $methodStore && $instrumentStore}
 		<FilePicker />
 	{/if}
 	{#key $methodStore}
-		<div in:fly|local={{ x: -20, duration: transitionDuration }}>
+		<div in:fade|local={{ delay: transitionDuration, duration: transitionDuration }}>
 			<MethodParams />
 		</div>
 	{/key}
