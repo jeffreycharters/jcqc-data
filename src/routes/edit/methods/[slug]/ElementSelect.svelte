@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { allElements, methodStore, methodElementsStore } from "$lib/stores"
+	import { allElements, methodElementsStore } from "$lib/stores"
 	import { flip } from "svelte/animate"
 	import { crossfade, fade, slide } from "svelte/transition"
 	import ActiveElement from "./ActiveElement.svelte"
@@ -11,7 +11,7 @@
 	let open = false
 
 	const usedElementIDs = derived(methodElementsStore, ($methodElementsStore) =>
-		$methodElementsStore.map((methodElement) => methodElement.elementID)
+		($methodElementsStore ?? []).map((methodElement) => methodElement.elementID)
 	)
 
 	const [send, receive] = crossfade({ duration: 200 })
@@ -27,7 +27,7 @@
 				<span class="text-gray-400 flex items-center font-semibold">
 					<IconAtom2Filled class="w-6 h-6" />
 					<IconX class="w-3 h-3 mx-1"></IconX>
-					{$methodElementsStore.length != undefined ? $methodElementsStore?.length : 0}</span
+					{$methodElementsStore?.length != undefined ? $methodElementsStore?.length : 0}</span
 				>
 			</h2>
 		</button>
@@ -44,7 +44,7 @@
 
 	{#if open}
 		<div class="grid grid-cols-8 gap-4 mb-8 mx-8" transition:slide={{ duration: 200 }}>
-			{#each $methodElementsStore.sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
+			{#each ($methodElementsStore ?? []).sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
 				<div
 					class="col-span-2"
 					in:receive|local={{ key: methodElement.elementID }}
@@ -55,7 +55,7 @@
 				</div>
 			{/each}
 
-			{#each $allElements
+			{#each ($allElements ?? [])
 				.filter((e) => !$usedElementIDs.includes(e.id))
 				.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
 				<div

@@ -19,7 +19,7 @@
 	let editing = false
 
 	let timer: number
-	const statusUpdate = (message: string, timeout = 3000) => {
+	const statusUpdate = (message: string, timeout = 1500) => {
 		if (timer) clearTimeout(timer)
 
 		statusMessage = message
@@ -68,7 +68,7 @@
 	</div>
 
 	<div class="grid grid-cols-6 gap-4 text-center">
-		{#each $methodElementsStore.sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
+		{#each ($methodElementsStore ?? []).sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
 			<div
 				in:receive|local={{ key: methodElement.id }}
 				out:send|local={{ key: methodElement.id }}

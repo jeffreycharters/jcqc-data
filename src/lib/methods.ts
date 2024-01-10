@@ -1,3 +1,4 @@
+import { setMethodElements } from "./elements"
 import { pb } from "./pocketbase"
 import type {
 	BlanksResponse,
@@ -50,6 +51,7 @@ export async function setReferenceMaterials(methodID: string) {
 }
 
 export async function setMethodStores(methodID: string) {
+	await setMethodElements(methodID)
 	await setCheckStandards(methodID)
 	await setBlanks(methodID)
 	await setReferenceMaterials(methodID)

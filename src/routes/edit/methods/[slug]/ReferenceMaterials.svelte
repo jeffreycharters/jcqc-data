@@ -20,6 +20,8 @@
 		})
 
 		await setReferenceMaterials($methodStore!.id)
+		newReferenceMaterialName = ""
+		addFormOpen = false
 	}
 </script>
 
@@ -42,7 +44,7 @@
 
 	{#if open}
 		<div class="flex flex-col gap-4 mx-8 mb-8" transition:slide={{ duration: 200 }}>
-			{#each $referenceMaterialsStore as referenceMaterial (referenceMaterial.id)}
+			{#each $referenceMaterialsStore ?? [] as referenceMaterial (referenceMaterial.id)}
 				<ReferenceMaterialList {referenceMaterial} />
 			{/each}
 

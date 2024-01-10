@@ -65,16 +65,16 @@
 			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
 
 			<h2>Edit Method</h2>
+			{#if formMessage}
+				<div
+					class="text-sm text-amber-600 italic w-fit"
+					in:fade={{ duration: 200 }}
+					out:fade={{ duration: 150 }}
+				>
+					{formMessage}
+				</div>
+			{/if}
 		</button>
-		{#if formMessage}
-			<div
-				class="text-sm text-amber-600 italic tracking-wide w-36 text-center"
-				in:fade={{ duration: 200 }}
-				out:fade={{ duration: 150 }}
-			>
-				{formMessage}
-			</div>
-		{/if}
 	</div>
 
 	{#if open}

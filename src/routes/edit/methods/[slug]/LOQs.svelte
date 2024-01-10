@@ -48,7 +48,7 @@
 
 	{#if open}
 		<div class="flex flex-col gap-4 mx-8" transition:slide={{ duration: 200 }}>
-			{#each $blanksStore as blank (blank.id)}
+			{#each $blanksStore ?? [] as blank (blank.id)}
 				<BlankList {blank} />
 			{/each}
 
@@ -71,7 +71,11 @@
 
 						<div class="flex flex-col gap-2 items-start">
 							<div class="text-sm text-red-500">{blankMessage ?? ""}</div>
-							<button type="button" class="btn font-semibold w-full" on:click={createNewBlank}>
+							<button
+								type="submit"
+								class="btn font-semibold w-full"
+								on:click|preventDefault={createNewBlank}
+							>
 								<div class="flex items-center justify-center py-[2px]">
 									<IconPlus class="h-4 w-4 mr-1" />
 									Add

@@ -78,9 +78,9 @@
 							<div class="text-sm text-red-700">{calMessage ?? ""}</div>
 
 							<button
-								type="button"
+								type="submit"
 								class="btn font-semibold w-full"
-								on:click={createNewCheckStandard}
+								on:click|preventDefault={createNewCheckStandard}
 							>
 								<div class="flex items-center justify-center py-[2px]">
 									<IconPlus class="h-4 w-4 mr-1" />

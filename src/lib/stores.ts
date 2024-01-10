@@ -14,15 +14,15 @@ import type {
 	ReferenceMaterialsStore
 } from "./types"
 
-export const methods: Writable<MethodsResponse[]> = writable([])
+export const methods: Writable<MethodsResponse[] | null> = writable([])
 
 export const methodStore: Writable<MethodsResponse<ExpandedMethod> | null> = writable()
-export const methodElementsStore: Writable<MethodElement[]> = writable()
-export const checkStandardsStore: Writable<CheckStandardStore> = writable()
-export const blanksStore: Writable<BlanksStore> = writable()
-export const referenceMaterialsStore: Writable<ReferenceMaterialsStore> = writable()
+export const methodElementsStore: Writable<MethodElement[] | null> = writable()
+export const checkStandardsStore: Writable<CheckStandardStore | null> = writable()
+export const blanksStore: Writable<BlanksStore | null> = writable()
+export const referenceMaterialsStore: Writable<ReferenceMaterialsStore | null> = writable()
 
-export const allElements: Writable<ElementsResponse[]> = writable([])
+export const allElements: Writable<ElementsResponse[] | null> = writable([])
 
 export const showAddForm: Writable<boolean> = writable(false)
 
