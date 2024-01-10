@@ -1,33 +1,25 @@
 <script lang="ts">
-	import { methods, showAddForm } from "$lib/stores"
-	import { onDestroy } from "svelte"
-	import AddMethodCard from "./AddMethodCard.svelte"
+	import { methods } from "$lib/stores"
 	import AddMethodForm from "./AddMethodForm.svelte"
 	import MethodCard from "./MethodCard.svelte"
 	import { flip } from "svelte/animate"
 	import { quintOut } from "svelte/easing"
 	import { crossfade } from "svelte/transition"
+	import { IconPlaylistAdd } from "@tabler/icons-svelte"
 
 	const [send, receive] = crossfade({
 		duration: 250,
 		easing: quintOut
 	})
 
-	const closeAddFormIfNecessary = (event: KeyboardEvent) => {
-		if (showAddForm && event.code === "Escape") $showAddForm = false
-	}
-
-	onDestroy(() => {
-		$showAddForm = false
-	})
+	let showAddForm = true
+	$: console.log(showAddForm)
 </script>
-
-<svelte:window on:keydown={closeAddFormIfNecessary} />
 
 <h1 class="my-8">Select Method</h1>
 
 <div class="list-grid-container">
-	{#each $methods.filter((method) => method.active) as method (method.id)}
+	{#each ($methods ?? []).filter((method) => method.active) as method (method.id)}
 		<div
 			animate:flip={{ duration: 250 }}
 			in:send={{ key: method.id }}
@@ -36,7 +28,7 @@
 			<MethodCard {method} />
 		</div>
 	{/each}
-	{#each $methods.filter((method) => !method.active) as method (method.id)}
+	{#each ($methods ?? []).filter((method) => !method.active) as method (method.id)}
 		<div
 			animate:flip={{ duration: 250 }}
 			in:send={{ key: method.id }}
@@ -45,10 +37,17 @@
 			<MethodCard {method} />
 		</div>
 	{/each}
-	<AddMethodCard on:toggleAddForm={() => ($showAddForm = !$showAddForm)} />
+
+	<button
+		on:click={() => (showAddForm = !showAddForm)}
+		class="border border-gray-500 w-full p-4 rounded shadow-lg flex gap-2 items-center justify-center font-bold"
+	>
+		<IconPlaylistAdd class=" h-8 w-8 stroke-[1.5]" />
+		Add Method
+	</button>
 </div>
 
-<AddMethodForm on:close={() => ($showAddForm = false)} />
+<AddMethodForm {showAddForm} on:close={() => (showAddForm = false)} />
 
 <div class="border border-gray-800 py-4 px-6 w-fit rounded shadow mt-8">
 	<a href="/edit/elements">

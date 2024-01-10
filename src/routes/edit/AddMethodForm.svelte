@@ -1,58 +1,56 @@
 <script lang="ts">
-	import NumberInput from '$lib/components/NumberInput.svelte';
-	import TextInput from '$lib/components/TextInput.svelte';
-	import { pb } from '$lib/pocketbase';
-	import type { MethodsResponse } from '$lib/pocketbase-types';
-	import { methods, showAddForm } from '$lib/stores';
-	import { createEventDispatcher } from 'svelte';
-	import slugify from 'slugify';
-	import { IconSquareX } from '@tabler/icons-svelte';
-	import { slide } from 'svelte/transition';
+	import NumberInput from "$lib/components/NumberInput.svelte"
+	import TextInput from "$lib/components/TextInput.svelte"
+	import { pb } from "$lib/pocketbase"
+	import { createEventDispatcher, type EventDispatcher } from "svelte"
+	import slugify from "slugify"
+	import { IconSquareX } from "@tabler/icons-svelte"
+	import { slide } from "svelte/transition"
+	import { setMethods } from "$lib/methods"
 
-	let formError = '';
-	let name: string;
-	let rpdLimit: number;
-	let calibrationCount = 1;
-	let description: string;
-	let checkStandardTolerance: number;
+	export let showAddForm: boolean
 
-	const dispatch = createEventDispatcher();
+	let formError = ""
+	let name: string
+	let rpdLimit: number
+	let calibrationCount = 1
+	let description: string
+	let checkStandardTolerance: number
+
+	const dispatch: EventDispatcher<{ close: unknown }> = createEventDispatcher()
 
 	const addMethod = async () => {
-		if (!name || !calibrationCount) formError = 'Missing something';
+		if (!name || !calibrationCount) formError = "Missing something"
 
-		const methodData = {
-			name,
-			slug: slugify(name, { lower: true }),
-			rpdLimit,
-			active: true,
-			calibrationCount,
-			description,
-			checkStandardTolerance
-		};
-		try {
-			const newMethod: MethodsResponse = await pb.collection('methods').create(methodData);
-			methods.update((n) => {
-				const newList = [...n, newMethod];
-				newList.sort((a, b) => (a.name < b.name ? 1 : -1));
-				name = '';
-				rpdLimit = 0;
-				return newList;
-			});
-		} catch (err) {
-			formError = (err as Error).message;
-		}
-	};
+		pb.collection("methods")
+			.create({
+				name,
+				slug: slugify(name, { lower: true }),
+				rpdLimit,
+				active: true,
+				calibrationCount,
+				description,
+				checkStandardTolerance
+			})
+			.then(async () => {
+				await setMethods()
+				name = ""
+				rpdLimit = 0
+			})
+			.catch((err) => {
+				throw new Error((err as Error).message)
+			})
+	}
 </script>
 
-{#if $showAddForm}
+{#if showAddForm}
 	<div
 		class="border border-gray-900 w-fit p-4 rounded shadow my-4 bg-white mb-8"
 		transition:slide={{ duration: 200 }}
 	>
 		<div class="flex justify-between items-center">
 			<h2>Add new</h2>
-			<button on:click={() => dispatch('close')}>
+			<button on:click={() => dispatch("close")}>
 				<IconSquareX size={24} stroke={1.5} class="stroke-stone-500" />
 			</button>
 		</div>
@@ -64,7 +62,7 @@
 				placeholder="e.g. Metals in sewage"
 				bind:value={description}
 			/>
-			<div class="flex gap-8 max-w-sm items-end">
+			<div class="flex gap-8 max-w-md items-end">
 				<NumberInput
 					name="cal-count"
 					label="Number of non-blank calibration standards"

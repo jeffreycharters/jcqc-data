@@ -1,33 +1,20 @@
 <script lang="ts">
-	import { pb } from '$lib/pocketbase';
-	import type { MethodsResponse } from '$lib/pocketbase-types';
-	import { methods } from '$lib/stores';
-	import { crossfade } from 'svelte/transition';
-	export let method: MethodsResponse;
+	import { setMethods } from "$lib/methods"
+	import { pb } from "$lib/pocketbase"
+	import type { MethodsResponse } from "$lib/pocketbase-types"
+	import { crossfade } from "svelte/transition"
+	export let method: MethodsResponse
 
-	const [send, receive] = crossfade({
-		duration: (d) => Math.sqrt(d * 200)
-	});
-	const { active } = method;
+	const [send, receive] = crossfade({ duration: 200 })
+	const { active } = method
 
-	const accentColour = active ? 'gray-900' : 'gray-300';
+	const accentColour = active ? "gray-900" : "gray-300"
 
 	const toggleMethodActive = async () => {
-		const methodData = {
-			active: !method.active
-		};
-		const updatedMethod: MethodsResponse = await pb
-			.collection('methods')
-			.update(method.id, methodData);
-
-		methods.update((n) => {
-			const selectedMethod = n.find((e) => e.id === updatedMethod.id);
-			if (selectedMethod) {
-				selectedMethod.active = updatedMethod.active;
-			}
-			return n;
-		});
-	};
+		pb.collection("methods")
+			.update(method.id, { active: !active })
+			.then(async () => await setMethods())
+	}
 </script>
 
 <div
@@ -43,7 +30,7 @@
 			class="text-sm border border-gray-400 text-gray-400 px-1 rounded-sm border-dotted"
 			on:click={toggleMethodActive}
 		>
-			{active ? 'Inactivate' : 'Activate'}
+			{active ? "Inactivate" : "Activate"}
 		</button>
 	</div>
 	<div>

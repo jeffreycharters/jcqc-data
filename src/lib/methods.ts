@@ -6,8 +6,13 @@ import type {
 	MethodsResponse,
 	ReferenceMaterialsResponse
 } from "./pocketbase-types"
-import { blanksStore, checkStandardsStore, referenceMaterialsStore } from "./stores"
-import type { ExpandedBlank, ExpandedCheckStandard, ExpandedReferenceMaterial } from "./types"
+import { blanksStore, checkStandardsStore, methods, referenceMaterialsStore } from "./stores"
+import type {
+	ExpandedBlank,
+	ExpandedCheckStandard,
+	ExpandedMethod,
+	ExpandedReferenceMaterial
+} from "./types"
 
 export const expandMethod = "methodElements(method).element"
 
@@ -17,6 +22,13 @@ export const getMethodList = async (sort = "name"): Promise<MethodsResponse[]> =
 
 export const getActiveMethods = async (): Promise<MethodsResponse[]> => {
 	return pb.collection("methods").getFullList(200, { filter: "active = true" })
+}
+
+export async function setMethods() {
+	const methodList = await pb
+		.collection("methods")
+		.getFullList<MethodsResponse<ExpandedMethod>>({ expand: expandMethod })
+	methods.set(methodList)
 }
 
 export async function setCheckStandards(methodID: string) {

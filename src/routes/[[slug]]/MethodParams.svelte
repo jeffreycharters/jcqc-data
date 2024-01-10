@@ -1,14 +1,19 @@
 <script lang="ts">
-	import { methodStore } from "$lib/stores"
-	import ReferenceMaterial from "../report/ReferenceMaterial.svelte"
+	import {
+		blanksStore,
+		checkStandardsStore,
+		methodElementsStore,
+		methodStore,
+		referenceMaterialsStore
+	} from "$lib/stores"
 
-	$: elements = $methodStore?.elements?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? []
-	$: lowElementCount = elements && elements?.length < 15
+	const elements = $methodElementsStore?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? []
+	const lowElementCount = elements && elements?.length < 15
 
-	$: methodHasCheckStandards = $methodStore?.checkStandards && $methodStore?.checkStandards.size > 0
-	$: methodHasBlanks = $methodStore?.blanks && $methodStore?.blanks.size > 0
-	$: methodHasReferenceMaterials =
-		$methodStore?.referenceMaterials && $methodStore?.referenceMaterials.size > 0
+	const methodHasReferenceMaterials =
+		$referenceMaterialsStore && $referenceMaterialsStore.length > 0
+	const methodHasBlanks = $blanksStore && $blanksStore?.length > 0
+	const methodHasCheckStandards = $checkStandardsStore && $checkStandardsStore.length > 0
 </script>
 
 {#if $methodStore}
@@ -91,94 +96,79 @@
 						{/each}
 					</tr>
 				{/if}
-				{#if methodHasCheckStandards}
-					{#each Array.from($methodStore.checkStandards?.values() ?? []) as checkStandard (checkStandard.id)}
-						<tr class="border-b border-gray-400">
-							<td class="first-column">{checkStandard.name}</td>
-							{#each elements as element}
-								{@const values = $methodStore?.getValue(
-									"checkStandards",
-									checkStandard.name,
-									"checkValues",
-									element.id
-								)}
-								<td class="text-center">{values?.value}</td>
-							{/each}
-						</tr>
-					{/each}
-				{/if}
+				{#each $checkStandardsStore ?? [] as checkStandard (checkStandard.id)}
+					<tr class="border-b border-gray-400">
+						<td class="first-column">{checkStandard.name}</td>
+						{#each elements as element}
+							{@const values = checkStandard.expand?.["checkValues(checkStandard)"].find(
+								(cv) => cv.element === element.elementID
+							)}
+							<td class="text-center">{values?.value ?? "- -"}</td>
+						{/each}
+					</tr>
+				{/each}
 
-				{#if methodHasBlanks}
-					{#each Array.from($methodStore?.blanks?.values() ?? []) as blank (blank.id)}
-						<tr class="border-b border-gray-400">
-							<td class="first-column items-center gap-2 flex justify-between">
-								<div>
-									{blank.name}
-								</div>
-								<div class="table font-normal">
-									<div>MDL</div>
-									<div>LOQ</div>
-								</div>
-							</td>
-							{#each elements as element}
-								{@const values = $methodStore?.getValue(
-									"blanks",
-									blank.name,
-									"detectionLimits",
-									element.id
-								)}
-								<td class="text-center">
-									<div class="table mx-auto">
-										<div class="table-row">
-											<div class="table-cell text-center">
-												{values.mdl === 0 ? "- -" : values.mdl}
-											</div>
-										</div>
-										<div>
-											{values.loq === 0 ? "- -" : values.loq}
+				{#each $blanksStore ?? [] as blank (blank.id)}
+					<tr class="border-b border-gray-400">
+						<td class="first-column items-center gap-2 flex justify-between">
+							<div>
+								{blank.name}
+							</div>
+							<div class="table font-normal">
+								<div>MDL</div>
+								<div>LOQ</div>
+							</div>
+						</td>
+						{#each elements as element}
+							{@const values = blank.expand?.["detectionLimits(blank)"].find(
+								(dl) => dl.element === element.elementID
+							)}
+							<td class="text-center">
+								<div class="table mx-auto">
+									<div class="table-row">
+										<div class="table-cell text-center">
+											{!values?.mdl ? "- -" : values.mdl}
 										</div>
 									</div>
-								</td>
-							{/each}
-						</tr>
-					{/each}
-				{/if}
-
-				{#if methodHasReferenceMaterials}
-					{#each Array.from($methodStore.referenceMaterials?.values() ?? []) as referenceMaterial (referenceMaterial.id)}
-						<tr class="border-b border-gray-400">
-							<td class="first-column items-center gap-2 flex justify-between">
-								<div>
-									{referenceMaterial.name}
-								</div>
-								<div class="table font-normal">
-									<div>Low</div>
-									<div>High</div>
+									<div>
+										{!values?.loq ? "- -" : values.loq}
+									</div>
 								</div>
 							</td>
-							{#each elements as element}
-								{@const values = $methodStore?.getValue(
-									"referenceMaterials",
-									referenceMaterial.name,
-									"ranges",
-									element.id
-								)}
-								<td class="text-center">
-									<div class="table mx-auto">
-										<div class="table-row">
-											<div class="table-cell text-center">
-												{values?.lower === 0 ? "- -" : values?.lower}
-											</div>
-										</div>
-										<div>
-											{values?.upper === 0 ? "- -" : values?.upper}
+						{/each}
+					</tr>
+				{/each}
+
+				{#each $referenceMaterialsStore ?? [] as referenceMaterial (referenceMaterial.id)}
+					<tr class="border-b border-gray-400">
+						<td class="first-column items-center gap-2 flex justify-between">
+							<div>
+								{referenceMaterial.name}
+							</div>
+							<div class="table font-normal">
+								<div>Low</div>
+								<div>High</div>
+							</div>
+						</td>
+						{#each elements as element}
+							{@const values = referenceMaterial.expand?.[
+								"referenceMaterialsRanges(referenceMaterial)"
+							].find((rmr) => rmr.element === element.elementID)}
+							<td class="text-center">
+								<div class="table mx-auto">
+									<div class="table-row">
+										<div class="table-cell text-center">
+											{!values?.lower ? "- -" : values?.lower}
 										</div>
 									</div>
-								</td>
-							{/each}
-						</tr>
-					{/each}
-				{/if}
+									<div>
+										{!values?.upper ? "- -" : values?.upper}
+									</div>
+								</div>
+							</td>
+						{/each}
+					</tr>
+				{/each}
 			</tbody>
 		</table>
 	</div>
