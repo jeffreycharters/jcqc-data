@@ -1,26 +1,36 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
 	import { parseFileAndUpdateStore } from "$lib/data"
-	import { methodStore } from "$lib/stores"
+	import { currentUser } from "$lib/pocketbase"
+	import { methodStore, reportData } from "$lib/stores"
 
 	let files: HTMLInputElement["files"]
 	let errorMessage: string = ""
 
-	const parseInput = (files: HTMLInputElement["files"]) => {
+	const parseInput = async (files: HTMLInputElement["files"]) => {
 		if (!files || !files[0]) return
-		const inputFile = files[0]
 
+		const inputFile = files[0]
 		if (inputFile.type != "text/plain") {
 			errorMessage = "Incorrect file type"
 			return
 		}
 
-		if (!$methodStore) throw new Error("no method set!")
-		parseFileAndUpdateStore(inputFile, $methodStore)
+		const analysisName = inputFile.name.split(".")[0]
+		const analysisDate = analysisName.split("=")[1] ?? undefined
+		const { runList, elementCount } = await parseFileAndUpdateStore(inputFile)
+
+		$reportData = {
+			meta: {
+				analysisName,
+				analysisDate,
+				elementCount
+			},
+			samples: runList
+		}
+
 		goto("/report")
 	}
-
-	$: parseInput(files)
 </script>
 
 <div class="w-fit mx-auto flex gap-4">
@@ -48,7 +58,13 @@
 		<p class="text-gray-500 dark:text-gray-400">
 			<span class="font-semibold">Select exported file</span>
 		</p>
-		<input id="dropzone-file" type="file" class="hidden" bind:files />
+		<input
+			id="dropzone-file"
+			type="file"
+			class="hidden"
+			bind:files
+			on:change={() => parseInput(files)}
+		/>
 	</label>
 
 	<div class="text-red-600 mt-2 rounded italic whitespace-nowrap">

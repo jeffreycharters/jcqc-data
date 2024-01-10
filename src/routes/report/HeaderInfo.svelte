@@ -9,13 +9,13 @@
 	<div class="headerItem">Sequence ID: ______________________________________</div>
 
 	<div class="headerItem">
-		Instrument: {$instrument?.name} (Serial Number: {$instrument?.serial})
+		Instrument: {$instrumentStore?.name} (Serial Number: {$instrumentStore?.serial})
 	</div>
 	<div class="headerItem -mt-3">
-		Software Version: {$instrument?.softwareVersion}
+		Software Version: {$instrumentStore?.softwareVersion}
 	</div>
 	<div class="headerItem -mt-3">
-		Autosampler Info: {$instrument?.autosamplerInfo}
+		Autosampler Info: {$instrumentStore?.autosamplerInfo}
 	</div>
 </div>
 

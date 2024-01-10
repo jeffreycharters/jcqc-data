@@ -1,6 +1,12 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 // and what to do when importing types
+import type {
+	BlanksResponse,
+	CheckStandardsResponse,
+	ReferenceMaterialsResponse
+} from "$lib/pocketbase-types"
+import type { ExpandedBlank, ExpandedCheckStandard, ExpandedReferenceMaterial } from "$lib/types"
 import PocketBase from "pocketbase"
 declare global {
 	declare namespace App {
@@ -92,17 +98,18 @@ interface InputLine {
 	results: Map<number, number>
 }
 
+type ElementMass = number
+type MeasuredConcentration = number
+
 interface RunListEntry {
 	name: string
 	id: string
 	isCalBlank?: boolean
-	isCalCheck?: boolean
-	isMethodBlank?: boolean
-	isReferenceMaterial?: boolean
-	isDup: boolean
-	isSample?: boolean
+	checkStandard?: CheckStandardsResponse<ExpandedCheckStandard>
+	blank?: BlanksResponse<ExpandedBlank>
+	referenceMaterial?: ReferenceMaterialsResponse<ExpandedReferenceMaterial>
+	duplicateSample?: RunListEntry
 	results: {
-		values: Map<number, number>
-		dupValues?: Map<number, number>
+		values: Record<ElementMass, MeasuredConcentration>
 	}
 }

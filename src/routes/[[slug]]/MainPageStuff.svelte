@@ -50,7 +50,7 @@
 
 <style lang="postcss">
 	.selected-button {
-		@apply text-teal-600 border-teal-700 shadow-sm shadow-teal-700/50 font-semibold;
+		@apply text-sky-600 border-sky-700 shadow-sm shadow-sky-700/50 font-semibold;
 		box-shadow: "0 0 5px #086077";
 	}
 	.method-button {

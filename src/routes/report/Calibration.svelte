@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { roundToSigFigs, sortedArrayFromMap } from '$lib/data';
-	import HeaderRow from './HeaderRow.svelte';
+	import { roundToSigFigs, sortedArrayFromMap } from "$lib/data"
+	import type { RunListEntry } from "../../app"
+	import HeaderRow from "./HeaderRow.svelte"
 
-	export let samples: RunListEntry[];
+	export let samples: RunListEntry[]
 </script>
 
 <div>

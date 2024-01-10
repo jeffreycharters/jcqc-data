@@ -6,7 +6,8 @@ import type {
 	CheckStandardStore,
 	ExpandedMethod,
 	MethodElement,
-	ReferenceMaterialsStore
+	ReferenceMaterialsStore,
+	ReportMetadata
 } from "./types"
 
 export const methods: Writable<MethodsResponse[] | null> = writable([])
@@ -18,7 +19,8 @@ export const checkStandardsStore: Writable<CheckStandardStore | null> = writable
 export const blanksStore: Writable<BlanksStore | null> = writable()
 export const referenceMaterialsStore: Writable<ReferenceMaterialsStore | null> = writable()
 
-export const instrumentStore: Writable<InstrumentsResponse> = writable()
-export const instruments: Writable<InstrumentsResponse[]> = writable()
+export const instrumentStore: Writable<InstrumentsResponse | null> = writable()
+export const instruments: Writable<InstrumentsResponse[] | null> = writable()
 
-export const reportData: Writable<RunListEntry[]> = writable()
+export const reportData: Writable<{ meta: ReportMetadata; samples: RunListEntry[] } | null> =
+	writable()

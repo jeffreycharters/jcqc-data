@@ -1,7 +1,9 @@
-import type { PageLoad } from './$types';
+import { methodStore } from "$lib/stores"
+import { get } from "svelte/store"
+import type { PageLoad } from "./$types"
 
 export const load = (async () => {
-    return {
-        title: "Report"
-    }
-}) satisfies PageLoad;
+	return {
+		title: `${get(methodStore)?.name} report`
+	}
+}) satisfies PageLoad

@@ -1,31 +1,37 @@
 <script lang="ts">
-	import { methodStore, reportData } from "$lib/stores"
-	import HeaderInfo from "./HeaderInfo.svelte"
-	import Calibration from "./Calibration.svelte"
-	import CheckStandard from "./CheckStandard.svelte"
-	import MethodBlank from "./MethodBlank.svelte"
-	import ReferenceMaterial from "./ReferenceMaterial.svelte"
-	import SampleBlock from "./SampleBlock.svelte"
-	import SampleRow from "./SampleRow.svelte"
-	import Duplicate from "./Duplicate.svelte"
-	import { browser } from "$app/environment"
+	import { reportData } from "$lib/stores"
 
-	let methodElementCount = $methodStore?.elements?.length || 0
-	let analysisElementCount = $reportData?.length > 0 ? $reportData[0]?.results.values.size : 0
+	// import { checkStandardsStore, methodElementsStore, methodStore, reportData } from "$lib/stores"
+	// import HeaderInfo from "./HeaderInfo.svelte"
+	// import Calibration from "./Calibration.svelte"
+	// import CheckStandard from "./CheckStandard.svelte"
+	// import MethodBlank from "./MethodBlank.svelte"
+	// import ReferenceMaterial from "./ReferenceMaterial.svelte"
+	// import SampleBlock from "./SampleBlock.svelte"
+	// import SampleRow from "./SampleRow.svelte"
+	// import Duplicate from "./Duplicate.svelte"
+	// import { browser } from "$app/environment"
+	// import type { RunListEntry } from "../../app"
 
-	const getSampleBlock = (index: number) => {
-		const samples: RunListEntry[] = []
-		while (index < $reportData.length) {
-			const thisSample = $reportData[index]
-			if (thisSample.isSample && !thisSample.isDup) samples.push(thisSample)
-			else break
-			++index
-		}
-		return samples
-	}
+	// const methodElementCount = $methodElementsStore?.length
+	// let analysisElementCount = $reportData?.length > 0 ? $reportData[0]?.results.values.size : 0
+
+	// const getSampleBlock = (index: number) => {
+	// 	let samples: RunListEntry[] = []
+	// 	while (index < ($reportData?.length ? $reportData.length : 0)) {
+	// 		const thisSample = $reportData?.[index]
+	// 		if (thisSample?.isSample && !thisSample.isDup) samples = [...samples, thisSample]
+	// 		else break
+	// 		++index
+	// 	}
+	// 	return samples
+	// }
+
+	console.log($reportData)
 </script>
 
-<div class="report-container mx-auto p-4">
+neat!
+<!-- <div class="report-container mx-auto p-4">
 	{#if methodElementCount != analysisElementCount}
 		<div class="text-red-500 text-sm w-fit mx-auto font-semibold">
 			Warning: expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {analysisElementCount}.
@@ -51,11 +57,11 @@
 							samples={$reportData.slice(index, index + ($methodStore?.calibrationCount ?? 0) + 1)}
 						/>
 					{/if}
-					{#if sample.isCalCheck && $methodStore?.checkStandards?.has(sample.name)}
-						<CheckStandard
-							{sample}
-							checkStandard={$methodStore?.checkStandards?.get(sample.name)}
-						/>
+					{#if sample.isCalCheck}
+						{@const checkStandard = $checkStandardsStore?.find(
+							(cs) => cs.name.toLowerCase() === sample.name.toLowerCase()
+						)}
+						<CheckStandard {sample} {checkStandard} />
 					{/if}
 
 					{#if sample.isMethodBlank}
@@ -87,4 +93,4 @@
 		font-family: Arial, Helvetica, sans-serif;
 		@apply text-[0.75rem];
 	}
-</style>
+</style> -->

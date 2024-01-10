@@ -13,16 +13,14 @@
 	if (methodList) {
 		$methods = methodList
 	}
-
-	const transitionDuration = 100
 </script>
 
 <MainPageStuff>
 	{#if $methodStore && !$instrumentStore}
 		<div
-			class="mx-auto w-fit flex gap-2 border-teal-500 border py-1 px-2 rounded bg-teal-50 text-teal-800"
+			class="mx-auto w-fit flex gap-2 border-sky-500 border py-1 px-2 rounded bg-sky-50 text-sky-800"
 		>
-			<IconArrowUpLeftCircle class="-rotate-12 stroke-[1.5] relative -top-1 stroke-teal-800" />
+			<IconArrowUpLeftCircle class="-rotate-12 stroke-[1.5] relative -top-1 stroke-sky-800" />
 			<div>Select an instrument!</div>
 		</div>
 	{/if}
@@ -30,7 +28,7 @@
 		<FilePicker />
 	{/if}
 	{#key $methodStore}
-		<div in:fade|local={{ delay: transitionDuration, duration: transitionDuration }}>
+		<div in:fade|local={{ duration: 100 }}>
 			<MethodParams />
 		</div>
 	{/key}

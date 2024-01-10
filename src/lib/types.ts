@@ -38,3 +38,9 @@ export type MethodElement = {
 export type CheckStandardStore = CheckStandardsResponse<ExpandedCheckStandard>[]
 export type BlanksStore = BlanksResponse<ExpandedBlank>[]
 export type ReferenceMaterialsStore = ReferenceMaterialsResponse<ExpandedReferenceMaterial>[]
+
+export interface ReportMetadata {
+	analysisName: string
+	analysisDate: string
+	elementCount: number
+}

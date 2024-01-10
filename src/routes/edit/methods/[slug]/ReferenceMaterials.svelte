@@ -9,7 +9,7 @@
 
 	let newReferenceMaterialName = ""
 	let formMessage: string
-	let open = true
+	let open = false
 	let addFormOpen = false
 
 	async function createNewReferenceMaterial() {
