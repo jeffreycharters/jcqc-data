@@ -4,7 +4,7 @@
 
 <div class="mb-4">
 	<h1>Sequence Information - {$methodStore?.name}</h1>
-	<div class="headerItem">
+	<div class="headerItem mt-2">
 		<div>Analyst:</div>
 		<div class="autofilled w-48">&nbsp;</div>
 	</div>
@@ -21,12 +21,14 @@
 
 	<div class="headerItem">
 		Instrument:
-		<span class="font-normal"
-			>{$instrumentStore?.name} (Serial Number: {$instrumentStore?.serial})</span
-		>
+		<span class="font-normal">
+			{$instrumentStore?.name}
+			(Serial Number: {$instrumentStore?.serial})
+		</span>
 	</div>
 	<div class="headerItem -mt-3">
-		Software Version: <span class="font-normal">{$instrumentStore?.softwareVersion}</span>
+		Software Version:
+		<span class="font-normal">{$instrumentStore?.softwareVersion}</span>
 	</div>
 	<div class="headerItem -mt-3">
 		Autosampler Model: <span class="font-normal">{$instrumentStore?.autosamplerInfo}</span>
