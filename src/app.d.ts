@@ -103,12 +103,12 @@ type MeasuredConcentration = number
 
 interface RunListEntry {
 	name: string
-	id: string
+	anaysisNumber: number
 	isCalBlank?: boolean
 	checkStandard?: CheckStandardsResponse<ExpandedCheckStandard>
 	blank?: BlanksResponse<ExpandedBlank>
 	referenceMaterial?: ReferenceMaterialsResponse<ExpandedReferenceMaterial>
-	duplicateSample?: RunListEntry
+	duplicateSamples?: RunListEntry[]
 	results: {
 		values: Record<ElementMass, MeasuredConcentration>
 	}

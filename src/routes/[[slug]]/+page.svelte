@@ -9,11 +9,9 @@
 
 <MainPageStuff>
 	{#if $methodStore && !$instrumentStore}
-		<div
-			class="mx-auto w-fit flex gap-2 border-sky-500 border py-1 px-2 rounded bg-sky-50 text-sky-800"
-		>
-			<IconArrowUpLeftCircle class="-rotate-12 stroke-[1.5] relative -top-1 stroke-sky-800" />
-			<div>Select an instrument!</div>
+		<div class="mx-auto w-fit flex gap-2 border-sky-500 border py-1 px-2 rounded bg-sky-50">
+			<IconArrowUpLeftCircle class="-rotate-12 stroke-[1.5] relative -top-[2px] stroke-sky-700" />
+			<div class="font-semibold text-sky-600">Select an instrument!</div>
 		</div>
 	{/if}
 	{#if $methodStore && $instrumentStore}

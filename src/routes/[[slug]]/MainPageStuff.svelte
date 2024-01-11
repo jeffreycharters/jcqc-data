@@ -19,7 +19,7 @@
 			<SelectInstrument />
 
 			<div class="border border-gray-500 rounded w-[36rem] py-2">
-				<h2 class="mb-2 text-center">Select Method</h2>
+				<h2 class="text-center">Select Method</h2>
 				<div class="flex flex-wrap justify-center mx-auto gap-3">
 					{#each $methods ?? [] as method (method.id)}
 						<a

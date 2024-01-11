@@ -1,24 +1,23 @@
 import { setMethodStores, setMethods } from "$lib/methods"
 import { pb } from "$lib/pocketbase"
 import type { InstrumentsResponse, MethodsResponse } from "$lib/pocketbase-types"
-import { methodStore, instruments, methodElementsStore } from "$lib/stores"
+import { methodStore, instruments } from "$lib/stores"
 import { redirect } from "@sveltejs/kit"
 import type { PageLoad } from "./$types"
 import type { ExpandedMethod } from "$lib/types"
-import { get } from "svelte/store"
 
 export const load: PageLoad = (async ({ params }) => {
+	const instrumentList: InstrumentsResponse[] = await pb.collection("instruments").getFullList()
+	instruments.set(instrumentList)
+
+	await setMethods()
+
 	if (!params.slug) {
 		methodStore.set(null)
 		return {
 			title: "JCQC Data Processor"
 		}
 	}
-
-	const instrumentList: InstrumentsResponse[] = await pb.collection("instruments").getFullList()
-	instruments.set(instrumentList)
-
-	await setMethods()
 
 	const methodResponse: MethodsResponse<ExpandedMethod> = await pb
 		.collection("methods")
