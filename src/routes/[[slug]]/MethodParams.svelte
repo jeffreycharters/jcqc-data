@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidate } from "$app/navigation"
 	import {
 		blanksStore,
 		checkStandardsStore,
@@ -9,11 +10,6 @@
 
 	const elements = $methodElementsStore?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? []
 	const lowElementCount = elements && elements?.length < 15
-
-	const methodHasReferenceMaterials =
-		$referenceMaterialsStore && $referenceMaterialsStore.length > 0
-	const methodHasBlanks = $blanksStore && $blanksStore?.length > 0
-	const methodHasCheckStandards = $checkStandardsStore && $checkStandardsStore.length > 0
 </script>
 
 {#if $methodStore}

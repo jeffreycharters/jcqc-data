@@ -44,3 +44,22 @@ export interface ReportMetadata {
 	analysisDate: string
 	elementCount: number
 }
+
+export interface InstrumentCSVRow {
+	Analyte: string
+	Concentration?: number
+	"Dilution Factor": number
+	Mass: number
+	"Sample Name": string
+	"Sample Weight or Volume": number
+	Units: Units
+}
+
+type ElementID = string
+type Concentration = number
+export type ElementConcentrations = Record<ElementID, Concentration>
+
+export interface RawRunlist {
+	sampleName: string
+	measurements: Record<ElementID, Concentration>
+}

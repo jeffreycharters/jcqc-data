@@ -17,17 +17,18 @@ import type {
 export const expandMethod = "methodElements(method).element"
 
 export const getMethodList = async (sort = "name"): Promise<MethodsResponse[]> => {
-	return await pb.collection("methods").getFullList(undefined, { sort })
+	return await pb.collection("methods").getFullList({ sort })
 }
 
 export const getActiveMethods = async (): Promise<MethodsResponse[]> => {
-	return pb.collection("methods").getFullList(200, { filter: "active = true" })
+	return pb.collection("methods").getFullList({ filter: "active = true" })
 }
 
 export async function setMethods() {
 	const methodList = await pb
 		.collection("methods")
 		.getFullList<MethodsResponse<ExpandedMethod>>({ expand: expandMethod })
+
 	methods.set(methodList)
 }
 

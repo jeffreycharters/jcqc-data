@@ -1,18 +1,10 @@
 <script lang="ts">
-	import { instrumentStore, methodStore, methods } from "$lib/stores"
+	import { instrumentStore, methodStore, referenceMaterialsStore } from "$lib/stores"
 	import FilePicker from "./FilePicker.svelte"
 	import MainPageStuff from "./MainPageStuff.svelte"
-	import type { PageData } from "./$types"
 	import MethodParams from "./MethodParams.svelte"
 	import { fade } from "svelte/transition"
 	import { IconArrowUpLeftCircle } from "@tabler/icons-svelte"
-
-	export let data: PageData
-	const methodList = data.methods
-
-	if (methodList) {
-		$methods = methodList
-	}
 </script>
 
 <MainPageStuff>
@@ -27,10 +19,9 @@
 	{#if $methodStore && $instrumentStore}
 		<FilePicker />
 	{/if}
+
 	{#key $methodStore}
-		<div in:fade|local={{ duration: 100 }}>
-			<MethodParams />
-		</div>
+		<MethodParams />
 	{/key}
 </MainPageStuff>
 

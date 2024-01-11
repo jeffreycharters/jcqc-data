@@ -1,19 +1,51 @@
 import Papa from "papaparse"
-import type { RunListEntry } from "../app"
+import type { InstrumentCSVRow, RawRunlist, ElementConcentrations } from "./types"
 
-export const parseFileAndUpdateStore = async (inputFile: File) => {
+export const parseCSV = async (inputFile: File) => {
 	const inputString = await inputFile.text()
-	const data = Papa.parse(inputString, {
+	const result = Papa.parse<InstrumentCSVRow>(inputString, {
 		header: true,
 		dynamicTyping: true
 	})
 
-	console.log(data.data[0])
-	const runList: RunListEntry[] = []
-	return {
-		runList,
-		elementCount: 0
+	return result.data
+}
+
+export function countElements(csvRows: InstrumentCSVRow[]) {
+	let elementMap: Record<string, boolean> = {}
+
+	for (let i = 0; i < csvRows.length; i++) {
+		if (elementMap[csvRows[i].Analyte]) return i
+
+		elementMap[csvRows[i].Analyte] = true
 	}
+
+	return -1
+}
+
+export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: number) {
+	let rawRunlist: RawRunlist[] = []
+	let analytes: ElementConcentrations = {}
+
+	for (let i = 0; i < csvRows.length; i++) {
+		const elementID = `${csvRows[i].Analyte}${csvRows[i].Mass}`
+
+		analytes = { ...analytes, [elementID]: csvRows[i].Concentration ?? 0 }
+
+		if (i % elementCount === elementCount - 1) {
+			rawRunlist = [
+				...rawRunlist,
+				{
+					sampleName: csvRows[i]["Sample Name"].toLowerCase().trim(),
+					measurements: analytes
+				}
+			]
+
+			analytes = {}
+		}
+	}
+
+	return rawRunlist
 }
 
 // export const roundToSigFigs = (number: number, sigFigs: number) => {

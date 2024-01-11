@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { reportData } from "$lib/stores"
+	import { methodElementsStore, reportData } from "$lib/stores"
 
 	// import { checkStandardsStore, methodElementsStore, methodStore, reportData } from "$lib/stores"
-	// import HeaderInfo from "./HeaderInfo.svelte"
+	import HeaderInfo from "./HeaderInfo.svelte"
 	// import Calibration from "./Calibration.svelte"
 	// import CheckStandard from "./CheckStandard.svelte"
 	// import MethodBlank from "./MethodBlank.svelte"
@@ -13,8 +13,8 @@
 	// import { browser } from "$app/environment"
 	// import type { RunListEntry } from "../../app"
 
-	// const methodElementCount = $methodElementsStore?.length
-	// let analysisElementCount = $reportData?.length > 0 ? $reportData[0]?.results.values.size : 0
+	const methodElementCount = $methodElementsStore?.length
+	const outputElementCount = $reportData?.meta.elementCount
 
 	// const getSampleBlock = (index: number) => {
 	// 	let samples: RunListEntry[] = []
@@ -30,16 +30,16 @@
 	console.log($reportData)
 </script>
 
-neat!
-<!-- <div class="report-container mx-auto p-4">
-	{#if methodElementCount != analysisElementCount}
+<div class="report-container mx-auto p-4">
+	{#if $methodElementsStore?.length != $reportData?.meta.elementCount}
 		<div class="text-red-500 text-sm w-fit mx-auto font-semibold">
-			Warning: expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {analysisElementCount}.
+			Warning: expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {outputElementCount}.
 			Possible method mismatch.
 		</div>
 	{/if}
 
 	<HeaderInfo />
+	<!--
 
 	<div>
 		{#if browser && $reportData}
@@ -85,7 +85,7 @@ neat!
 				No data found! <a class="text-black" href="/">Click here to start over.</a>
 			</div>
 		{/if}
-	</div>
+	</div> -->
 </div>
 
 <style lang="postcss">
@@ -93,4 +93,4 @@ neat!
 		font-family: Arial, Helvetica, sans-serif;
 		@apply text-[0.75rem];
 	}
-</style> -->
+</style>

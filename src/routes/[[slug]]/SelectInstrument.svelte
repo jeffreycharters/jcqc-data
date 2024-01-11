@@ -20,12 +20,10 @@
 <div class="border border-gray-500 rounded w-52 py-2">
 	<h2 class="mb-2 text-center">Select Instrument</h2>
 
-	<div class="flex flex-col items-center gap-2">
+	<div class="flex gap-4 justify-center">
 		{#each $instruments || [] as instrument (instrument.id)}
 			<button
-				class="btn my-2 {$instrumentStore?.id === instrument.id
-					? 'selected-button'
-					: 'method-button'}"
+				class="btn {$instrumentStore?.id === instrument.id ? 'selected-button' : 'method-button'}"
 				on:click={() => saveInstrument(instrument)}
 			>
 				{instrument.name}
