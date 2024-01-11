@@ -20,13 +20,16 @@
 	</div>
 
 	<div class="headerItem">
-		Instrument: {$instrumentStore?.name} (Serial Number: {$instrumentStore?.serial})
+		Instrument:
+		<span class="font-normal"
+			>{$instrumentStore?.name} (Serial Number: {$instrumentStore?.serial})</span
+		>
 	</div>
 	<div class="headerItem -mt-3">
-		Software Version: {$instrumentStore?.softwareVersion}
+		Software Version: <span class="font-normal">{$instrumentStore?.softwareVersion}</span>
 	</div>
 	<div class="headerItem -mt-3">
-		Autosampler Info: {$instrumentStore?.autosamplerInfo}
+		Autosampler Model: <span class="font-normal">{$instrumentStore?.autosamplerInfo}</span>
 	</div>
 </div>
 
