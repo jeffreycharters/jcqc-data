@@ -3,41 +3,46 @@
 </script>
 
 <div class="mb-4">
-	<h1>Sequence Information - {$methodStore?.name}</h1>
-	<div class="headerItem mt-2">
-		<div>Analyst:</div>
-		<div class="autofilled w-48">&nbsp;</div>
-	</div>
-	<div class="headerItem">
-		Analysis Date: <div class="autofilled w-48">
-			{$reportData?.meta.analysisDate}
+	<h1 class="mb-2">Sequence Information - {$methodStore?.name}</h1>
+
+	<div class="max-w-xs">
+		<div class="headerItem mt-2 py-1">
+			<div>Analyst:</div>
+			<div class="autofilled">&nbsp;</div>
 		</div>
-	</div>
-	<div class="headerItem">
-		Sequence ID: <div class="autofilled w-64">
-			{$reportData?.meta.analysisName}
+		<div class="headerItem py-1">
+			Analysis Date: <div class="autofilled">
+				{$reportData?.meta.analysisDate}
+			</div>
+		</div>
+		<div class="headerItem py-1">
+			Sequence ID: <div class="autofilled">
+				{$reportData?.meta.analysisName}
+			</div>
 		</div>
 	</div>
 
-	<div class="headerItem">
-		Instrument:
-		<span class="font-normal">
-			{$instrumentStore?.name}
-			(Serial Number: {$instrumentStore?.serial})
-		</span>
-	</div>
-	<div class="headerItem -mt-3">
-		Software Version:
-		<span class="font-normal">{$instrumentStore?.softwareVersion}</span>
-	</div>
-	<div class="headerItem -mt-3">
-		Autosampler Model: <span class="font-normal">{$instrumentStore?.autosamplerInfo}</span>
+	<div class="bg-stone-100 rounded py-2 px-4 w-fit mt-2">
+		<div class="headerItem py-[1px]">
+			Instrument Name:
+			<span class="font-normal">
+				{$instrumentStore?.name}
+				(Serial number: {$instrumentStore?.serial})
+			</span>
+		</div>
+		<div class="headerItem py-[1px]">
+			Software Version:
+			<span class="font-normal">{$instrumentStore?.softwareVersion}</span>
+		</div>
+		<div class="headerItem py-[1px]">
+			Autosampler: <span class="font-normal">{$instrumentStore?.autosamplerInfo}</span>
+		</div>
 	</div>
 </div>
 
 <style lang="postcss">
 	.headerItem {
-		@apply font-semibold px-2 py-[6px] text-sm flex items-baseline gap-2 max-w-sm;
+		@apply font-semibold px-2 text-sm flex items-baseline gap-2;
 	}
 
 	.autofilled {
