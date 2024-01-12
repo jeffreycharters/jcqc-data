@@ -24,7 +24,6 @@
 
 		const rawRunlist = flattenAnalytes(structuredOutput, elementCount)
 		const runlist = parseRun(rawRunlist)
-		console.log(rawRunlist)
 
 		$reportData = {
 			meta: {

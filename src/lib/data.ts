@@ -12,8 +12,7 @@ import type {
 	CheckStandardValue,
 	ElementID,
 	ReferenceMaterialRange,
-	RunListEntry,
-	SimplifiedComparator
+	RunListEntry
 } from "../app"
 import {
 	blanksStore,
@@ -28,7 +27,9 @@ import type {
 	ReferenceMaterialsResponse
 } from "./pocketbase-types"
 
-const qcRegex = /^(qc:).*$/
+const qcRegex = /^(qc:)/i
+const sampleRegex = /\d{2}-\d{6}-\d{4}/
+const dupRegex = /(.*)[\d\s](d|dup)$/i // number or whitespace then "d" or "dup"
 
 export const parseCSV = async (inputFile: File) => {
 	const inputString = await inputFile.text()
@@ -79,6 +80,7 @@ export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: numbe
 
 export function parseRun(rawRunlist: RawRunlist[]) {
 	let runlist: RunListEntry[] = []
+
 	const checkStandards = get(checkStandardsStore)
 	const checkStandardNames = checkStandards?.map((c) => c.name.toLowerCase()) ?? []
 
@@ -88,7 +90,7 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 	const referenceMaterials = get(referenceMaterialsStore)
 	const referenceMaterialNames = referenceMaterials?.map((r) => r.name.toLowerCase()) ?? []
 
-	for (let i = 0; i < rawRunlist.length; i++) {
+	listLoop: for (let i = 0; i < rawRunlist.length; i++) {
 		const name = rawRunlist[i].name.trim()
 
 		// special case
@@ -111,29 +113,38 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 			results: rawRunlist[i].measurements
 		}
 
-		const isCheckStandard = checkStandardNames.includes(name)
-		if (isCheckStandard) {
-			const cs = checkStandards?.find((c) => c.name.toLowerCase() === name)
-			if (cs) runlistEntry = { ...runlistEntry, checkStandard: simplifiedCheckStandard(cs) }
+		switch (true) {
+			case dupRegex.test(name):
+				const refSampleName = dupRegex.exec(name)?.[1]
+				if (!refSampleName) break
+
+				for (let j = runlist.length - 1; j >= 0; j--) {
+					if (runlist[j].name === refSampleName) {
+						const duplicateSamples = runlist[j].duplicateSamples ?? []
+						runlist[j] = { ...runlist[j], duplicateSamples: [...duplicateSamples, runlistEntry] }
+						continue listLoop
+					}
+				}
+				break
+			case checkStandardNames.includes(name):
+				const cs = checkStandards?.find((c) => c.name.toLowerCase() === name)
+				if (cs) runlistEntry = { ...runlistEntry, checkStandard: simplifiedCheckStandard(cs) }
+
+			case blankNames.includes(name):
+				const blank = blanks?.find((b) => b.name.toLowerCase() === name)
+				if (blank) runlistEntry = { ...runlistEntry, blank: simplifiedBlank(blank) }
+
+			case referenceMaterialNames.includes(name):
+				const rm = referenceMaterials?.find((r) => r.name.toLowerCase() === name)
+				if (rm)
+					runlistEntry = { ...runlistEntry, referenceMaterial: simplifiedReferenceMaterial(rm) }
 		}
 
-		const isMethodblank = blankNames.includes(name)
-		if (isMethodblank) {
-			const blank = blanks?.find((b) => b.name.toLowerCase() === name)
-			if (blank) {
-				runlistEntry = { ...runlistEntry, blank: simplifiedBlank(blank) }
-			}
-		}
+		const normalSample = sampleRegex.test(name) || qcRegex.test(name)
+		const { checkStandard, blank, referenceMaterial, duplicateSamples } = runlistEntry
 
-		const isReferenceMaterial = referenceMaterialNames.includes(name)
-		if (isReferenceMaterial) {
-			const rm = referenceMaterials?.find((r) => r.name.toLowerCase() === name)
-			if (rm) runlistEntry = { ...runlistEntry, referenceMaterial: simplifiedReferenceMaterial(rm) }
-		}
-
-		const includeSample = isCheckStandard || isMethodblank || isReferenceMaterial
-
-		if (includeSample) runlist = [...runlist, runlistEntry]
+		if (blank || checkStandard || referenceMaterial || duplicateSamples || normalSample)
+			runlist = [...runlist, runlistEntry]
 	}
 
 	return runlist

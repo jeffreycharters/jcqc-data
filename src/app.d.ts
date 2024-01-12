@@ -41,7 +41,7 @@ interface RunListEntry {
 	analysisNumber: number
 	isCalBlank?: boolean
 	checkStandard?: SimplifiedComparator<CheckStandardValue>
-	blank?: BlanksResponse<ExpandedBlank>
+	blank?: SimplifiedComparator<BlankLimits>
 	referenceMaterial?: SimplifiedComparator<ReferenceMaterialRange>
 	duplicateSamples?: RunListEntry[]
 	results: Record<ElementID, MeasuredConcentration>
