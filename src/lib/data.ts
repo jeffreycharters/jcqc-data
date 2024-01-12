@@ -1,5 +1,34 @@
 import Papa from "papaparse"
-import type { InstrumentCSVRow, RawRunlist, ElementConcentrations } from "./types"
+import type {
+	InstrumentCSVRow,
+	RawRunlist,
+	ElementConcentrations,
+	ExpandedReferenceMaterial,
+	ExpandedCheckStandard,
+	ExpandedBlank
+} from "./types"
+import type {
+	BlankLimits,
+	CheckStandardValue,
+	ElementID,
+	ReferenceMaterialRange,
+	RunListEntry,
+	SimplifiedComparator
+} from "../app"
+import {
+	blanksStore,
+	checkStandardsStore,
+	methodElementsStore,
+	referenceMaterialsStore
+} from "./stores"
+import { get } from "svelte/store"
+import type {
+	BlanksResponse,
+	CheckStandardsResponse,
+	ReferenceMaterialsResponse
+} from "./pocketbase-types"
+
+const qcRegex = /^(qc:).*$/
 
 export const parseCSV = async (inputFile: File) => {
 	const inputString = await inputFile.text()
@@ -36,7 +65,7 @@ export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: numbe
 			rawRunlist = [
 				...rawRunlist,
 				{
-					sampleName: csvRows[i]["Sample Name"].toLowerCase().trim(),
+					name: csvRows[i]["Sample Name"].toLowerCase().trim(),
 					measurements: analytes
 				}
 			]
@@ -46,6 +75,128 @@ export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: numbe
 	}
 
 	return rawRunlist
+}
+
+export function parseRun(rawRunlist: RawRunlist[]) {
+	let runlist: RunListEntry[] = []
+	const checkStandards = get(checkStandardsStore)
+	const checkStandardNames = checkStandards?.map((c) => c.name.toLowerCase()) ?? []
+
+	const blanks = get(blanksStore)
+	const blankNames = blanks?.map((b) => b.name.toLowerCase()) ?? []
+
+	const referenceMaterials = get(referenceMaterialsStore)
+	const referenceMaterialNames = referenceMaterials?.map((r) => r.name.toLowerCase()) ?? []
+
+	for (let i = 0; i < rawRunlist.length; i++) {
+		const name = rawRunlist[i].name.trim()
+
+		// special case
+		if (name === "cal blank") {
+			runlist = [
+				...runlist,
+				{
+					name,
+					analysisNumber: i,
+					isCalBlank: true,
+					results: {}
+				}
+			]
+			continue
+		}
+
+		let runlistEntry: RunListEntry = {
+			name,
+			analysisNumber: i,
+			results: rawRunlist[i].measurements
+		}
+
+		const isCheckStandard = checkStandardNames.includes(name)
+		if (isCheckStandard) {
+			const cs = checkStandards?.find((c) => c.name.toLowerCase() === name)
+			if (cs) runlistEntry = { ...runlistEntry, checkStandard: simplifiedCheckStandard(cs) }
+		}
+
+		const isMethodblank = blankNames.includes(name)
+		if (isMethodblank) {
+			const blank = blanks?.find((b) => b.name.toLowerCase() === name)
+			if (blank) {
+				runlistEntry = { ...runlistEntry, blank: simplifiedBlank(blank) }
+			}
+		}
+
+		const isReferenceMaterial = referenceMaterialNames.includes(name)
+		if (isReferenceMaterial) {
+			const rm = referenceMaterials?.find((r) => r.name.toLowerCase() === name)
+			if (rm) runlistEntry = { ...runlistEntry, referenceMaterial: simplifiedReferenceMaterial(rm) }
+		}
+
+		const includeSample = isCheckStandard || isMethodblank || isReferenceMaterial
+
+		if (includeSample) runlist = [...runlist, runlistEntry]
+	}
+
+	return runlist
+}
+
+function simplifiedReferenceMaterial(rm: ReferenceMaterialsResponse<ExpandedReferenceMaterial>) {
+	const methodElements = get(methodElementsStore)
+
+	return {
+		name: rm.name,
+		elements: (rm.expand?.["referenceMaterialsRanges(referenceMaterial)"] ?? []).reduce(
+			(acc, curr) => {
+				const element = methodElements?.find((e) => e.elementID === curr.element)
+				if (!element) return acc
+
+				const elementID = `${element?.symbol}${element?.mass}` as ElementID
+				acc[elementID] = { low: curr.lower, high: curr.upper }
+
+				return acc
+			},
+			{} as Record<ElementID, ReferenceMaterialRange>
+		)
+	}
+}
+
+function simplifiedBlank(b: BlanksResponse<ExpandedBlank>) {
+	const methodElements = get(methodElementsStore)
+
+	return {
+		name: b.name,
+		elements: (b.expand?.["detectionLimits(blank)"] ?? []).reduce(
+			(acc, curr) => {
+				const element = methodElements?.find((e) => e.elementID === curr.element)
+				if (!element) return acc
+
+				const elementID = `${element?.symbol}${element?.mass}` as ElementID
+				acc[elementID] = { mdl: curr.mdl, loq: curr.loq }
+
+				return acc
+			},
+			{} as Record<ElementID, BlankLimits>
+		)
+	}
+}
+
+function simplifiedCheckStandard(cs: CheckStandardsResponse<ExpandedCheckStandard>) {
+	const methodElements = get(methodElementsStore)
+
+	return {
+		name: cs.name,
+		elements: (cs.expand?.["checkValues(checkStandard)"] ?? []).reduce(
+			(acc, curr) => {
+				const element = methodElements?.find((e) => e.elementID === curr.element)
+				if (!element) return acc
+
+				const elementID = `${element?.symbol}${element?.mass}` as ElementID
+				acc[elementID] = { expected: curr.value }
+
+				return acc
+			},
+			{} as Record<ElementID, CheckStandardValue>
+		)
+	}
 }
 
 // export const roundToSigFigs = (number: number, sigFigs: number) => {

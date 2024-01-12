@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
-	import { countElements, flattenAnalytes, parseCSV } from "$lib/data"
+	import { countElements, flattenAnalytes, parseCSV, parseRun } from "$lib/data"
 	import { reportData } from "$lib/stores"
 	import { IconFileUpload } from "@tabler/icons-svelte"
 
@@ -23,6 +23,7 @@
 		const elementCount = countElements(structuredOutput)
 
 		const rawRunlist = flattenAnalytes(structuredOutput, elementCount)
+		const runlist = parseRun(rawRunlist)
 		console.log(rawRunlist)
 
 		$reportData = {
@@ -31,7 +32,7 @@
 				analysisDate,
 				elementCount
 			},
-			samples: []
+			samples: runlist
 		}
 
 		goto("/report")

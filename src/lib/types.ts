@@ -60,6 +60,6 @@ type Concentration = number
 export type ElementConcentrations = Record<ElementID, Concentration>
 
 export interface RawRunlist {
-	sampleName: string
+	name: string
 	measurements: Record<ElementID, Concentration>
 }

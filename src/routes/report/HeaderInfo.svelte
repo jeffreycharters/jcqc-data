@@ -5,7 +5,7 @@
 <div class="mb-4">
 	<h1 class="mb-2">Sequence Information - {$methodStore?.name}</h1>
 
-	<div class="max-w-xs">
+	<div class="max-w-xs ml-4">
 		<div class="headerItem mt-2 py-1">
 			<div>Analyst:</div>
 			<div class="autofilled">&nbsp;</div>
