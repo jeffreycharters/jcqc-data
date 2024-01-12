@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
-	import { countElements, flattenAnalytes, parseCSV, parseRun } from "$lib/data"
+	import { findElementOrder, flattenAnalytes, parseCSV, parseRun } from "$lib/data"
 	import { reportData } from "$lib/stores"
 	import { IconFileUpload } from "@tabler/icons-svelte"
 
@@ -20,16 +20,16 @@
 		const analysisDate = analysisName.split("=")[1] ?? undefined
 
 		const structuredOutput = await parseCSV(inputFile)
-		const elementCount = countElements(structuredOutput)
+		const elementOrder = findElementOrder(structuredOutput)
 
-		const rawRunlist = flattenAnalytes(structuredOutput, elementCount)
+		const rawRunlist = flattenAnalytes(structuredOutput, elementOrder.length)
 		const runlist = parseRun(rawRunlist)
 
 		$reportData = {
 			meta: {
 				analysisName,
 				analysisDate,
-				elementCount
+				orderedElements: elementOrder
 			},
 			samples: runlist
 		}

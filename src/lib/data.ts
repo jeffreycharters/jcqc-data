@@ -12,12 +12,14 @@ import type {
 	CheckStandardValue,
 	ElementID,
 	ReferenceMaterialRange,
-	RunListEntry
+	RunListEntry,
+	SimplifiedComparator
 } from "../app"
 import {
 	blanksStore,
 	checkStandardsStore,
 	methodElementsStore,
+	methodStore,
 	referenceMaterialsStore
 } from "./stores"
 import { get } from "svelte/store"
@@ -41,16 +43,18 @@ export const parseCSV = async (inputFile: File) => {
 	return result.data
 }
 
-export function countElements(csvRows: InstrumentCSVRow[]) {
+export function findElementOrder(csvRows: InstrumentCSVRow[]) {
 	let elementMap: Record<string, boolean> = {}
+	let elements: ElementID[] = []
 
 	for (let i = 0; i < csvRows.length; i++) {
-		if (elementMap[csvRows[i].Analyte]) return i
+		if (elementMap[csvRows[i].Analyte]) return elements
 
 		elementMap[csvRows[i].Analyte] = true
+		elements = [...elements, `${csvRows[i].Analyte}${csvRows[i].Mass}`]
 	}
 
-	return -1
+	return elements
 }
 
 export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: number) {
@@ -66,7 +70,7 @@ export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: numbe
 			rawRunlist = [
 				...rawRunlist,
 				{
-					name: csvRows[i]["Sample Name"].toLowerCase().trim(),
+					name: csvRows[i]["Sample Name"].trim(),
 					measurements: analytes
 				}
 			]
@@ -79,6 +83,7 @@ export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: numbe
 }
 
 export function parseRun(rawRunlist: RawRunlist[]) {
+	const method = get(methodStore)
 	let runlist: RunListEntry[] = []
 
 	const checkStandards = get(checkStandardsStore)
@@ -90,25 +95,35 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 	const referenceMaterials = get(referenceMaterialsStore)
 	const referenceMaterialNames = referenceMaterials?.map((r) => r.name.toLowerCase()) ?? []
 
+	let mostRecentBlank: SimplifiedComparator<BlankLimits> | undefined
+
 	listLoop: for (let i = 0; i < rawRunlist.length; i++) {
-		const name = rawRunlist[i].name.trim()
+		const name = rawRunlist[i].name.trim().toLowerCase()
 
 		// special case
 		if (name === "cal blank") {
 			runlist = [
 				...runlist,
 				{
-					name,
+					name: rawRunlist[i].name,
 					analysisNumber: i,
-					isCalBlank: true,
-					results: {}
+					calStandards: rawRunlist
+						.slice(i + 1, i + (method?.calibrationCount ?? 0))
+						.map((r, index) => {
+							return {
+								name: r.name,
+								analysisCount: i + index,
+								results: r.measurements
+							}
+						}),
+					results: rawRunlist[i].measurements
 				}
 			]
 			continue
 		}
 
 		let runlistEntry: RunListEntry = {
-			name,
+			name: rawRunlist[i].name,
 			analysisNumber: i,
 			results: rawRunlist[i].measurements
 		}
@@ -119,34 +134,44 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 				if (!refSampleName) break
 
 				for (let j = runlist.length - 1; j >= 0; j--) {
-					if (runlist[j].name === refSampleName) {
+					if (runlist[j].name.toLowerCase() === refSampleName.toLowerCase()) {
 						const duplicateSamples = runlist[j].duplicateSamples ?? []
-						runlist[j] = { ...runlist[j], duplicateSamples: [...duplicateSamples, runlistEntry] }
+						runlist[j] = {
+							...runlist[j],
+							duplicateSamples: [...duplicateSamples, runlistEntry],
+							referenceBlank: mostRecentBlank
+						}
 						continue listLoop
 					}
 				}
 				break
+
 			case checkStandardNames.includes(name):
 				const cs = checkStandards?.find((c) => c.name.toLowerCase() === name)
 				if (cs) runlistEntry = { ...runlistEntry, checkStandard: simplifiedCheckStandard(cs) }
 
 			case blankNames.includes(name):
-				const blank = blanks?.find((b) => b.name.toLowerCase() === name)
-				if (blank) runlistEntry = { ...runlistEntry, blank: simplifiedBlank(blank) }
+				const blk = blanks?.find((b) => b.name.toLowerCase() === name)
+				if (blk) {
+					runlistEntry = { ...runlistEntry, blank: simplifiedBlank(blk) }
+					mostRecentBlank = simplifiedBlank(blk)
+				}
 
 			case referenceMaterialNames.includes(name):
 				const rm = referenceMaterials?.find((r) => r.name.toLowerCase() === name)
 				if (rm)
 					runlistEntry = { ...runlistEntry, referenceMaterial: simplifiedReferenceMaterial(rm) }
+
+			case sampleRegex.test(name) || qcRegex.test(name):
+				runlistEntry = { ...runlistEntry, isSample: true }
 		}
 
-		const normalSample = sampleRegex.test(name) || qcRegex.test(name)
-		const { checkStandard, blank, referenceMaterial, duplicateSamples } = runlistEntry
-
-		if (blank || checkStandard || referenceMaterial || duplicateSamples || normalSample)
+		const { checkStandard, blank, referenceMaterial, duplicateSamples, isSample } = runlistEntry
+		if (blank || checkStandard || referenceMaterial || duplicateSamples || isSample)
 			runlist = [...runlist, runlistEntry]
 	}
 
+	console.log(runlist)
 	return runlist
 }
 
@@ -210,44 +235,44 @@ function simplifiedCheckStandard(cs: CheckStandardsResponse<ExpandedCheckStandar
 	}
 }
 
-// export const roundToSigFigs = (number: number, sigFigs: number) => {
-// 	let orderOfMagnitude = 0
-// 	let result = Number(number)
+export const roundToSigFigs = (number: number, sigFigs: number) => {
+	let orderOfMagnitude = 0
+	let result = Number(number)
 
-// 	if (number > 10) {
-// 		while (result > 10) {
-// 			result /= 10
-// 			orderOfMagnitude += 1
-// 		}
-// 	} else if (number < 0.0001 && number > 0) {
-// 		return "0.00"
-// 	} else if (number < 10) {
-// 		while (result < 1 && result > 0) {
-// 			if (result < 0) {
-// 				result = result * -1
-// 			}
-// 			result = result * 10
-// 			orderOfMagnitude += 1
-// 		}
-// 	}
-// 	if (number > 10) {
-// 		result = number / Math.pow(10, orderOfMagnitude)
-// 		result = result * Math.pow(10, sigFigs - 1)
-// 		result = Math.round(result)
-// 		result = result / Math.pow(10, sigFigs - orderOfMagnitude - 1)
-// 		return parseFloat(result.toPrecision(sigFigs))
-// 	} else if (number < 0) {
-// 		result = number * Math.pow(10, sigFigs + 1)
-// 		result = Math.round(result)
-// 		result = result / Math.pow(10, sigFigs + 1)
-// 		return parseFloat(result.toPrecision(sigFigs))
-// 	} else if (number < 1) {
-// 		result = number * Math.pow(10, orderOfMagnitude)
-// 		result = result * Math.pow(10, sigFigs - 1)
-// 		result = Math.round(result)
-// 		result = result / Math.pow(10, sigFigs + orderOfMagnitude - 1)
-// 		return parseFloat(result.toPrecision(sigFigs))
-// 	} else {
-// 		return parseFloat(number.toPrecision(sigFigs))
-// 	}
-// }
+	if (number > 10) {
+		while (result > 10) {
+			result /= 10
+			orderOfMagnitude += 1
+		}
+	} else if (number < 0.0001 && number > 0) {
+		return "0.00"
+	} else if (number < 10) {
+		while (result < 1 && result > 0) {
+			if (result < 0) {
+				result = result * -1
+			}
+			result = result * 10
+			orderOfMagnitude += 1
+		}
+	}
+	if (number > 10) {
+		result = number / Math.pow(10, orderOfMagnitude)
+		result = result * Math.pow(10, sigFigs - 1)
+		result = Math.round(result)
+		result = result / Math.pow(10, sigFigs - orderOfMagnitude - 1)
+		return parseFloat(result.toPrecision(sigFigs))
+	} else if (number < 0) {
+		result = number * Math.pow(10, sigFigs + 1)
+		result = Math.round(result)
+		result = result / Math.pow(10, sigFigs + 1)
+		return parseFloat(result.toPrecision(sigFigs))
+	} else if (number < 1) {
+		result = number * Math.pow(10, orderOfMagnitude)
+		result = result * Math.pow(10, sigFigs - 1)
+		result = Math.round(result)
+		result = result / Math.pow(10, sigFigs + orderOfMagnitude - 1)
+		return parseFloat(result.toPrecision(sigFigs))
+	} else {
+		return parseFloat(number.toPrecision(sigFigs))
+	}
+}

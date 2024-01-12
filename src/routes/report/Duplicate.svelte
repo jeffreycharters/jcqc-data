@@ -1,24 +1,20 @@
 <script lang="ts">
-	import { goto } from "$app/navigation"
-	import { roundToSigFigs, sortedArrayFromMap } from "$lib/data"
-	import { methodStore } from "$lib/stores"
+	import { roundToSigFigs } from "$lib/data"
+	import { methodStore, reportData } from "$lib/stores"
+	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry
-	let values = sortedArrayFromMap(sample?.results?.values)
-	let dupValues = sortedArrayFromMap(sample?.results.dupValues ?? new Map())
-	$: rpdLimit = $methodStore?.rpdLimit ?? 0
-	let lowestLoqs = $methodStore?.getLowestLoqs()
+	export let duplicate: RunListEntry
 
-	if (dupValues.length === 0) goto("/")
+	const rpdLimit = $methodStore?.rpdLimit ?? 0
 
 	const calculateRPD = (value: number, dupValue: number) => {
-		if (!value || !dupValue) return undefined
 		return (Math.abs(value - dupValue) / (value + dupValue / 2)) * 100
 	}
 
-	const checkIfDupPassing = (average: number, rpd: number | undefined, loq: number | undefined) => {
-		if (!rpd || !loq || !rpdLimit || average < 2 * loq) return "neutral"
+	const checkIfDupPassing = (average: number, rpd: number, loq: number | undefined) => {
+		if (!rpdLimit || !loq || average < 2 * loq) return "neutral"
 		if (rpd > rpdLimit) return "fails"
 		if (rpd < rpdLimit) return "passes"
 	}
@@ -32,9 +28,9 @@
 			<tr class="">
 				<td class="firstCol">{sample.name}</td>
 
-				{#each values as [_, value]}
+				{#each $reportData?.meta.orderedElements ?? [] as elementID}
 					<td class="text-center">
-						{roundToSigFigs(value, 3)}
+						{roundToSigFigs(sample.results[elementID], 3)}
 					</td>
 				{/each}
 			</tr>
@@ -42,40 +38,38 @@
 			<tr class="border-b border-b-gray-400">
 				<td class="firstCol">{sample.name} DUP</td>
 
-				{#each dupValues as [_, dupValue]}
+				{#each $reportData?.meta.orderedElements ?? [] as elementID}
 					<td class="text-center">
-						{roundToSigFigs(dupValue, 3)}
+						{roundToSigFigs(duplicate.results[elementID], 3)}
 					</td>
 				{/each}
 			</tr>
 
-			{#if values}
-				<tr class="border-b border-gray-500">
-					<td>Average</td>
-					{#each values as [_, value], index}
-						<td>
-							{roundToSigFigs((value + dupValues[index][1]) / 2, 3)}
-						</td>
-					{/each}
-				</tr>
+			<tr class="border-b border-gray-500">
+				<td>Average</td>
+				{#each $reportData?.meta.orderedElements ?? [] as elementID}
+					<td>
+						{roundToSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2, 3)}
+					</td>
+				{/each}
+			</tr>
 
-				<tr>
-					<td>RPD (%)</td>
-					{#each values as [mass, value], index}
-						{@const rpd = calculateRPD(value, dupValues[index][1])}
-						{@const loq = lowestLoqs?.get(mass)}
-						{@const average = (value + dupValues[index][1]) / 2}
-						{@const passing = checkIfDupPassing(average, rpd, loq)}
-						<td class={passing}>
-							{#if !rpd || !loq || average < loq * 2}
-								{rpd?.toFixed(1) ?? "- -"}
-							{:else}
-								{parseFloat(rpd.toPrecision(2))}
-							{/if}
-						</td>
-					{/each}
-				</tr>
-			{/if}
+			<tr>
+				<td>RPD (%)</td>
+				{#each $reportData?.meta.orderedElements ?? [] as elementID}
+					{@const rpd = calculateRPD(sample.results[elementID], duplicate.results[elementID])}
+					{@const loq = sample.referenceBlank?.elements[elementID]?.mdl}
+					{@const average = (sample.results[elementID] + duplicate.results[elementID]) / 2}
+					{@const passing = checkIfDupPassing(average, rpd, loq)}
+					<td class={passing}>
+						{#if !rpd || !loq || average < loq * 2}
+							{rpd?.toFixed(1) ?? "- -"}
+						{:else}
+							{parseFloat(rpd.toPrecision(2))}
+						{/if}
+					</td>
+				{/each}
+			</tr>
 		</tbody>
 	</table>
 	<br />

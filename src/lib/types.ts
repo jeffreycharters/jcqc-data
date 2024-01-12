@@ -42,7 +42,7 @@ export type ReferenceMaterialsStore = ReferenceMaterialsResponse<ExpandedReferen
 export interface ReportMetadata {
 	analysisName: string
 	analysisDate: string
-	elementCount: number
+	orderedElements: ElementID[]
 }
 
 export interface InstrumentCSVRow {

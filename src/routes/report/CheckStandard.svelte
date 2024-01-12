@@ -1,27 +1,39 @@
 <script lang="ts">
-	import { roundToSigFigs, sortedArrayFromMap } from "$lib/data"
+	import { roundToSigFigs } from "$lib/data"
 	import HeaderRow from "./HeaderRow.svelte"
-	import { methodStore } from "$lib/stores"
-	import type { CheckStandardsResponse } from "$lib/pocketbase-types"
+	import { methodElementsStore, methodStore, reportData } from "$lib/stores"
+	import type { RunListEntry } from "../../app"
 
 	export let sample: RunListEntry
-	export let checkStandard: CheckStandardsResponse | undefined
 
-	let values = sortedArrayFromMap(sample.results.values)
-	$: checkStandardLimit = ($methodStore?.checkStandardTolerance ?? 0) / 100
+	const checkStandardLimit = ($methodStore?.checkStandardTolerance ?? 0) / 100
+
+	function elementPassing(elementID: string) {
+		const expected = sample.checkStandard?.elements[elementID].expected ?? 0
+		const value = sample.results[elementID]
+
+		if (!expected || !value) return undefined
+
+		const lowerLimit = expected * (1 - checkStandardLimit)
+		const upperLimit = expected * (1 + checkStandardLimit)
+
+		return value >= lowerLimit && value <= upperLimit
+	}
 </script>
 
 <div>
 	<table class="results">
-		<HeaderRow firstColumnLabel="Check Standard" allPpb={true} />
+		<HeaderRow firstColumnLabel="Check Standard" />
 
 		<tbody>
 			<tr class="border-b border-b-gray-400">
 				<td class="firstCol">{sample.name}</td>
 
-				{#each values as [mass, value]}
-					{@const units = $methodStore?.elements?.find((e) => e.mass === mass)?.units || "ppm"}
-					{@const prettyValue = units === "ppb" ? value : value * 1000}
+				{#each $reportData?.meta.orderedElements ?? [] as elementID}
+					{@const units =
+						$methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)?.units || "ppm"}
+					{@const prettyValue =
+						units === "ppb" ? sample.results[elementID] : sample.results[elementID] * 1000}
 					<td class="text-center">
 						{roundToSigFigs(prettyValue, 3)}
 					</td>
@@ -31,18 +43,9 @@
 			{#if checkStandardLimit}
 				<tr>
 					<td>Within Range</td>
-					{#each values as [key, value]}
-						{@const elementExpected =
-							$methodStore?.getValue(
-								"checkStandards",
-								checkStandard?.name ?? "",
-								"checkValues",
-								$methodStore.getElementIdFromMass(key) ?? ""
-							)?.value ?? 0}
-						{@const tolerance = elementExpected * checkStandardLimit}
-						{@const passes =
-							value < elementExpected + tolerance && value > elementExpected - tolerance}
-						{#if elementExpected != 0}
+					{#each $reportData?.meta.orderedElements ?? [] as elementID}
+						{@const passes = elementPassing(elementID)}
+						{#if passes != undefined}
 							<td class={passes ? "passes" : "fails"}>
 								{passes ? "Yes" : "No"}
 							</td>

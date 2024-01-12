@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { roundToSigFigs, sortedArrayFromMap } from "$lib/data"
+	import { roundToSigFigs } from "$lib/data"
+	import { reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
-	export let samples: RunListEntry[]
+	export let calBlank: RunListEntry
+	const orderedElements = $reportData?.meta.orderedElements ?? []
+
+	const allCalibrations: RunListEntry[] = [calBlank, ...(calBlank?.calStandards ?? [])]
 </script>
 
 <div>
@@ -13,12 +17,11 @@
 		<HeaderRow firstColumnLabel="Concentration" />
 
 		<tbody>
-			{#each samples as sample (sample.id)}
-				{@const values = sortedArrayFromMap(sample.results.values)}
+			{#each allCalibrations as sample}
 				<tr>
 					<td class="max-w-[175px] truncate text-left">{sample.name}</td>
-					{#each values as [_, value]}
-						<td class="text-center">{roundToSigFigs(value, 3)}</td>
+					{#each orderedElements as elementID}
+						<td class="text-center">{roundToSigFigs(sample.results[elementID], 3)}</td>
 					{/each}
 				</tr>
 			{/each}

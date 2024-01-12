@@ -39,11 +39,13 @@ type MeasuredConcentration = number
 interface RunListEntry {
 	name: string
 	analysisNumber: number
-	isCalBlank?: boolean
+	isSample?: boolean
+	calStandards?: RunlistEntry[]
 	checkStandard?: SimplifiedComparator<CheckStandardValue>
 	blank?: SimplifiedComparator<BlankLimits>
 	referenceMaterial?: SimplifiedComparator<ReferenceMaterialRange>
 	duplicateSamples?: RunListEntry[]
+	referenceBlank?: SimplifiedComparator<BlankLimits>
 	results: Record<ElementID, MeasuredConcentration>
 }
 
