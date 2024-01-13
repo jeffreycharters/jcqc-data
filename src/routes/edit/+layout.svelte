@@ -8,7 +8,7 @@
 	]
 </script>
 
-<div class="flex gap-12 w-full mx-4" data-sveltekit-preload-data="off">
+<div class="flex gap-12 w-full px-4" data-sveltekit-preload-data="off">
 	<ul class="flex flex-col gap-2 relative top-12 w-48">
 		{#each menuLinks as link}
 			<a
@@ -22,7 +22,8 @@
 			</a>
 		{/each}
 	</ul>
-	<div class="w-full">
+
+	<div>
 		<slot />
 	</div>
 </div>

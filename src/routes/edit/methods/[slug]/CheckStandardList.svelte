@@ -9,6 +9,7 @@
 	import type { ExpandedCheckStandard } from "$lib/types"
 	import { pb } from "$lib/pocketbase"
 	import { setCheckStandards } from "$lib/methods"
+	import { fade } from "svelte/transition"
 
 	export let checkStandard: CheckStandardsResponse<ExpandedCheckStandard>
 	let { name } = checkStandard
@@ -60,7 +61,16 @@
 					{/if}
 				</button>
 			</form>
-			<div class="italic font-bold text-amber-600">{statusMessage ?? ""}</div>
+
+			{#if statusMessage}
+				<div
+					class="italic font-bold text-amber-700"
+					in:fade={{ duration: 200 }}
+					out:fade={{ duration: 500 }}
+				>
+					{statusMessage ?? ""}
+				</div>
+			{/if}
 		</div>
 		<button on:click={deleteCheckStandard}>
 			<IconTrash class="stroke-red-700 h-8 w-8 p-1" />

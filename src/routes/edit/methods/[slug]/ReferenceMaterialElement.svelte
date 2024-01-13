@@ -59,9 +59,6 @@
 		range = updatedReferenceMaterial
 		dispatch("updateStatus", "Saved!")
 	}
-
-	const processUpdate = (toUpdate: "lower" | "upper") =>
-		debounce(() => updateReferenceMaterial(toUpdate))
 </script>
 
 <form class="basic-border flex flex-col pt-2">
@@ -80,7 +77,7 @@
 						type="text"
 						name={`${methodElement.id}-lower`}
 						bind:value={lower}
-						on:keypress={processUpdate("lower")}
+						on:input={debounce(() => updateReferenceMaterial("lower"))}
 						on:focus={() => (lower = lower === "- -" ? "" : lower)}
 						on:blur={() => (lower = lower === "" ? "- -" : lower)}
 						class="number-input mt-1 mb-2 text-sm text-center {lower === '- -'
@@ -100,7 +97,7 @@
 						type="text"
 						name={`${methodElement.id}-upper`}
 						bind:value={upper}
-						on:keypress={processUpdate("upper")}
+						on:input={debounce(() => updateReferenceMaterial("upper"))}
 						on:focus={() => (upper = upper === "- -" ? "" : upper)}
 						on:blur={() => (upper = upper === "" ? "- -" : upper)}
 						class="number-input mt-1 mb-2 text-sm text-center {upper === '- -'

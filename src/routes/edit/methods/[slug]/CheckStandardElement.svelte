@@ -29,12 +29,19 @@
 	}
 
 	const updateCalCheck = async () => {
-		let updatedCheckValue: CheckValuesResponse<ExpandedCheckStandard>
-		if (checkValue) {
+		let updatedCheckValue: CheckValuesResponse<ExpandedCheckStandard> | undefined
+		if (checkValue && value === "") {
+			await pb.collection("checkValues").delete(checkValue.id)
+			updatedCheckValue = undefined
+		}
+
+		if (checkValue && value != "") {
 			updatedCheckValue = await pb
 				.collection("checkValues")
 				.update(checkValue.id, { value: value, expand: "checkValues(checkStandard)" })
-		} else {
+		}
+
+		if (!checkValue && value != "") {
 			updatedCheckValue = await pb.collection("checkValues").create({
 				value,
 				element: element.elementID,
@@ -45,8 +52,6 @@
 		checkValue = updatedCheckValue
 		dispatch("updateStatus", "Saved!")
 	}
-
-	const processUpdate = () => debounce(() => updateCalCheck())
 </script>
 
 <form class="basic-border flex flex-col pt-2">
@@ -61,7 +66,7 @@
 				type="text"
 				name={`${element.id}-value`}
 				bind:value
-				on:keypress={processUpdate()}
+				on:input={debounce(updateCalCheck)}
 				on:focus={() => (value = value === "- -" ? "" : value)}
 				on:blur={() => (value = value === "" ? "- -" : value)}
 				class="number-input mt-1 mb-2 text-sm text-center {value === '- -' ? 'text-gray-500' : ''}"

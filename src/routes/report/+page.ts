@@ -45,8 +45,6 @@ export const load = (async () => {
 		sampleList = [...sampleList, { type: "qc", sample: runlist[i] }]
 	}
 
-	console.log(sampleList)
-
 	return {
 		title,
 		sampleList

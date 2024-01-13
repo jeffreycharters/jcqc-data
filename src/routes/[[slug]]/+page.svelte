@@ -34,7 +34,9 @@
 	<FilePicker />
 {/if}
 
-<MethodParams />
+{#key $methodStore}
+	<MethodParams />
+{/key}
 
 <div class="absolute bottom-4 left-4">
 	<a class="no-underline btn" href="/edit">Edit stuff</a>

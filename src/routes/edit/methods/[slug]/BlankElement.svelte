@@ -50,9 +50,6 @@
 		await setBlanks($methodStore!.id)
 		dispatch("updateStatus", "Saved!")
 	}
-
-	const processUpdate = (toUpdate: "mdl" | "loq") =>
-		debounce(() => updatedDetectionLimits(toUpdate))
 </script>
 
 <form class="basic-border flex flex-col pt-2">
@@ -67,7 +64,7 @@
 				type="text"
 				name={`${element.id}-mdl`}
 				bind:value={mdl}
-				on:keypress={processUpdate("mdl")}
+				on:input={debounce(() => updatedDetectionLimits("mdl"))}
 				on:focus={() => (mdl = mdl === "- -" ? "" : mdl)}
 				on:blur={() => (mdl = mdl === "" ? "- -" : mdl)}
 				class="number-input mt-1 mb-2 text-sm text-center {mdl === '- -' ? 'text-gray-500' : ''}"
@@ -81,7 +78,7 @@
 				type="text"
 				name={`${element.id}-loq`}
 				bind:value={loq}
-				on:keypress={processUpdate("loq")}
+				on:input={debounce(() => updatedDetectionLimits("loq"))}
 				on:focus={() => (loq = loq === "- -" ? "" : loq)}
 				on:blur={() => (loq = loq === "" ? "- -" : loq)}
 				class="number-input mt-1 mb-2 text-sm text-center {loq === '- -' ? 'text-gray-500' : ''}"
