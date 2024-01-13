@@ -48,7 +48,7 @@
 						{:else if passes === "passes"}
 							Yes
 						{:else if ranges}
-							{sample.results[elementID] > ranges.high ? "High" : "Low"}
+							{sample.results[elementID] > ranges.high ? `> ${ranges.high}` : `< ${ranges.low}`}
 						{/if}
 					</td>
 				{/each}
