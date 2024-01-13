@@ -112,7 +112,7 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 						.map((r, index) => {
 							return {
 								name: r.name,
-								analysisCount: i + index,
+								analysisNumber: i + index + 1,
 								results: r.measurements
 							}
 						}),

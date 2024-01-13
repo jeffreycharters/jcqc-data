@@ -6,7 +6,8 @@
 
 <thead>
 	<tr>
-		<th class="min-w-[175px] border-b-2 border-b-gray-900 p-[3px] w-[105px] text-left align-bottom"
+		<th
+			class="min-w-[175px] border-b-2 border-b-stone-900 p-[3px] w-[105px] text-left! align-bottom"
 			>{firstColumnLabel}</th
 		>
 		{#each $reportData?.meta.orderedElements ?? [] as elementID}

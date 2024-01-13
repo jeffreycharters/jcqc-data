@@ -14,7 +14,7 @@
 	<h1>Calibration Data</h1>
 
 	<table class="results">
-		<HeaderRow firstColumnLabel="Concentration" />
+		<HeaderRow firstColumnLabel="Standard Name" />
 
 		<tbody>
 			{#each allCalibrations as sample}
