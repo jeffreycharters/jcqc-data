@@ -5,7 +5,7 @@
 	import { flip } from "svelte/animate"
 	import { quintOut } from "svelte/easing"
 	import { crossfade } from "svelte/transition"
-	import { IconBrandSupernova, IconCookieMan, IconPlaylistAdd } from "@tabler/icons-svelte"
+	import { IconAtom2, IconCookieMan, IconPlaylistAdd } from "@tabler/icons-svelte"
 
 	const [send, receive] = crossfade({
 		duration: 250,
@@ -52,14 +52,14 @@
 
 <div class="grid grid-cols-4 gap-4 max-w-screen-lg">
 	<div class="border border-gray-800 rounded shadow mt-8 w-full h-fit">
-		<a href="/edit/elements" class="no-underline my-4 mx-6 inline-flex items-center gap-2">
-			<IconBrandSupernova />
+		<a href="/edit/elements" class="no-underline py-4 px-6 inline-flex items-center gap-2">
+			<IconAtom2 class="rotate-45" />
 			<h2>Edit elements</h2>
 		</a>
 	</div>
 
 	<div class="border border-gray-800 w-full rounded shadow mt-8 h-fit">
-		<a href="/edit/elements" class="no-underline my-4 mx-6 inline-flex items-center gap-2">
+		<a href="/" class="no-underline py-4 px-6 inline-flex items-center gap-2">
 			<IconCookieMan class="-rotate-12 stroke-amber-700" />
 			<h2>Return to Main</h2>
 		</a>

@@ -6,6 +6,7 @@
 	import Element from "./Element.svelte"
 	import { crossfade } from "svelte/transition"
 	import { quintOut } from "svelte/easing"
+	import { IconExclamationCircle } from "@tabler/icons-svelte"
 
 	const [send, receive] = crossfade({
 		duration: 250,
@@ -33,28 +34,18 @@
 <h1 class="my-4">Available Elements</h1>
 
 <div
-	class="flex gap-2 my-4 border-orange-500 border py-2 px-4 rounded bg-orange-100 text-orange-600"
+	class="flex gap-4 my-4 border-orange-500 border py-4 px-8 rounded bg-orange-100 text-orange-600 w-fit items-center"
 >
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		class="h6 w-6 stroke-orange-600"
-		viewBox="0 0 24 24"
-		stroke-width="1.5"
-		stroke="currentColor"
-		fill="none"
-		stroke-linecap="round"
-		stroke-linejoin="round"
-		><path stroke="none" d="M0 0h24v24H0z" fill="none" /><path
-			d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"
-		/><path d="M12 8v4" /><path d="M12 16h.01" /></svg
-	>
+	<IconExclamationCircle />
 	<p>
-		Inactivating will remove the element <em>across all methods</em>. Maybe you just want to remove
-		the element from <a href="/edit" class="">one method</a>?
+		Inactivating will remove the element <em>across all methods</em>.
+		<br />
+		Maybe you just want to remove the element from
+		<a href="/edit" class="font-bold underline">one method</a>?
 	</p>
 </div>
 
-<div class="grid grid-cols-5 gap-4">
+<div class="grid grid-cols-5 gap-4 max-w-screen-lg">
 	{#each elementList.filter((element) => element.active) as element (element.id)}
 		<div
 			animate:flip={{ duration: 250 }}
