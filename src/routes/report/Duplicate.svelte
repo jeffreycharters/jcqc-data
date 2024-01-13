@@ -20,7 +20,7 @@
 	}
 </script>
 
-<div>
+<div class="w-fit mb-4">
 	<table class="results">
 		<HeaderRow firstColumnLabel="Duplicate" />
 
@@ -72,5 +72,7 @@
 			</tr>
 		</tbody>
 	</table>
-	<br />
+	<div class="w-full text-right pr-8 italic text-xs text-stone-500">
+		LOQs taken from {sample.referenceBlank?.name}. If this is incorrect be sure to verify RPDs.
+	</div>
 </div>
