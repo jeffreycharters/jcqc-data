@@ -5,7 +5,7 @@
 	import { flip } from "svelte/animate"
 	import { quintOut } from "svelte/easing"
 	import { crossfade } from "svelte/transition"
-	import { IconPlaylistAdd } from "@tabler/icons-svelte"
+	import { IconBrandSupernova, IconCookieMan, IconPlaylistAdd } from "@tabler/icons-svelte"
 
 	const [send, receive] = crossfade({
 		duration: 250,
@@ -15,9 +15,9 @@
 	let showAddForm = false
 </script>
 
-<h1 class="my-8">Select Method</h1>
+<h1 class="mt-8 mb-6">Select method to edit</h1>
 
-<div class="list-grid-container">
+<div class="grid grid-cols-4 gap-4 max-w-screen-lg">
 	{#each ($methods ?? []).filter((method) => method.active) as method (method.id)}
 		<div
 			animate:flip={{ duration: 250 }}
@@ -48,10 +48,20 @@
 
 <AddMethodForm {showAddForm} on:close={() => (showAddForm = false)} />
 
-<div class="border border-gray-800 py-4 px-6 w-fit rounded shadow mt-8">
-	<a href="/edit/elements">
-		<h2>Add, update or remove elements</h2>
-	</a>
-</div>
+<h1 class="mt-10 -mb-2">Other options</h1>
 
-<p class="mt-8"><a href="/">Back to main</a></p>
+<div class="grid grid-cols-4 gap-4 max-w-screen-lg">
+	<div class="border border-gray-800 rounded shadow mt-8 w-full h-fit">
+		<a href="/edit/elements" class="no-underline my-4 mx-6 inline-flex items-center gap-2">
+			<IconBrandSupernova />
+			<h2>Edit elements</h2>
+		</a>
+	</div>
+
+	<div class="border border-gray-800 w-full rounded shadow mt-8 h-fit">
+		<a href="/edit/elements" class="no-underline my-4 mx-6 inline-flex items-center gap-2">
+			<IconCookieMan class="-rotate-12 stroke-amber-700" />
+			<h2>Return to Main</h2>
+		</a>
+	</div>
+</div>
