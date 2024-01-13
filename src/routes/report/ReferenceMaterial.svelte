@@ -20,40 +20,36 @@
 	}
 </script>
 
-<div>
-	<br />
-	<table class="results">
-		<HeaderRow firstColumnLabel="Reference Material" />
+<table class="results">
+	<HeaderRow firstColumnLabel="Reference Material" />
 
-		<tbody>
-			<tr class="border-b border-b-gray-400">
-				<td class="firstCol">{sample.name}</td>
-				{#each $reportData?.meta.orderedElements ?? [] as elementID}
-					<td>
-						{roundToSigFigs(sample.results[elementID], 3)}
-					</td>
-				{/each}
-			</tr>
-			<tr>
-				<td class="firstCol">Within Range</td>
+	<tbody>
+		<tr class="border-b border-b-gray-400">
+			<td class="firstCol">{sample.name}</td>
+			{#each $reportData?.meta.orderedElements ?? [] as elementID}
+				<td>
+					{roundToSigFigs(sample.results[elementID], 3)}
+				</td>
+			{/each}
+		</tr>
+		<tr>
+			<td class="firstCol">Within Range</td>
 
-				{#each $reportData?.meta.orderedElements ?? [] as elementID}
-					{@const ranges = sample.referenceMaterial?.elements[elementID]}
+			{#each $reportData?.meta.orderedElements ?? [] as elementID}
+				{@const ranges = sample.referenceMaterial?.elements[elementID]}
 
-					{@const passes = ranges ? checkRanges(sample.results[elementID], ranges) : "neutral"}
+				{@const passes = ranges ? checkRanges(sample.results[elementID], ranges) : "neutral"}
 
-					<td class={passes}>
-						{#if passes === "neutral"}
-							- -
-						{:else if passes === "passes"}
-							Yes
-						{:else if ranges}
-							{sample.results[elementID] > ranges.high ? `> ${ranges.high}` : `< ${ranges.low}`}
-						{/if}
-					</td>
-				{/each}
-			</tr>
-		</tbody>
-	</table>
-	<br />
-</div>
+				<td class={passes}>
+					{#if passes === "neutral"}
+						- -
+					{:else if passes === "passes"}
+						Yes
+					{:else if ranges}
+						{sample.results[elementID] > ranges.high ? `> ${ranges.high}` : `< ${ranges.low}`}
+					{/if}
+				</td>
+			{/each}
+		</tr>
+	</tbody>
+</table>

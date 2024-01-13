@@ -1,8 +1,8 @@
 <script>
-	import HeaderRow from './HeaderRow.svelte';
+	import HeaderRow from "./HeaderRow.svelte"
 </script>
 
-<table class="results mb-4">
+<table class="results">
 	<HeaderRow firstColumnLabel="Sample Name" />
 	<tbody>
 		<slot />

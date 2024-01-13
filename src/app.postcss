@@ -37,7 +37,11 @@ h3 {
 }
 
 table.results {
-	@apply border-collapse mx-2 border-b border-b-gray-600;
+	@apply border-collapse ml-2 border-b border-b-gray-600;
+}
+
+.report-container > table.results {
+	@apply mb-4 last-of-type:mb-0;
 }
 
 table.results td {
@@ -79,5 +83,9 @@ td.neutral {
 @media print {
 	.no-print {
 		display: none !important;
+	}
+
+	.report-container {
+		@apply px-0 pb-0;
 	}
 }

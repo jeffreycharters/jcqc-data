@@ -20,60 +20,58 @@
 	}
 </script>
 
-<div class="w-fit mb-4">
-	<table class="results">
-		<HeaderRow firstColumnLabel="Duplicate" />
+<table class="results relative">
+	<HeaderRow firstColumnLabel="Duplicate" />
 
-		<tbody>
-			<tr class="">
-				<td class="firstCol">{sample.name}</td>
+	<tbody>
+		<tr class="">
+			<td class="firstCol">{sample.name}</td>
 
-				{#each $reportData?.meta.orderedElements ?? [] as elementID}
-					<td class="text-center">
-						{roundToSigFigs(sample.results[elementID], 3)}
-					</td>
-				{/each}
-			</tr>
+			{#each $reportData?.meta.orderedElements ?? [] as elementID}
+				<td class="text-center">
+					{roundToSigFigs(sample.results[elementID], 3)}
+				</td>
+			{/each}
+		</tr>
 
-			<tr class="border-b border-b-gray-400">
-				<td class="firstCol">{sample.name} DUP</td>
+		<tr class="border-b border-b-gray-400">
+			<td class="firstCol">{sample.name} DUP</td>
 
-				{#each $reportData?.meta.orderedElements ?? [] as elementID}
-					<td class="text-center">
-						{roundToSigFigs(duplicate.results[elementID], 3)}
-					</td>
-				{/each}
-			</tr>
+			{#each $reportData?.meta.orderedElements ?? [] as elementID}
+				<td class="text-center">
+					{roundToSigFigs(duplicate.results[elementID], 3)}
+				</td>
+			{/each}
+		</tr>
 
-			<tr class="border-b border-gray-500">
-				<td>Average</td>
-				{#each $reportData?.meta.orderedElements ?? [] as elementID}
-					<td>
-						{roundToSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2, 3)}
-					</td>
-				{/each}
-			</tr>
+		<tr class="border-b border-gray-500">
+			<td>Average</td>
+			{#each $reportData?.meta.orderedElements ?? [] as elementID}
+				<td>
+					{roundToSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2, 3)}
+				</td>
+			{/each}
+		</tr>
 
-			<tr>
-				<td>RPD (%)</td>
-				{#each $reportData?.meta.orderedElements ?? [] as elementID}
-					{@const rpd = calculateRPD(sample.results[elementID], duplicate.results[elementID])}
-					{@const loq = sample.referenceBlank?.elements[elementID]?.mdl}
-					{@const average = (sample.results[elementID] + duplicate.results[elementID]) / 2}
-					{@const passing = checkIfDupPassing(average, rpd, loq)}
-					<td class={passing}>
-						{#if !rpd || !loq || average < loq * 2}
-							{rpd?.toFixed(1) ?? "- -"}
-						{:else}
-							{parseFloat(rpd.toPrecision(2))}
-						{/if}
-					</td>
-				{/each}
-			</tr>
-		</tbody>
-	</table>
-	<div class="w-full text-right pr-8 italic text-xs text-stone-500">
-		LOQs taken from {sample.referenceBlank?.name ?? "unknown"}. If this is incorrect be sure to
-		verify RPDs.
-	</div>
+		<tr>
+			<td>RPD (%)</td>
+			{#each $reportData?.meta.orderedElements ?? [] as elementID}
+				{@const rpd = calculateRPD(sample.results[elementID], duplicate.results[elementID])}
+				{@const loq = sample.referenceBlank?.elements[elementID]?.mdl}
+				{@const average = (sample.results[elementID] + duplicate.results[elementID]) / 2}
+				{@const passing = checkIfDupPassing(average, rpd, loq)}
+				<td class={passing}>
+					{#if !rpd || !loq || average < loq * 2}
+						{rpd?.toFixed(1) ?? "- -"}
+					{:else}
+						{parseFloat(rpd.toPrecision(2))}
+					{/if}
+				</td>
+			{/each}
+		</tr>
+	</tbody>
+</table>
+<div class="w-full text-right pr-8 italic text-xs text-stone-500 -mt-4 pb-2">
+	LOQs taken from {sample.referenceBlank?.name ?? "unknown"}. If this is incorrect be sure to verify
+	RPDs.
 </div>
