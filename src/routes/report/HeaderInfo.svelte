@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { instrumentStore, methodStore, reportData } from "$lib/stores"
+	import { IconPrinter, IconPrinterOff } from "@tabler/icons-svelte"
+
+	let printAnalysisDate = true
+	let printAnalysisName = true
 </script>
 
 <div class="mb-4">
@@ -10,15 +14,41 @@
 			<div>Analyst:</div>
 			<div class="autofilled">&nbsp;</div>
 		</div>
+
 		<div class="headerItem py-1">
 			Analysis Date: <div class="autofilled">
-				{$reportData?.meta.analysisDate}
+				<span class:no-print={!printAnalysisDate} class:text-stone-300={!printAnalysisDate}
+					>{$reportData?.meta.analysisDate}</span
+				>
 			</div>
+			<button
+				on:click={() => (printAnalysisDate = !printAnalysisDate)}
+				class="no-print"
+				class:text-stone-400={!printAnalysisDate}
+			>
+				<svelte:component
+					this={printAnalysisDate ? IconPrinterOff : IconPrinter}
+					class="w-4 h-4 text-stone-600"
+				/>
+			</button>
 		</div>
+
 		<div class="headerItem py-1">
 			Sequence ID: <div class="autofilled">
-				{$reportData?.meta.analysisName}
+				<span class:no-print={!printAnalysisName} class:text-stone-300={!printAnalysisName}
+					>{$reportData?.meta.analysisName}</span
+				>
 			</div>
+			<button
+				on:click={() => (printAnalysisName = !printAnalysisName)}
+				class="no-print"
+				class:text-stone-400={!printAnalysisName}
+			>
+				<svelte:component
+					this={printAnalysisName ? IconPrinterOff : IconPrinter}
+					class="w-4 h-4 text-stone-600"
+				/>
+			</button>
 		</div>
 	</div>
 
