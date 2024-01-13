@@ -9,14 +9,14 @@
 
 	type PassesString = "passes" | "fails" | "neutral"
 
-	const checkRanges = (value: number, ranges: ReferenceMaterialRange): [PassesString, string] => {
+	const checkRanges = (value: number, ranges: ReferenceMaterialRange): PassesString => {
 		const { low, high } = ranges
 
-		if ((low === 0 && high === 0) || (!low && !high)) return ["neutral", "- -"]
-		if ((!low || low === 0) && high && value < high) return ["passes", "Yes"]
-		if ((!high || high === 0) && low && value > low) return ["passes", "Yes"]
-		if (low && high && value > low && value < high) return ["passes", "Yes"]
-		return ["fails", "No"]
+		if ((low === 0 && high === 0) || (!low && !high)) return "neutral"
+		if ((!low || low === 0) && high && value < high) return "passes"
+		if ((!high || high === 0) && low && value > low) return "passes"
+		if (low && high && value > low && value < high) return "passes"
+		return "fails"
 	}
 </script>
 
@@ -40,12 +40,16 @@
 				{#each $reportData?.meta.orderedElements ?? [] as elementID}
 					{@const ranges = sample.referenceMaterial?.elements[elementID]}
 
-					{@const [passes, output] = ranges
-						? checkRanges(sample.results[elementID], ranges)
-						: ["neutral", "- -"]}
+					{@const passes = ranges ? checkRanges(sample.results[elementID], ranges) : "neutral"}
 
 					<td class={passes}>
-						{output}
+						{#if passes === "neutral"}
+							- -
+						{:else if passes === "passes"}
+							Yes
+						{:else if ranges}
+							{sample.results[elementID] > ranges.high ? "High" : "Low"}
+						{/if}
 					</td>
 				{/each}
 			</tr>
