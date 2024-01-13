@@ -6,7 +6,7 @@
 	let printAnalysisName = true
 </script>
 
-<div class="mb-4">
+<div class="header-info mb-4">
 	<h1 class="mb-2">Sequence Information - {$methodStore?.name}</h1>
 
 	<div class="max-w-xs ml-4">

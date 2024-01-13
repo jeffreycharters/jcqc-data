@@ -72,6 +72,6 @@
 	</tbody>
 </table>
 <div class="w-full text-right pr-8 italic text-xs text-stone-500 -mt-4 pb-2">
-	LOQs taken from {sample.referenceBlank?.name ?? "unknown"}. If this is incorrect be sure to verify
-	RPDs.
+	LOQs taken from <span class="font-bold">{sample.referenceBlank?.name ?? "unknown"}</span>. If this
+	is incorrect be sure to verify RPDs.
 </div>

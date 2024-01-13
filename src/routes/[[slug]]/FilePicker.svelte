@@ -40,14 +40,10 @@
 </script>
 
 <div class="w-fit mx-auto flex flex-col gap-2">
-	<div
-		class="flex flex-col gap-1 w-full border-2 border-sky-600 border-dashed rounded cursor-pointer bg-sky-200 hover:bg-sky-100"
-	>
-		<div class="flex items-center justify-center gap-2 pt-3 px-9">
-			<IconFileUpload class="w-6 h-6 text-sky-700" />
-			<label for="dropzone-file" class="text-sky-700 font-semibold text-md">
-				Select exported file
-			</label>
+	<label for="dropzone-file" class="text-sky-700 font-semibold text-md cursor-pointer">
+		<div
+			class="flex flex-col gap-1 w-full border-2 border-sky-600 border-dashed rounded cursor-pointer bg-sky-200 hover:bg-sky-100 transition-colors"
+		>
 			<input
 				id="dropzone-file"
 				type="file"
@@ -55,10 +51,14 @@
 				bind:files
 				on:change={() => parseInput(files)}
 			/>
-		</div>
+			<div class="flex items-center justify-center gap-2 pt-3 px-9">
+				<IconFileUpload class="w-6 h-6 text-sky-700" />
+				Select exported file
+			</div>
 
-		<div class="mx-auto italic text-xs text-sky-600 mb-3">Click here or drag-and-drop file</div>
-	</div>
+			<div class="mx-auto italic text-xs text-sky-600 mb-3">Click here or drag-and-drop file</div>
+		</div>
+	</label>
 
 	{#if errorMessage}
 		<div
