@@ -4,9 +4,10 @@
 	import type { RunListEntry } from "../../app"
 
 	export let sample: RunListEntry
+	export let index: number
 </script>
 
-<tr>
+<tr class:bg-stone-200={index % 2 === 1}>
 	<td>
 		{sample.name}
 	</td>

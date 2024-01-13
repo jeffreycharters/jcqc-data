@@ -55,8 +55,8 @@
 
 				{#if block.type === "sampleBlock"}
 					<SampleBlock>
-						{#each block.samples as sample}
-							<SampleRow {sample} />
+						{#each block.samples as sample, index}
+							<SampleRow {sample} {index} />
 						{/each}
 					</SampleBlock>
 				{/if}

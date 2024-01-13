@@ -39,6 +39,6 @@
 
 <style lang="postcss">
 	tr:nth-of-type(even) {
-		@apply bg-gray-200;
+		@apply bg-stone-200;
 	}
 </style>

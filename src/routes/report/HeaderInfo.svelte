@@ -22,7 +22,7 @@
 		</div>
 	</div>
 
-	<div class="bg-stone-100 rounded py-2 px-4 w-fit mt-2">
+	<div class="bg-stone-100 rounded py-2 px-4 w-fit mt-2 text-xs">
 		<div class="headerItem py-[1px]">
 			Instrument Name:
 			<span class="font-normal">
