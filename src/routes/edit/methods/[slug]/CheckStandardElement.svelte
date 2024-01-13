@@ -17,7 +17,7 @@
 	let rawValue = checkValue?.value
 	let value = !rawValue || rawValue === 0 ? "- -" : rawValue
 
-	function debounce(callback: () => void, timeout = 1000) {
+	function debounce(callback: () => void, timeout = 250) {
 		let timer: number
 		return (...args: any) => {
 			dispatch("updateStatus", "Pending...")

@@ -18,7 +18,7 @@
 </script>
 
 <div class="border border-gray-500 rounded w-52 py-2">
-	<h2 class="mb-2 text-center">Select Instrument</h2>
+	<h2 class="mb-2 text-center">Instruments</h2>
 
 	<div class="flex gap-4 justify-center">
 		{#each $instruments || [] as instrument (instrument.id)}

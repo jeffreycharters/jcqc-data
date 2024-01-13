@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { invalidate } from "$app/navigation"
 	import {
 		blanksStore,
 		checkStandardsStore,

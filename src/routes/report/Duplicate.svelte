@@ -54,7 +54,7 @@
 		</tr>
 
 		<tr>
-			<td>RPD (%)</td>
+			<td>RPD</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{@const rpd = calculateRPD(sample.results[elementID], duplicate.results[elementID])}
 				{@const loq = sample.referenceBlank?.elements[elementID]?.mdl}
@@ -62,9 +62,9 @@
 				{@const passing = checkIfDupPassing(average, rpd, loq)}
 				<td class={passing}>
 					{#if !rpd || !loq || average < loq * 2}
-						{rpd?.toFixed(1) ?? "- -"}
+						- -
 					{:else}
-						{parseFloat(rpd.toPrecision(2))}
+						{parseFloat(rpd.toPrecision(2))}%
 					{/if}
 				</td>
 			{/each}

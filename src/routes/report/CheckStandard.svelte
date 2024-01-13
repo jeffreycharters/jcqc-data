@@ -17,7 +17,10 @@
 		const lowerLimit = expected * (1 - checkStandardLimit)
 		const upperLimit = expected * (1 + checkStandardLimit)
 
-		return value >= lowerLimit && value <= upperLimit
+		return {
+			passes: value >= lowerLimit && value <= upperLimit,
+			recovery: ((value / expected) * 100).toFixed(0)
+		}
 	}
 </script>
 
@@ -41,15 +44,15 @@
 
 		{#if checkStandardLimit}
 			<tr>
-				<td>Within Range</td>
+				<td>Recovery of expected</td>
 				{#each $reportData?.meta.orderedElements ?? [] as elementID}
-					{@const passes = elementPassing(elementID)}
+					{@const { passes, recovery } = elementPassing(elementID) ?? { passes: undefined }}
 					{#if passes != undefined}
 						<td class={passes ? "passes" : "fails"}>
-							{passes ? "Yes" : "No"}
+							{recovery}%
 						</td>
 					{:else}
-						<td>- -</td>
+						<td class="neutral">- -</td>
 					{/if}
 				{/each}
 			</tr>

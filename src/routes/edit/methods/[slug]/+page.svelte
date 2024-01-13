@@ -7,14 +7,16 @@
 	import ElementSelect from "./ElementSelect.svelte"
 </script>
 
-<h1>{$methodStore?.name}: {$methodStore?.description}</h1>
+<div class="max-w-screen-lg">
+	<h1>{$methodStore?.name}: {$methodStore?.description}</h1>
 
-<EditMethod />
+	<EditMethod />
 
-<ElementSelect />
+	<ElementSelect />
 
-<CheckStandards />
+	<CheckStandards />
 
-<LOQs />
+	<LOQs />
 
-<ReferenceMaterials />
+	<ReferenceMaterials />
+</div>
