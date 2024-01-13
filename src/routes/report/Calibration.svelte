@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { roundToSigFigs } from "$lib/data"
-	import { reportData } from "$lib/stores"
+	import { methodElementsStore, reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
@@ -21,7 +21,12 @@
 				<tr>
 					<td class="max-w-[175px] truncate text-left">{sample.name}</td>
 					{#each orderedElements as elementID}
-						<td class="text-center">{roundToSigFigs(sample.results[elementID], 3)}</td>
+						{@const prettyValue =
+							$methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)?.units ===
+							"ppm"
+								? sample.results[elementID] * 1000
+								: sample.results[elementID]}
+						<td class="text-center">{roundToSigFigs(prettyValue, 3)}</td>
 					{/each}
 				</tr>
 			{/each}

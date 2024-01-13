@@ -10,22 +10,12 @@
 	import SampleBlock from "./SampleBlock.svelte"
 	import SampleRow from "./SampleRow.svelte"
 	import Duplicate from "./Duplicate.svelte"
-	import type { RunListEntry } from "../../app"
+
+	export let data
+	const { sampleList } = data
 
 	const methodElementCount = $methodElementsStore?.length ?? 0
 	const outputElementCount = $reportData?.meta.orderedElements.length ?? 0
-
-	const getSampleBlock = (i: number) => {
-		let samples: RunListEntry[] = []
-		while (i < ($reportData?.samples.length ?? 0)) {
-			const thisSample = $reportData?.samples[i]
-			if (!thisSample?.isSample) break
-
-			samples = [...samples, thisSample]
-			i++
-		}
-		return samples
-	}
 </script>
 
 <div class="report-container mx-auto p-4">
@@ -40,11 +30,37 @@
 
 	<div>
 		{#if browser && $reportData}
-			<SampleBlock>
-				{#each $reportData.samples as sample, index}
-					<SampleRow {sample} {index} />
-				{/each}
-			</SampleBlock>
+			{#each sampleList ?? [] as block}
+				{#if block.type === "qc" && block.sample.calStandards}
+					<Calibration calBlank={block.sample} />
+				{/if}
+
+				{#if block.type === "qc" && block.sample.checkStandard}
+					<CheckStandard sample={block.sample} />
+				{/if}
+
+				{#if block.type === "qc" && block.sample.blank}
+					<MethodBlank sample={block.sample} />
+				{/if}
+
+				{#if block.type === "qc" && block.sample.referenceMaterial}
+					<ReferenceMaterial sample={block.sample} />
+				{/if}
+
+				{#if block.type === "qc" && block.sample.duplicateSamples}
+					{#each block.sample.duplicateSamples as duplicate}
+						<Duplicate sample={block.sample} {duplicate} />
+					{/each}
+				{/if}
+
+				{#if block.type === "sampleBlock"}
+					<SampleBlock>
+						{#each block.samples as sample}
+							<SampleRow {sample} />
+						{/each}
+					</SampleBlock>
+				{/if}
+			{/each}
 		{:else}
 			<div class="text-error">
 				No data found! <a class="text-black" href="/">Click here to start over.</a>

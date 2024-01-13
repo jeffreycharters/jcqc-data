@@ -87,13 +87,13 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 	let runlist: RunListEntry[] = []
 
 	const checkStandards = get(checkStandardsStore)
-	const checkStandardNames = checkStandards?.map((c) => c.name.toLowerCase()) ?? []
+	const checkStandardNames = checkStandards?.map((c) => c.name.trim().toLowerCase()) ?? []
 
 	const blanks = get(blanksStore)
-	const blankNames = blanks?.map((b) => b.name.toLowerCase()) ?? []
+	const blankNames = blanks?.map((b) => b.name.trim().toLowerCase()) ?? []
 
 	const referenceMaterials = get(referenceMaterialsStore)
-	const referenceMaterialNames = referenceMaterials?.map((r) => r.name.toLowerCase()) ?? []
+	const referenceMaterialNames = referenceMaterials?.map((r) => r.name.trim().toLowerCase()) ?? []
 
 	let mostRecentBlank: SimplifiedComparator<BlankLimits> | undefined
 
@@ -128,50 +128,49 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 			results: rawRunlist[i].measurements
 		}
 
-		switch (true) {
-			case dupRegex.test(name):
-				const refSampleName = dupRegex.exec(name)?.[1]
-				if (!refSampleName) break
+		if (dupRegex.test(name)) {
+			const refSampleName = dupRegex.exec(name)?.[1]
+			if (!refSampleName) break
 
-				for (let j = runlist.length - 1; j >= 0; j--) {
-					if (runlist[j].name.toLowerCase() === refSampleName.toLowerCase()) {
-						const duplicateSamples = runlist[j].duplicateSamples ?? []
-						runlist[j] = {
-							...runlist[j],
-							duplicateSamples: [...duplicateSamples, runlistEntry],
-							referenceBlank: mostRecentBlank
-						}
-						continue listLoop
+			for (let j = runlist.length - 1; j >= 0; j--) {
+				if (runlist[j].name.toLowerCase() === refSampleName.toLowerCase()) {
+					const duplicateSamples = runlist[j].duplicateSamples ?? []
+					runlist[j] = {
+						...runlist[j],
+						duplicateSamples: [...duplicateSamples, runlistEntry],
+						referenceBlank: mostRecentBlank
 					}
+					continue listLoop
 				}
-				break
-
-			case checkStandardNames.includes(name):
-				const cs = checkStandards?.find((c) => c.name.toLowerCase() === name)
-				if (cs) runlistEntry = { ...runlistEntry, checkStandard: simplifiedCheckStandard(cs) }
-
-			case blankNames.includes(name):
-				const blk = blanks?.find((b) => b.name.toLowerCase() === name)
-				if (blk) {
-					runlistEntry = { ...runlistEntry, blank: simplifiedBlank(blk) }
-					mostRecentBlank = simplifiedBlank(blk)
-				}
-
-			case referenceMaterialNames.includes(name):
-				const rm = referenceMaterials?.find((r) => r.name.toLowerCase() === name)
-				if (rm)
-					runlistEntry = { ...runlistEntry, referenceMaterial: simplifiedReferenceMaterial(rm) }
-
-			case sampleRegex.test(name) || qcRegex.test(name):
-				runlistEntry = { ...runlistEntry, isSample: true }
+			}
 		}
+
+		if (checkStandardNames.includes(name)) {
+			const cs = checkStandards?.find((c) => c.name.toLowerCase() === name)
+			if (cs) runlistEntry = { ...runlistEntry, checkStandard: simplifiedCheckStandard(cs) }
+		}
+
+		if (blankNames.includes(name)) {
+			const blk = blanks?.find((b) => b.name.toLowerCase() === name)
+			if (blk) {
+				runlistEntry = { ...runlistEntry, blank: simplifiedBlank(blk) }
+				mostRecentBlank = simplifiedBlank(blk)
+			}
+		}
+
+		if (referenceMaterialNames.includes(name)) {
+			const rm = referenceMaterials?.find((r) => r.name.toLowerCase() === name)
+			if (rm) runlistEntry = { ...runlistEntry, referenceMaterial: simplifiedReferenceMaterial(rm) }
+		}
+
+		if (sampleRegex.test(name) || qcRegex.test(name))
+			runlistEntry = { ...runlistEntry, isSample: true }
 
 		const { checkStandard, blank, referenceMaterial, duplicateSamples, isSample } = runlistEntry
 		if (blank || checkStandard || referenceMaterial || duplicateSamples || isSample)
 			runlist = [...runlist, runlistEntry]
 	}
 
-	console.log(runlist)
 	return runlist
 }
 
