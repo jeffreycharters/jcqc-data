@@ -20,18 +20,18 @@
 	const outputElementCount = $reportData?.meta.orderedElements.length ?? 0
 </script>
 
-<div class="report-container p-4 w-fit">
+<div class="report-container w-fit p-4">
 	{#if $methodElementsStore?.length != outputElementCount}
 		<div
-			class="flex gap-4 items-center text-sm w-fit mx-auto border border-red-500 bg-red-200 text-red-600 rounded py-2 px-4 no-print mb-4 absolute top-8 right-8 motion-safe:animate-bounce"
+			class="no-print absolute right-8 top-8 mx-auto mb-4 flex w-fit items-center gap-4 rounded border border-red-500 bg-red-200 px-4 py-2 text-sm text-red-600 motion-safe:animate-bounce"
 		>
 			<IconSkull class="h-8 w-8 stroke-[1.5]" />
 			<div>
-				<p class="font-semibold mb-1">Warning!</p>
-				<p class="text-xs">
+				<p class="mb-1 text-lg font-semibold">Warning!</p>
+				<p class="text-sm">
 					Expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {outputElementCount}.
 				</p>
-				<p class="text-xs italic">Possible method mismatch.</p>
+				<p class="text-sm font-semibold italic">Possible method mismatch.</p>
 			</div>
 		</div>
 	{/if}
