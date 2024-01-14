@@ -7,7 +7,7 @@
 	import ElementSelect from "./ElementSelect.svelte"
 </script>
 
-<div class="w-full max-w-screen-lg mt-8 mb-6">
+<div class="w-full max-w-screen-xl mt-8 mb-6">
 	<h1>{$methodStore?.name}: {$methodStore?.description}</h1>
 
 	<EditMethod />

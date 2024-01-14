@@ -11,6 +11,8 @@
 	import SampleRow from "./SampleRow.svelte"
 	import Duplicate from "./Duplicate.svelte"
 
+	import { IconSkull } from "@tabler/icons-svelte"
+
 	export let data
 	const { sampleList } = data
 
@@ -20,9 +22,17 @@
 
 <div class="report-container p-4 w-fit">
 	{#if $methodElementsStore?.length != outputElementCount}
-		<div class="text-red-500 text-sm w-fit mx-auto font-semibold">
-			Warning: expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {outputElementCount}.
-			Possible method mismatch.
+		<div
+			class="flex gap-4 items-center text-sm w-fit mx-auto border border-red-500 bg-red-200 text-red-600 rounded py-2 px-4 no-print mb-4 absolute top-8 right-8 motion-safe:animate-bounce"
+		>
+			<IconSkull class="h-8 w-8 stroke-[1.5]" />
+			<div>
+				<p class="font-semibold mb-1">Warning!</p>
+				<p class="text-xs">
+					Expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {outputElementCount}.
+				</p>
+				<p class="text-xs italic">Possible method mismatch.</p>
+			</div>
 		</div>
 	{/if}
 
@@ -32,6 +42,8 @@
 		{#each sampleList ?? [] as block}
 			{#if block.type === "qc" && block.sample.calStandards}
 				<Calibration calBlank={block.sample} />
+
+				<h1>Sample Data</h1>
 			{/if}
 
 			{#if block.type === "qc" && block.sample.checkStandard}

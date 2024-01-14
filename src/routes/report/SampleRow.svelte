@@ -2,6 +2,7 @@
 	import { roundToSigFigs } from "$lib/data"
 	import { reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
+	import { methodElementsStore } from "$lib/stores"
 
 	export let sample: RunListEntry
 	export let index: number
@@ -12,8 +13,10 @@
 		{sample.name}
 	</td>
 	{#each $reportData?.meta.orderedElements ?? [] as elementID}
-		<td>
-			{roundToSigFigs(sample.results[elementID], 3)}
-		</td>
+		{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+			<td>
+				{roundToSigFigs(sample.results[elementID], 3)}
+			</td>
+		{/if}
 	{/each}
 </tr>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { roundToSigFigs } from "$lib/data"
-	import { methodStore, reportData, blanksStore } from "$lib/stores"
+	import { methodStore, reportData, blanksStore, methodElementsStore } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
@@ -28,9 +28,11 @@
 			<td class="firstCol">{sample.name}</td>
 
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				<td class="text-center">
-					{roundToSigFigs(sample.results[elementID], 3)}
-				</td>
+				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+					<td class="text-center">
+						{roundToSigFigs(sample.results[elementID], 3)}
+					</td>
+				{/if}
 			{/each}
 		</tr>
 
@@ -38,35 +40,41 @@
 			<td class="firstCol">{sample.name} DUP</td>
 
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				<td class="text-center">
-					{roundToSigFigs(duplicate.results[elementID], 3)}
-				</td>
+				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+					<td class="text-center">
+						{roundToSigFigs(duplicate.results[elementID], 3)}
+					</td>
+				{/if}
 			{/each}
 		</tr>
 
 		<tr class="border-b border-gray-500">
 			<td>Average</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				<td>
-					{roundToSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2, 3)}
-				</td>
+				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+					<td>
+						{roundToSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2, 3)}
+					</td>
+				{/if}
 			{/each}
 		</tr>
 
 		<tr>
 			<td>RPD</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{@const rpd = calculateRPD(sample.results[elementID], duplicate.results[elementID])}
-				{@const loq = sample.referenceBlank?.elements[elementID]?.mdl}
-				{@const average = (sample.results[elementID] + duplicate.results[elementID]) / 2}
-				{@const passing = checkIfDupPassing(average, rpd, loq)}
-				<td class={passing}>
-					{#if !rpd || !loq || average < loq * 2}
-						- -
-					{:else}
-						{parseFloat(rpd.toPrecision(2))}%
-					{/if}
-				</td>
+				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+					{@const rpd = calculateRPD(sample.results[elementID], duplicate.results[elementID])}
+					{@const loq = sample.referenceBlank?.elements[elementID]?.mdl}
+					{@const average = (sample.results[elementID] + duplicate.results[elementID]) / 2}
+					{@const passing = checkIfDupPassing(average, rpd, loq)}
+					<td class={passing}>
+						{#if !rpd || !loq || average < loq * 2}
+							- -
+						{:else}
+							{parseFloat(rpd.toPrecision(2))}%
+						{/if}
+					</td>
+				{/if}
 			{/each}
 		</tr>
 	</tbody>

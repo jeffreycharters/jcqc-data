@@ -20,18 +20,19 @@
 			<tr>
 				<td class="max-w-[175px] truncate text-left">{sample.name}</td>
 				{#each orderedElements as elementID}
-					{@const prettyValue =
-						$methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)?.units === "ppm"
-							? sample.results[elementID] * 1000
-							: sample.results[elementID]}
-					<td class="text-center">{roundToSigFigs(prettyValue, 3)}</td>
+					{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+						{@const prettyValue =
+							$methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)?.units ===
+							"ppm"
+								? sample.results[elementID] * 1000
+								: sample.results[elementID]}
+						<td class="text-center">{roundToSigFigs(prettyValue, 3)}</td>
+					{/if}
 				{/each}
 			</tr>
 		{/each}
 	</tbody>
 </table>
-
-<h1>Sample Data</h1>
 
 <style lang="postcss">
 	tr:nth-of-type(even) {

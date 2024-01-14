@@ -23,7 +23,7 @@
 		{/each}
 	</ul>
 
-	<div>
+	<div class="w-full">
 		<slot />
 	</div>
 </div>

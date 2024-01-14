@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { roundToSigFigs } from "$lib/data"
-	import type { ReferenceMaterialsRangesResponse } from "$lib/pocketbase-types"
-	import { methodStore, reportData } from "$lib/stores"
+	import { methodElementsStore, reportData } from "$lib/stores"
 	import type { ReferenceMaterialRange, RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
@@ -27,28 +26,31 @@
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name}</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				<td>
-					{roundToSigFigs(sample.results[elementID], 3)}
-				</td>
+				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+					<td>
+						{roundToSigFigs(sample.results[elementID], 3)}
+					</td>
+				{/if}
 			{/each}
 		</tr>
 		<tr>
 			<td class="firstCol">Within Range</td>
 
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{@const ranges = sample.referenceMaterial?.elements[elementID]}
+				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+					{@const ranges = sample.referenceMaterial?.elements[elementID]}
+					{@const passes = ranges ? checkRanges(sample.results[elementID], ranges) : "neutral"}
 
-				{@const passes = ranges ? checkRanges(sample.results[elementID], ranges) : "neutral"}
-
-				<td class={passes}>
-					{#if passes === "neutral"}
-						- -
-					{:else if passes === "passes"}
-						Yes
-					{:else if ranges}
-						{sample.results[elementID] > ranges.high ? `> ${ranges.high}` : `< ${ranges.low}`}
-					{/if}
-				</td>
+					<td class={passes}>
+						{#if passes === "neutral"}
+							- -
+						{:else if passes === "passes"}
+							Yes
+						{:else if ranges}
+							{sample.results[elementID] > ranges.high ? `> ${ranges.high}` : `< ${ranges.low}`}
+						{/if}
+					</td>
+				{/if}
 			{/each}
 		</tr>
 	</tbody>
