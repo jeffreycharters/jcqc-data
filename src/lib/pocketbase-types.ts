@@ -69,7 +69,6 @@ export type DetectionLimitsRecord = {
 export type ElementsRecord = {
 	active?: boolean
 	mass: number
-	name?: string
 	symbol?: string
 }
 

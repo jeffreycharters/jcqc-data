@@ -1,8 +1,8 @@
 <script lang="ts">
-	export let value: string = '';
-	export let label: string;
-	export let name: string;
-	export let placeholder = '';
+	export let value: string = ""
+	export let label: string
+	export let name: string
+	export let placeholder = ""
 </script>
 
 <div class="flex flex-col text-sm my-2">
