@@ -1,10 +1,7 @@
-import { dev } from "$app/environment"
 import PocketBase from "pocketbase"
 import { writable } from "svelte/store"
 
-const HOST = dev ? "http://127.0.0.1:8090" : "http://0.0.0.0:8090"
-
-export const pb = new PocketBase(HOST)
+export const pb = new PocketBase("http://127.0.0.1:8090")
 pb.autoCancellation(false)
 
 export const currentUser = writable(pb.authStore.model)
