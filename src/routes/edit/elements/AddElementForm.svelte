@@ -16,7 +16,7 @@
 		mass: z.coerce
 			.number()
 			.min(1, "Mass must be greater than 1")
-			.max(150, "Mass must be less than 150")
+			.max(250, "Mass must be less than 250")
 	})
 
 	const dispatch: EventDispatcher<{ addElement: ElementsResponse }> = createEventDispatcher()
@@ -30,10 +30,11 @@
 		const exists = await pb
 			.collection("elements")
 			.getFirstListItem(`symbol="${symbol}" && mass="${mass}"`)
+			.then(() => true)
+			.catch(() => false)
 
 		if (exists) return (formError = "Element+Mass already exists")
 
-		console.log("creating!")
 		pb.collection("elements")
 			.create({
 				symbol,
@@ -52,17 +53,17 @@
 	}
 </script>
 
-<div class="border border-gray-800 rounded shadow w-fit p-4">
+<div class="w-fit rounded border border-gray-800 p-4 shadow">
 	<h2 class="-mt-2">Add Element</h2>
 
 	<form on:submit|preventDefault={addElement}>
 		<TextInput name="symbol" label="Chemical Symbol" bind:value={symbol} placeholder="e.g. Fe" />
-		<div class="flex items-end justify-between max-w-xs gap-4">
+		<div class="flex max-w-xs items-end justify-between gap-4">
 			<NumberInput name="mass" label="Isotope Mass" bind:value={mass} placeholder="e.g. 57" />
-			<button type="submit" class="btn h-fit mb-2">Add</button>
+			<button type="submit" class="btn mb-2 h-fit">Add</button>
 		</div>
 		{#if formError}
-			<div class="text-red-600 text-sm italic ml-2">{formError}</div>
+			<div class="ml-2 text-sm italic text-red-600">{formError}</div>
 		{/if}
 	</form>
 </div>

@@ -34,7 +34,7 @@
 <h1 class="my-4">Available Elements</h1>
 
 <div
-	class="flex gap-4 my-4 border-orange-500 border py-4 px-8 rounded bg-orange-100 text-orange-600 w-fit items-center"
+	class="my-4 flex w-fit items-center gap-4 rounded border border-orange-500 bg-orange-100 px-8 py-4 text-orange-600"
 >
 	<IconExclamationCircle />
 	<p>
@@ -45,7 +45,7 @@
 	</p>
 </div>
 
-<div class="grid grid-cols-5 gap-4 max-w-screen-lg">
+<div class="grid max-w-screen-lg grid-cols-4 gap-4">
 	{#each elementList.filter((element) => element.active) as element (element.id)}
 		<div
 			animate:flip={{ duration: 250 }}
