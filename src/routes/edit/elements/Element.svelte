@@ -3,11 +3,13 @@
 	import TextInput from "$lib/components/TextInput.svelte"
 	import { pb } from "$lib/pocketbase"
 	import type { ElementsResponse } from "$lib/pocketbase-types"
-	import { IconEditOff } from "@tabler/icons-svelte"
 	import { createEventDispatcher, type EventDispatcher } from "svelte"
 	import { fade } from "svelte/transition"
 	import { z } from "zod"
+	import { IconEdit } from "@tabler/icons-svelte"
+	import { createTooltip, melt } from "@melt-ui/svelte"
 
+	export let editable: boolean = false
 	export let element: ElementsResponse
 	let { symbol, mass } = element
 
@@ -29,6 +31,19 @@
 	}
 
 	let editing = false
+
+	const {
+		elements: { trigger, content, arrow },
+		states: { open }
+	} = createTooltip({
+		positioning: {
+			placement: "top"
+		},
+		openDelay: 0,
+		closeDelay: 0,
+		closeOnPointerDown: false,
+		forceVisible: true
+	})
 
 	async function saveChanges() {
 		const fd = schema.safeParse({ symbol, mass })
@@ -76,76 +91,74 @@
 				throw new Error(err)
 			})
 	}
-
-	const editStatus = pb
-		.collection("methodElements")
-		.getFirstListItem(`element="${element.id}"`)
-		.then(() => false)
-		.catch(() => true)
 </script>
 
-{#await editStatus}
-	...
-{:then editable}
-	<div
-		class="element {editing ? 'row-span-2' : ''} {element.active ? 'active' : 'inactive'} relative"
-	>
-		{#if editing && editable}
-			<form on:submit|preventDefault={saveChanges} class="w-full">
-				<TextInput name="symbol" label="Chemical Symbol" bind:value={symbol} />
-				<NumberInput name="mass" label="Isotope Mass" bind:value={mass} />
+<div
+	class="flex items-center justify-around rounded border px-4 py-2 shadow {element.active
+		? 'active'
+		: 'inactive'}"
+	class:row-span-2={editing}
+>
+	{#if editing}
+		<form on:submit|preventDefault={saveChanges} class="w-full">
+			<TextInput name="symbol" label="Chemical Symbol" bind:value={symbol} />
+			<NumberInput name="mass" label="Isotope Mass" bind:value={mass} />
 
-				<div class="mt-4 flex items-center justify-between">
-					<button class="btn text-sm" type="submit">Save</button>
-					<button type="button" class="ml-2 text-sm" on:click={() => (editing = false)}
-						>Cancel</button
-					>
-				</div>
-
-				<div class="ml-1 text-sm text-red-600">
-					{formMessage ?? ""}
-				</div>
-			</form>
-		{:else if editing}
-			<button
-				class="flex h-full cursor-pointer items-center gap-1 text-sm text-red-700"
-				on:click={() => (editing = false)}
-			>
-				<IconEditOff class="h-4 w-4 flex-shrink-0" />
-				<div>Can't edit an element that is being used in a method</div>
-			</button>
-		{:else}
-			<div class="flex flex-col">
-				<div>
-					<sup>{mass}</sup>{symbol}
-				</div>
-				<button class="inactivate-button" on:click={toggleElementActive}
-					>{element.active ? "Inactivate" : "Activate"}</button
+			<div class="mt-4 flex items-center justify-between">
+				<button class="btn text-sm" type="submit">Save</button>
+				<button type="button" class="ml-2 text-sm" on:click={() => (editing = false)}>Cancel</button
 				>
 			</div>
-			{#if !element.active}
-				<div class="w-12" />
-			{:else}
-				<div>
-					<button class="btn" on:click={() => (editing = true)}>Edit</button>
-					{#if formMessage}
-						<div
-							transition:fade|local={{ duration: 200 }}
-							class="absolute -bottom-2 right-2 rounded border border-gray-600 bg-white px-2 text-sm text-green-700"
-						>
-							{formMessage}
-						</div>
-					{/if}
+
+			<div class="ml-1 text-sm text-red-600">
+				{formMessage ?? ""}
+			</div>
+		</form>
+	{:else}
+		<div class="flex flex-col">
+			<div>
+				<sup>{mass}</sup>{symbol}
+			</div>
+			<button class="inactivate-button" on:click={toggleElementActive}
+				>{element.active ? "Inactivate" : "Activate"}</button
+			>
+		</div>
+		{#if !element.active}
+			<div class="w-12" />
+		{:else}
+			<button
+				use:melt={$trigger}
+				aria-label="editing disallowed for element in use by a method"
+				class="btn flex items-center gap-1 disabled:border-stone-300 disabled:text-stone-400"
+				on:click={() => editable && (editing = true)}
+				disabled={!editable}
+			>
+				<IconEdit class="h-4 w-4" />
+				Edit
+			</button>
+			{#if $open && !editable}
+				<div
+					use:melt={$content}
+					transition:fade={{ duration: 100 }}
+					class="z-10 rounded bg-stone-100 shadow-lg"
+				>
+					<div use:melt={$arrow} />
+					<p class="px-4 py-1 text-stone-700">Element is in use</p>
+				</div>
+			{/if}
+			{#if formMessage}
+				<div
+					transition:fade|local={{ duration: 200 }}
+					class="absolute -bottom-2 right-2 rounded border border-gray-600 bg-white px-2 text-sm text-green-700"
+				>
+					{formMessage}
 				</div>
 			{/if}
 		{/if}
-	</div>
-{/await}
+	{/if}
+</div>
 
 <style lang="postcss">
-	.element {
-		@apply flex items-center justify-around rounded border px-4 py-2 shadow;
-	}
 	.active {
 		@apply border-gray-800;
 	}

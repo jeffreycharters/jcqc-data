@@ -13,8 +13,8 @@
 		easing: quintOut
 	})
 
-	export let data: PageData
-	let { elementList } = data
+	export let data
+	let { elementList, editableList } = data
 
 	function toggleActive({ detail }: CustomEvent<ElementsResponse>) {
 		const element = elementList.find((element) => element.id === detail.id)
@@ -52,7 +52,11 @@
 			in:send={{ key: element.id }}
 			out:receive={{ key: element.id }}
 		>
-			<Element {element} on:toggleActive={toggleActive} />
+			<Element
+				{element}
+				on:toggleActive={toggleActive}
+				editable={editableList.includes(element.id)}
+			/>
 		</div>
 	{/each}
 
