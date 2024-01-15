@@ -7,23 +7,23 @@
 		referenceMaterialsStore
 	} from "$lib/stores"
 
-	const elements = $methodElementsStore?.sort((a, b) => (a.mass < b.mass ? -1 : 1)) ?? []
+	const elements = $methodElementsStore?.sort((a, b) => a.mass - b.mass) ?? []
 	const lowElementCount = elements && elements?.length < 15
 </script>
 
 {#if $methodStore}
-	<div class="w-fit mx-auto">
+	<div class="mx-auto w-fit">
 		<div
 			class="flex {lowElementCount
 				? 'flex-col gap-4'
-				: 'justify-between gap-8'} items-end flex-wrap my-8"
+				: 'justify-between gap-8'} my-8 flex-wrap items-end"
 		>
-			<h2 class="text-2xl flex-grow border-b {lowElementCount ? 'self-start' : 'self-end'}">
+			<h2 class="flex-grow border-b text-2xl {lowElementCount ? 'self-start' : 'self-end'}">
 				{$methodStore.name}: {$methodStore.description}
 			</h2>
 
 			<div class="flex items-stretch gap-4">
-				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
+				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
 						{#if $methodStore.checkStandardTolerance}
 							{$methodStore.checkStandardTolerance}%
@@ -31,12 +31,12 @@
 							- -
 						{/if}
 					</div>
-					<div class="text-sm text-center text-gray-400 font-semibold">
+					<div class="text-center text-sm font-semibold text-gray-400">
 						Check Standard Tolerance
 					</div>
 				</div>
 
-				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
+				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
 						{#if $methodStore.rpdLimit}
 							{$methodStore.rpdLimit}%
@@ -44,10 +44,10 @@
 							- -
 						{/if}
 					</div>
-					<div class="text-sm text-center text-gray-400 font-semibold">Duplicate RPD</div>
+					<div class="text-center text-sm font-semibold text-gray-400">Duplicate RPD</div>
 				</div>
 
-				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
+				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
 						{#if $methodStore.calibrationCount}
 							{$methodStore.calibrationCount}
@@ -55,10 +55,10 @@
 							- -
 						{/if}
 					</div>
-					<div class="text-sm text-center text-gray-400 font-semibold">Non-blank Standards</div>
+					<div class="text-center text-sm font-semibold text-gray-400">Non-blank Standards</div>
 				</div>
 
-				<div class="shadow py-2 px-4 flex flex-col items-center rouded bg-gray-50">
+				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
 						{#if $methodStore}
 							3
@@ -66,16 +66,16 @@
 							??
 						{/if}
 					</div>
-					<div class="text-sm text-center text-gray-400 font-semibold">Sig figs on Report</div>
+					<div class="text-center text-sm font-semibold text-gray-400">Sig figs on Report</div>
 				</div>
 			</div>
 		</div>
-		<table class="text-sm my-2 w-fit mx-auto">
+		<table class="mx-auto my-2 w-fit text-sm">
 			<thead>
 				<tr class="border-b border-gray-400">
-					<th class="max-w-xs text-sm first-column">Elements</th>
+					<th class="first-column max-w-xs text-sm">Elements</th>
 					{#each elements as element}
-						<th class="text-sm font-semibold px-2 text-center">
+						<th class="px-2 text-center text-sm font-semibold">
 							<sup>{element.mass}</sup>{element.symbol}
 						</th>
 					{/each}
@@ -105,7 +105,7 @@
 
 				{#each $blanksStore ?? [] as blank (blank.id)}
 					<tr class="border-b border-gray-400">
-						<td class="first-column items-center gap-2 flex justify-between">
+						<td class="first-column flex items-center justify-between gap-2">
 							<div>
 								{blank.name}
 							</div>
@@ -119,7 +119,7 @@
 								(dl) => dl.element === element.elementID
 							)}
 							<td class="text-center">
-								<div class="table mx-auto">
+								<div class="mx-auto table">
 									<div class="table-row">
 										<div class="table-cell text-center">
 											{!values?.mdl ? "- -" : values.mdl}
@@ -136,7 +136,7 @@
 
 				{#each $referenceMaterialsStore ?? [] as referenceMaterial (referenceMaterial.id)}
 					<tr class="border-b border-gray-400">
-						<td class="first-column items-center gap-2 flex justify-between">
+						<td class="first-column flex items-center justify-between gap-2">
 							<div>
 								{referenceMaterial.name}
 							</div>
@@ -150,7 +150,7 @@
 								"referenceMaterialsRanges(referenceMaterial)"
 							].find((rmr) => rmr.element === element.elementID)}
 							<td class="text-center">
-								<div class="table mx-auto">
+								<div class="mx-auto table">
 									<div class="table-row">
 										<div class="table-cell text-center">
 											{!values?.lower ? "- -" : values?.lower}
@@ -174,9 +174,9 @@
 		@apply bg-gray-100;
 	}
 	td {
-		@apply py-[6px] px-[10px];
+		@apply px-[10px] py-[6px];
 	}
 	td.first-column {
-		@apply font-semibold text-gray-800 text-left;
+		@apply text-left font-semibold text-gray-800;
 	}
 </style>

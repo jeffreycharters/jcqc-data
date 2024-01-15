@@ -3,9 +3,9 @@
 	import { page } from "$app/stores"
 </script>
 
-<div class="border border-gray-500 rounded w-[36rem] py-2">
+<div class="w-[36rem] rounded border border-gray-500 py-2">
 	<h2 class="text-center">Methods</h2>
-	<div class="flex flex-wrap justify-center mx-auto gap-3">
+	<div class="mx-auto flex flex-wrap justify-center gap-3">
 		{#each $methods ?? [] as method (method.id)}
 			<a
 				data-sveltekit-preload-data="tap"
@@ -18,7 +18,7 @@
 		<a
 			href="/"
 			data-sveltekit-preload-data="tap"
-			class="btn my-2 method-button no-underline"
+			class="btn method-button my-2 no-underline"
 			on:click={() => ($methodStore = null)}>Clear</a
 		>
 	</div>
@@ -26,10 +26,10 @@
 
 <style lang="postcss">
 	.selected-button {
-		@apply text-sky-600 border-sky-700 shadow-sm shadow-sky-700/50 font-semibold;
+		@apply border-sky-700 font-semibold text-sky-600 shadow-sm shadow-sky-700/50;
 		box-shadow: "0 0 5px #086077";
 	}
 	.method-button {
-		@apply text-gray-600 border-gray-700 scale-95 transition-all;
+		@apply scale-95 border-gray-700 text-gray-600 transition-all;
 	}
 </style>

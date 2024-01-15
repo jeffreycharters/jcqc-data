@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { ElementsResponse } from "$lib/pocketbase-types"
 	import { flip } from "svelte/animate"
-	import type { PageData } from "./$types"
 	import AddElementForm from "./AddElementForm.svelte"
 	import Element from "./Element.svelte"
 	import { crossfade } from "svelte/transition"
 	import { quintOut } from "svelte/easing"
+
 	// @ts-expect-error
 	import IconExclamationCircle from "@tabler/icons-svelte/dist/svelte/icons/IconExclamationCircle.svelte"
 
@@ -22,13 +22,13 @@
 		if (!element) throw new Error("element not found")
 
 		element.active = detail.active
-		elementList = [...elementList.filter((e) => e.id != detail.id), element].sort((a, b) =>
-			a.mass < b.mass ? -1 : 1
+		elementList = [...elementList.filter((e) => e.id != detail.id), element].sort(
+			(a, b) => a.mass - b.mass
 		)
 	}
 
 	function addElement({ detail }: CustomEvent<ElementsResponse>) {
-		elementList = [...elementList, detail].sort((a, b) => (a.mass < b.mass ? -1 : 1))
+		elementList = [...elementList, detail].sort((a, b) => a.mass - b.mass)
 		editableList = [...editableList, detail.id]
 	}
 </script>

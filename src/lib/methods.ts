@@ -27,7 +27,7 @@ export const getActiveMethods = async (): Promise<MethodsResponse[]> => {
 export async function setMethods() {
 	const methodList = await pb
 		.collection("methods")
-		.getFullList<MethodsResponse<ExpandedMethod>>({ expand: expandMethod })
+		.getFullList<MethodsResponse<ExpandedMethod>>({ sort: "name", expand: expandMethod })
 
 	methods.set(methodList)
 }

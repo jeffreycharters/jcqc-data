@@ -50,7 +50,7 @@
 
 		{#if checkStandardLimit}
 			<tr>
-				<td>Recovery of expected</td>
+				<td>Recovery</td>
 				{#each $reportData?.meta.orderedElements ?? [] as elementID}
 					{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 						{@const { passes, recovery } = elementPassing(elementID) ?? { passes: undefined }}

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { roundToSigFigs } from "$lib/data"
-	import type { DetectionLimitsResponse } from "$lib/pocketbase-types"
-	import { methodStore, reportData } from "$lib/stores"
+	import { methodElementsStore, reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
@@ -15,22 +14,26 @@
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name}</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				<td>{roundToSigFigs(sample.results[elementID], 3)}</td>
+				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+					<td>{roundToSigFigs(sample.results[elementID], 3)}</td>
+				{/if}
 			{/each}
 		</tr>
 		<tr>
 			<td class="firstCol">Below LOQ</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{@const loq = sample.blank?.elements[elementID]?.loq ?? 0}
-				{@const tdClass =
-					loq != 0 && sample.results[elementID]
-						? sample.results[elementID] < loq
-							? "passes"
-							: "fails"
-						: "neutral"}
-				<td class={tdClass}>
-					{loq != 0 ? loq : "- -"}
-				</td>
+				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+					{@const loq = sample.blank?.elements[elementID]?.loq ?? 0}
+					{@const tdClass =
+						loq != 0 && sample.results[elementID]
+							? sample.results[elementID] < loq
+								? "passes"
+								: "fails"
+							: "neutral"}
+					<td class={tdClass}>
+						{loq != 0 ? loq : "- -"}
+					</td>
+				{/if}
 			{/each}
 		</tr>
 	</tbody>

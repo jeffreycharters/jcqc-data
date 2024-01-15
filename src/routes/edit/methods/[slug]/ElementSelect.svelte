@@ -49,7 +49,7 @@
 
 	{#if open}
 		<div class="mx-8 mb-8 grid grid-cols-8 gap-4" transition:slide={{ duration: 200 }}>
-			{#each ($methodElementsStore ?? []).sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
+			{#each ($methodElementsStore ?? []).sort((a, b) => a.mass - b.mass) as methodElement (methodElement.id)}
 				<div
 					class="col-span-2"
 					in:receive|local={{ key: methodElement.elementID }}
@@ -62,7 +62,7 @@
 
 			{#each ($allElements ?? [])
 				.filter((e) => !$usedElementIDs.includes(e.id))
-				.sort((a, b) => (a.mass < b.mass ? -1 : 1)) as element (element.id)}
+				.sort((a, b) => a.mass - b.mass) as element (element.id)}
 				<div
 					in:receive|local={{ key: element.id }}
 					out:send|local={{ key: element.id }}

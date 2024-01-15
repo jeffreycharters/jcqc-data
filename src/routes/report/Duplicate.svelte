@@ -14,6 +14,7 @@
 	}
 
 	const checkIfDupPassing = (average: number, rpd: number, loq: number | undefined) => {
+		console.log({ rpdLimit, loq, average })
 		if (!rpdLimit || !loq || average < 2 * loq) return "neutral"
 		if (rpd > rpdLimit) return "fails"
 		if (rpd < rpdLimit) return "passes"
@@ -64,7 +65,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					{@const rpd = calculateRPD(sample.results[elementID], duplicate.results[elementID])}
-					{@const loq = sample.referenceBlank?.elements[elementID]?.mdl}
+					{@const loq = sample.referenceBlank?.elements[elementID]?.loq}
 					{@const average = (sample.results[elementID] + duplicate.results[elementID]) / 2}
 					{@const passing = checkIfDupPassing(average, rpd, loq)}
 					<td class={passing}>
@@ -80,7 +81,7 @@
 	</tbody>
 </table>
 {#if ($blanksStore?.length ?? 0) > 1}
-	<div class="w-full text-right pr-8 italic text-xs text-stone-500 -mt-4 pb-2">
+	<div class="-mt-4 w-full pb-2 pr-8 text-right text-xs italic text-stone-500">
 		LOQs taken from <span class="font-bold">{sample.referenceBlank?.name ?? "unknown"}</span>. If
 		this is incorrect be sure to verify RPDs.
 	</div>
