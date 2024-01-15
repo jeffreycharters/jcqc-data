@@ -20,7 +20,6 @@ export async function setMethodElements(methodID: string) {
 				id: methodEl.id,
 				elementID: methodEl.element,
 				units: methodEl.units,
-				name: methodEl.expand!.element.name,
 				mass: methodEl.expand!.element.mass,
 				symbol: methodEl.expand!.element.symbol,
 				active: methodEl.expand!.element.active

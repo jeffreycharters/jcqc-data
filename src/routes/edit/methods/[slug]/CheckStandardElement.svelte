@@ -18,7 +18,7 @@
 	let value = !rawValue || rawValue === 0 ? "- -" : rawValue
 
 	function debounce(callback: () => void, timeout = 250) {
-		let timer: number
+		let timer: NodeJS.Timeout
 		return (...args: any) => {
 			dispatch("updateStatus", "Pending...")
 			clearTimeout(timer)
@@ -55,11 +55,11 @@
 </script>
 
 <form class="basic-border flex flex-col pt-2">
-	<div class="flex items-center justify-center h-full gap-4">
+	<div class="flex h-full items-center justify-center gap-4">
 		<ElementWithMass symbol={element.symbol} mass={element.mass} />
 		<span class="text-gray-500">{element.units}</span>
 	</div>
-	<div class="flex items-center gap-2 justify-center">
+	<div class="flex items-center justify-center gap-2">
 		<label for={`${element.id}-mdl`}>Expect:</label>
 		<div class="w-16">
 			<input
@@ -69,7 +69,7 @@
 				on:input={debounce(updateCalCheck)}
 				on:focus={() => (value = value === "- -" ? "" : value)}
 				on:blur={() => (value = value === "" ? "- -" : value)}
-				class="number-input mt-1 mb-2 text-sm text-center {value === '- -' ? 'text-gray-500' : ''}"
+				class="number-input mb-2 mt-1 text-center text-sm {value === '- -' ? 'text-gray-500' : ''}"
 			/>
 		</div>
 	</div>

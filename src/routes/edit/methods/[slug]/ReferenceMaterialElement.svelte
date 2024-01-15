@@ -23,7 +23,7 @@
 	let upper = !upperBase || upperBase === 0 ? "- -" : upperBase
 
 	function debounce(callback: () => void, timeout = 250) {
-		let timer: number
+		let timer: NodeJS.Timeout
 		return (...args: any) => {
 			dispatch("updateStatus", "Pending...")
 			clearTimeout(timer)
@@ -62,13 +62,13 @@
 </script>
 
 <form class="basic-border flex flex-col pt-2">
-	<div class="flex items-center justify-center h-full gap-4">
+	<div class="flex h-full items-center justify-center gap-4">
 		<ElementWithMass symbol={methodElement.symbol} mass={methodElement.mass} />
 		<span class="text-gray-500">{methodElement.units}</span>
 	</div>
 	<table class="border-collapse">
 		<tr>
-			<td class="text-right pr-2 pb-1">
+			<td class="pb-1 pr-2 text-right">
 				<label for={`${methodElement.id}-lower`}>Low:</label>
 			</td>
 			<td>
@@ -80,7 +80,7 @@
 						on:input={debounce(() => updateReferenceMaterial("lower"))}
 						on:focus={() => (lower = lower === "- -" ? "" : lower)}
 						on:blur={() => (lower = lower === "" ? "- -" : lower)}
-						class="number-input mt-1 mb-2 text-sm text-center {lower === '- -'
+						class="number-input mb-2 mt-1 text-center text-sm {lower === '- -'
 							? 'text-gray-500'
 							: ''}"
 					/>
@@ -88,7 +88,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="text-right pr-2 pb-1">
+			<td class="pb-1 pr-2 text-right">
 				<label for={`${methodElement.id}-upper`}>High:</label>
 			</td>
 			<td>
@@ -100,7 +100,7 @@
 						on:input={debounce(() => updateReferenceMaterial("upper"))}
 						on:focus={() => (upper = upper === "- -" ? "" : upper)}
 						on:blur={() => (upper = upper === "" ? "- -" : upper)}
-						class="number-input mt-1 mb-2 text-sm text-center {upper === '- -'
+						class="number-input mb-2 mt-1 text-center text-sm {upper === '- -'
 							? 'text-gray-500'
 							: ''}"
 					/>

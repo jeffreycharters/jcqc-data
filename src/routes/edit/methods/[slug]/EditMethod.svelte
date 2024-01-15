@@ -11,7 +11,7 @@
 	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
 
 	let formMessage = ""
-	let timer: number
+	let timer: NodeJS.Timeout
 
 	let open = false
 

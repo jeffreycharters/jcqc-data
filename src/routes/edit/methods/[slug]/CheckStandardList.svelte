@@ -20,7 +20,7 @@
 	let statusMessage = ""
 	let editing = false
 
-	let timer: number
+	let timer: NodeJS.Timeout
 	const statusUpdate = (message: string, timeout = 1500) => {
 		if (timer) clearTimeout(timer)
 

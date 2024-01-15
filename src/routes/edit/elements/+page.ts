@@ -9,7 +9,7 @@ export const load = (async () => {
 
 	let editableList: string[] = []
 
-	for (let element of elementList) {
+	for (const element of elementList) {
 		const inUse = await pb
 			.collection("methodElements")
 			.getFirstListItem(`element="${element.id}"`)

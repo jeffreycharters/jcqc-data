@@ -28,7 +28,6 @@ export type Units = "ppb" | "ppm"
 export type MethodElement = {
 	id: string
 	elementID: string
-	name: string
 	symbol: string
 	mass: number
 	active: boolean
