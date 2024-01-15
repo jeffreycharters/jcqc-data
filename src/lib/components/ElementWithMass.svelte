@@ -1,12 +1,9 @@
 <script lang="ts">
 	export let symbol: string
 	export let mass: number
-	export let bold: boolean = true
 </script>
 
-<div class="{bold ? 'font-bold' : ''} relative flex items-center justify-center">
+<div class="flex items-center justify-center {$$props.class}">
+	<sup>{mass}</sup>
 	<div>{symbol}</div>
-	<div class="absolute right-full top-0">
-		<sup>{mass}</sup>
-	</div>
 </div>

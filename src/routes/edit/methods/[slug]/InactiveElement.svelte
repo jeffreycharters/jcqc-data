@@ -2,8 +2,10 @@
 	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
 	import { setMethodElements } from "$lib/elements"
 	import { pb } from "$lib/pocketbase"
-	import type { ElementsResponse, MethodsResponse } from "$lib/pocketbase-types"
+	import type { ElementsResponse } from "$lib/pocketbase-types"
 	import { methodStore } from "$lib/stores"
+	// @ts-expect-error
+	import IconSquareRoundedPlus from "@tabler/icons-svelte/dist/svelte/icons/IconSquareRoundedPlus.svelte"
 
 	export let element: ElementsResponse
 
@@ -18,13 +20,22 @@
 	}
 </script>
 
-<div class="basic-border h-full w-full flex justify-center items-center inactive-element bg-white">
-	<ElementWithMass symbol={element.symbol} mass={element.mass} />
-	<button class="inactivate-button" on:click={addElement}>Add</button>
-</div>
+<button
+	class="basic-border inactive-element flex h-full w-full items-center justify-center bg-white"
+	on:click={addElement}
+>
+	<div class="flex w-full items-center justify-evenly gap-2">
+		<ElementWithMass symbol={element.symbol} mass={element.mass} class="text-xl font-bold" />
+
+		<div class="flex items-center gap-1 font-semibold">
+			<IconSquareRoundedPlus class="h-4 w-4" />
+			<span>Activate</span>
+		</div>
+	</div>
+</button>
 
 <style lang="postcss">
 	.inactive-element {
-		@apply border border-gray-300 rounded shadow py-2 px-4 flex items-center justify-around text-gray-400;
+		@apply flex items-center justify-around rounded border border-gray-300 px-4 py-2 text-gray-400 shadow;
 	}
 </style>
