@@ -4,8 +4,13 @@
 	import { crossfade, fade, slide } from "svelte/transition"
 	import ActiveElement from "./ActiveElement.svelte"
 	import InactiveElement from "./InactiveElement.svelte"
-	import { IconAtom2Filled, IconChevronsRight, IconX } from "@tabler/icons-svelte"
 	import { derived } from "svelte/store"
+	// @ts-expect-error
+	import IconAtom2Filled from "@tabler/icons-svelte/dist/svelte/icons/IconAtom2Filled.svelte"
+	// @ts-expect-error
+	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
+	// @ts-expect-error
+	import IconX from "@tabler/icons-svelte/dist/svelte/icons/IconX.svelte"
 
 	let formMessage: string | undefined = undefined
 	let open = false
@@ -19,21 +24,21 @@
 
 <div class="basic-border my-4 w-full bg-stone-100">
 	<div class="flex items-end gap-4">
-		<button class="flex gap-2 items-center px-8 py-4 w-full" on:click={() => (open = !open)}>
+		<button class="flex w-full items-center gap-2 px-8 py-4" on:click={() => (open = !open)}>
 			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
 
-			<h2 class="inline-flex whitespace-nowrap gap-4">
+			<h2 class="inline-flex gap-4 whitespace-nowrap">
 				Add/Remove elements
-				<span class="text-gray-400 flex items-center font-semibold">
-					<IconAtom2Filled class="w-6 h-6" />
-					<IconX class="w-3 h-3 mx-1"></IconX>
+				<span class="flex items-center font-semibold text-gray-400">
+					<IconAtom2Filled class="h-6 w-6" />
+					<IconX class="mx-1 h-3 w-3"></IconX>
 					{$methodElementsStore?.length != undefined ? $methodElementsStore?.length : 0}</span
 				>
 			</h2>
 		</button>
 		{#if formMessage}
 			<div
-				class="text-sm text-amber-600 italic tracking-wide w-36 text-center"
+				class="w-36 text-center text-sm italic tracking-wide text-amber-600"
 				in:fade={{ duration: 200 }}
 				out:fade={{ duration: 100 }}
 			>
@@ -43,7 +48,7 @@
 	</div>
 
 	{#if open}
-		<div class="grid grid-cols-8 gap-4 mb-8 mx-8" transition:slide={{ duration: 200 }}>
+		<div class="mx-8 mb-8 grid grid-cols-8 gap-4" transition:slide={{ duration: 200 }}>
 			{#each ($methodElementsStore ?? []).sort( (a, b) => (a.mass < b.mass ? -1 : 1) ) as methodElement (methodElement.id)}
 				<div
 					class="col-span-2"

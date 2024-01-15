@@ -4,10 +4,11 @@
 	import { pb } from "$lib/pocketbase"
 	import { createEventDispatcher, type EventDispatcher } from "svelte"
 	import slugify from "slugify"
-	import { IconSquareX } from "@tabler/icons-svelte"
 	import { slide } from "svelte/transition"
 	import { setMethods } from "$lib/methods"
 	import { z } from "zod"
+	// @ts-expect-error
+	import IconSquareX from "@tabler/icons-svelte/dist/svelte/icons/IconSquareX.svelte"
 
 	const schema = z.object({
 		name: z

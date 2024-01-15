@@ -2,8 +2,9 @@
 	import { goto } from "$app/navigation"
 	import { findElementOrder, flattenAnalytes, parseCSV, parseRun } from "$lib/data"
 	import { reportData } from "$lib/stores"
-	import { IconFileUpload } from "@tabler/icons-svelte"
 	import { fade } from "svelte/transition"
+	// @ts-expect-error
+	import IconFileUpload from "@tabler/icons-svelte/dist/svelte/icons/IconFileUpload.svelte"
 
 	let files: HTMLInputElement["files"]
 	let errorMessage: string = ""
@@ -39,10 +40,10 @@
 	}
 </script>
 
-<div class="w-fit mx-auto flex flex-col gap-2">
-	<label for="dropzone-file" class="text-sky-700 font-semibold text-md cursor-pointer">
+<div class="mx-auto flex w-fit flex-col gap-2">
+	<label for="dropzone-file" class="text-md cursor-pointer font-semibold text-sky-700">
 		<div
-			class="flex flex-col gap-1 w-full border-2 border-sky-600 border-dashed rounded cursor-pointer bg-sky-200 hover:bg-sky-100 transition-colors"
+			class="flex w-full cursor-pointer flex-col gap-1 rounded border-2 border-dashed border-sky-600 bg-sky-200 transition-colors hover:bg-sky-100"
 		>
 			<input
 				id="dropzone-file"
@@ -51,19 +52,19 @@
 				bind:files
 				on:change={() => parseInput(files)}
 			/>
-			<div class="flex items-center justify-center gap-2 pt-3 px-9">
-				<IconFileUpload class="w-6 h-6 text-sky-700" />
+			<div class="flex items-center justify-center gap-2 px-9 pt-3">
+				<IconFileUpload class="h-6 w-6 text-sky-700" />
 				Select exported file
 			</div>
 
-			<div class="mx-auto italic text-xs text-sky-600 mb-3">Click here or drag-and-drop file</div>
+			<div class="mx-auto mb-3 text-xs italic text-sky-600">Click here or drag-and-drop file</div>
 		</div>
 	</label>
 
 	{#if errorMessage}
 		<div
 			transition:fade={{ duration: 200 }}
-			class="text-red-600 text-sm mx-auto rounded italic whitespace-nowrap"
+			class="mx-auto whitespace-nowrap rounded text-sm italic text-red-600"
 		>
 			{errorMessage ?? ""}
 		</div>

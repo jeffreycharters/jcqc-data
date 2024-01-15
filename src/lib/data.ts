@@ -70,7 +70,7 @@ export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: numbe
 			rawRunlist = [
 				...rawRunlist,
 				{
-					name: csvRows[i]["Sample Name"].trim(),
+					name: csvRows[i]["Sample Name"]?.trim(),
 					measurements: analytes
 				}
 			]
@@ -98,7 +98,7 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 	let mostRecentBlank: SimplifiedComparator<BlankLimits> | undefined
 
 	listLoop: for (let i = 0; i < rawRunlist.length; i++) {
-		const name = rawRunlist[i].name.trim().toLowerCase()
+		const name = rawRunlist[i].name?.trim().toLowerCase()
 
 		// special case
 		if (name === "cal blank") {

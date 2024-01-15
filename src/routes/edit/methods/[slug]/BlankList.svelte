@@ -2,13 +2,14 @@
 	import EditIcon from "$lib/components/EditIcon.svelte"
 	import type { BlanksResponse } from "$lib/pocketbase-types"
 	import { methodElementsStore, methodStore } from "$lib/stores"
-	import { IconTrash } from "@tabler/icons-svelte"
 	import BlankElement from "./BlankElement.svelte"
 	import { pb } from "$lib/pocketbase"
 	import { setBlanks } from "$lib/methods"
 	import type { ExpandedBlank } from "$lib/types"
 	import { crossfade, fade } from "svelte/transition"
 	import { flip } from "svelte/animate"
+	// @ts-expect-error
+	import IconTrash from "@tabler/icons-svelte/dist/svelte/icons/IconTrash.svelte"
 
 	export let blank: BlanksResponse<ExpandedBlank>
 
@@ -41,8 +42,8 @@
 	}
 </script>
 
-<div class="basic-border w-full h-full p-4 bg-white">
-	<div class="flex justify-between items-center mb-4">
+<div class="basic-border h-full w-full bg-white p-4">
+	<div class="mb-4 flex items-center justify-between">
 		<div class="flex items-baseline gap-2">
 			<form
 				class="flex items-center {editing ? 'gap-1' : 'gap-2'}"
@@ -65,7 +66,7 @@
 			</form>
 			{#if statusMessage}
 				<div
-					class="italic font-bold text-amber-700"
+					class="font-bold italic text-amber-700"
 					in:fade={{ duration: 200 }}
 					out:fade={{ duration: 500 }}
 				>
@@ -74,7 +75,7 @@
 			{/if}
 		</div>
 		<button on:click={deleteBlank}>
-			<IconTrash class="stroke-red-700 h-8 w-8 p-1" />
+			<IconTrash class="h-8 w-8 stroke-red-700 p-1" />
 		</button>
 	</div>
 

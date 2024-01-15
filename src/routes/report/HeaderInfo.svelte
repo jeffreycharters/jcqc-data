@@ -1,9 +1,12 @@
 <script lang="ts">
-	import { instrumentStore, methodStore, reportData } from "$lib/stores"
-	import { IconPrinter, IconPrinterOff } from "@tabler/icons-svelte"
-
 	import { createTooltip, melt } from "@melt-ui/svelte"
 	import { fade } from "svelte/transition"
+	import { instrumentStore, methodStore, reportData } from "$lib/stores"
+
+	// @ts-expect-error
+	import IconPrinter from "@tabler/icons-svelte/dist/svelte/icons/IconPrinterOff.svelte"
+	// @ts-expect-error
+	import IconPrinterOff from "@tabler/icons-svelte/dist/svelte/icons/IconPrinter.svelte"
 
 	const {
 		elements: { trigger: dateTrigger, content: dateContent, arrow: dateArrow },

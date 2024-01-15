@@ -6,7 +6,8 @@
 	import Element from "./Element.svelte"
 	import { crossfade } from "svelte/transition"
 	import { quintOut } from "svelte/easing"
-	import { IconExclamationCircle } from "@tabler/icons-svelte"
+	// @ts-expect-error
+	import IconExclamationCircle from "@tabler/icons-svelte/dist/svelte/icons/IconExclamationCircle.svelte"
 
 	const [send, receive] = crossfade({
 		duration: 250,

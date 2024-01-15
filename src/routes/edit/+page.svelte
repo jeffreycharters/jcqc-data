@@ -5,7 +5,13 @@
 	import { flip } from "svelte/animate"
 	import { quintOut } from "svelte/easing"
 	import { crossfade } from "svelte/transition"
-	import { IconAtom2, IconCookieMan, IconPlaylistAdd } from "@tabler/icons-svelte"
+
+	// @ts-expect-error
+	import IconAtom2 from "@tabler/icons-svelte/dist/svelte/icons/IconAtom2.svelte"
+	// @ts-expect-error
+	import IconCookieMan from "@tabler/icons-svelte/dist/svelte/icons/IconCookieMan.svelte"
+	// @ts-expect-error
+	import IconPlaylistAdd from "@tabler/icons-svelte/dist/svelte/icons/IconPlaylistAdd.svelte"
 
 	const [send, receive] = crossfade({
 		duration: 250,
@@ -15,9 +21,9 @@
 	let showAddForm = false
 </script>
 
-<h1 class="mt-8 mb-6">Select method to edit</h1>
+<h1 class="mb-6 mt-8">Select method to edit</h1>
 
-<div class="grid grid-cols-4 gap-4 max-w-screen-lg">
+<div class="grid max-w-screen-lg grid-cols-4 gap-4">
 	{#each ($methods ?? []).filter((method) => method.active) as method (method.id)}
 		<div
 			animate:flip={{ duration: 250 }}
@@ -39,7 +45,7 @@
 
 	<button
 		on:click={() => (showAddForm = !showAddForm)}
-		class="border border-gray-500 w-full p-4 rounded shadow-lg flex gap-2 items-center justify-center font-bold"
+		class="flex w-full items-center justify-center gap-2 rounded border border-gray-500 p-4 font-bold shadow-lg"
 	>
 		<IconPlaylistAdd class=" h-8 w-8 stroke-[1.5]" />
 		Add Method
@@ -48,18 +54,18 @@
 
 <AddMethodForm {showAddForm} on:close={() => (showAddForm = false)} />
 
-<h1 class="mt-10 -mb-2">Other options</h1>
+<h1 class="-mb-2 mt-10">Other options</h1>
 
-<div class="grid grid-cols-4 gap-4 max-w-screen-lg">
-	<div class="border border-gray-800 rounded shadow mt-8 w-full h-fit">
-		<a href="/edit/elements" class="no-underline py-4 px-6 inline-flex items-center gap-2">
+<div class="grid max-w-screen-lg grid-cols-4 gap-4">
+	<div class="mt-8 h-fit w-full rounded border border-gray-800 shadow">
+		<a href="/edit/elements" class="inline-flex items-center gap-2 px-6 py-4 no-underline">
 			<IconAtom2 class="rotate-45" />
 			<h2>Edit elements</h2>
 		</a>
 	</div>
 
-	<div class="border border-gray-800 w-full rounded shadow mt-8 h-fit">
-		<a href="/" class="no-underline py-4 px-6 inline-flex items-center gap-2">
+	<div class="mt-8 h-fit w-full rounded border border-gray-800 shadow">
+		<a href="/" class="inline-flex items-center gap-2 px-6 py-4 no-underline">
 			<IconCookieMan class="-rotate-12 stroke-amber-700" />
 			<h2>Return to Main</h2>
 		</a>

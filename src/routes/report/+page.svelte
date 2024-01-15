@@ -11,7 +11,8 @@
 	import SampleRow from "./SampleRow.svelte"
 	import Duplicate from "./Duplicate.svelte"
 
-	import { IconSkull } from "@tabler/icons-svelte"
+	// @ts-expect-error
+	import IconSkull from "@tabler/icons-svelte/dist/svelte/icons/IconSkull.svelte"
 
 	export let data
 	const { sampleList } = data
@@ -23,7 +24,7 @@
 <div class="report-container w-fit p-4">
 	{#if $methodElementsStore?.length != outputElementCount}
 		<div
-			class="no-print absolute right-8 top-8 mx-auto mb-4 flex w-fit items-center gap-4 rounded border border-red-500 bg-red-200 px-4 py-2 text-sm text-red-600 motion-safe:animate-bounce"
+			class="no-print absolute right-8 top-8 mx-auto mb-4 flex w-fit animate-bounce items-center gap-4 rounded border border-red-500 bg-red-200 px-4 py-2 text-sm text-red-600"
 		>
 			<IconSkull class="h-8 w-8 stroke-[1.5]" />
 			<div>

@@ -6,8 +6,9 @@
 	import type { MethodsResponse } from "$lib/pocketbase-types"
 	import { methodStore } from "$lib/stores"
 	import type { ExpandedMethod } from "$lib/types"
-	import { IconChevronsRight } from "@tabler/icons-svelte"
 	import { fade, slide } from "svelte/transition"
+	// @ts-expect-error
+	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
 
 	let formMessage = ""
 	let timer: number
@@ -61,13 +62,13 @@
 
 <div class="basic-border my-4 w-full bg-stone-100">
 	<div class="flex items-end gap-4">
-		<button class="flex gap-2 items-center px-8 py-4 w-full" on:click={() => (open = !open)}>
+		<button class="flex w-full items-center gap-2 px-8 py-4" on:click={() => (open = !open)}>
 			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
 
 			<h2>Edit Method</h2>
 			{#if formMessage}
 				<div
-					class="text-sm text-amber-600 italic w-fit"
+					class="w-fit text-sm italic text-amber-600"
 					in:fade={{ duration: 200 }}
 					out:fade={{ duration: 150 }}
 				>
@@ -82,7 +83,7 @@
 			on:input={processUpdate()}
 			on:submit|preventDefault
 			transition:slide={{ duration: 200 }}
-			class="mb-8 mx-8"
+			class="mx-8 mb-8"
 		>
 			<div class="grid grid-cols-2">
 				<TextInput

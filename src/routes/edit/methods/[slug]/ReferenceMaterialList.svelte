@@ -2,12 +2,13 @@
 	import EditIcon from "$lib/components/EditIcon.svelte"
 	import type { ReferenceMaterialsResponse } from "$lib/pocketbase-types"
 	import { methodElementsStore, methodStore } from "$lib/stores"
-	import { IconTrash } from "@tabler/icons-svelte"
 	import ReferenceMaterialElement from "./ReferenceMaterialElement.svelte"
 	import type { ExpandedReferenceMaterial } from "$lib/types"
 	import { pb } from "$lib/pocketbase"
 	import { setReferenceMaterials } from "$lib/methods"
 	import { fade } from "svelte/transition"
+	// @ts-expect-error
+	import IconTrash from "@tabler/icons-svelte/dist/svelte/icons/IconTrash.svelte"
 
 	export let referenceMaterial: ReferenceMaterialsResponse<ExpandedReferenceMaterial>
 	let { name } = referenceMaterial
@@ -35,8 +36,8 @@
 	}
 </script>
 
-<div class="basic-border w-full h-full p-4 bg-white">
-	<div class="flex justify-between items-center mb-4">
+<div class="basic-border h-full w-full bg-white p-4">
+	<div class="mb-4 flex items-center justify-between">
 		<div class="flex items-baseline gap-2">
 			<form
 				class="flex items-center {editing ? 'gap-1' : 'gap-2'}"
@@ -59,7 +60,7 @@
 			</form>
 			{#if statusMessage}
 				<div
-					class="italic font-bold text-amber-600"
+					class="font-bold italic text-amber-600"
 					in:fade={{ duration: 200 }}
 					out:fade={{ duration: 500 }}
 				>
@@ -68,7 +69,7 @@
 			{/if}
 		</div>
 		<button on:click={deleteCheckStandard}>
-			<IconTrash class="stroke-red-700 h-8 w-8 p-1" />
+			<IconTrash class="h-8 w-8 stroke-red-700 p-1" />
 		</button>
 	</div>
 

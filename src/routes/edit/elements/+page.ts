@@ -19,8 +19,6 @@ export const load = (async () => {
 		if (!inUse) editableList = [...editableList, element.id]
 	}
 
-	console.log(editableList)
-
 	return {
 		title: "Edit Elements",
 		elementList,

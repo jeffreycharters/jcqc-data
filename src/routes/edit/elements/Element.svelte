@@ -6,8 +6,10 @@
 	import { createEventDispatcher, type EventDispatcher } from "svelte"
 	import { fade } from "svelte/transition"
 	import { z } from "zod"
-	import { IconEdit } from "@tabler/icons-svelte"
 	import { createTooltip, melt } from "@melt-ui/svelte"
+
+	// @ts-expect-error
+	import IconEdit from "@tabler/icons-svelte/dist/svelte/icons/IconEdit.svelte"
 
 	export let editable: boolean = false
 	export let element: ElementsResponse
