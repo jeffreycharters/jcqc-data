@@ -3,22 +3,22 @@
 	import { page } from "$app/stores"
 </script>
 
-<div class="w-[36rem] rounded border border-gray-500 py-2">
+<div class="flex-grow rounded border border-gray-500 px-4 py-2">
 	<h2 class="text-center">Methods</h2>
-	<div class="mx-auto flex flex-wrap justify-center gap-3">
+	<div class="mx-auto my-2 flex flex-wrap justify-center gap-x-2 gap-y-1">
 		{#each $methods ?? [] as method (method.id)}
 			<a
-				data-sveltekit-preload-data="tap"
+				data-sveltekit-preload-data="off"
 				href="/{method.slug}"
-				class="btn my-2 no-underline {$page.params.slug === method.slug
+				class="btn no-underline {$page.params.slug === method.slug
 					? 'selected-button'
 					: 'method-button'}">{method.name}</a
 			>
 		{/each}
 		<a
 			href="/"
-			data-sveltekit-preload-data="tap"
-			class="btn method-button my-2 no-underline"
+			data-sveltekit-preload-data="off"
+			class="btn method-button no-underline"
 			on:click={() => ($methodStore = null)}>Clear</a
 		>
 	</div>

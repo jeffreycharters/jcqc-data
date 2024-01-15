@@ -17,13 +17,15 @@
 	}
 </script>
 
-<div class="border border-gray-500 rounded w-52 py-2">
-	<h2 class="mb-2 text-center">Instruments</h2>
+<div class="flex h-fit w-fit flex-col gap-2 rounded border border-gray-500 p-2">
+	<h2 class="text-center">Instruments</h2>
 
-	<div class="flex gap-4 justify-center">
+	<div class="flex justify-center gap-4">
 		{#each $instruments || [] as instrument (instrument.id)}
 			<button
-				class="btn {$instrumentStore?.id === instrument.id ? 'selected-button' : 'method-button'}"
+				class="btn whitespace-nowrap {$instrumentStore?.id === instrument.id
+					? 'selected-button'
+					: 'method-button'}"
 				on:click={() => saveInstrument(instrument)}
 			>
 				{instrument.name}
@@ -34,7 +36,7 @@
 
 <style lang="postcss">
 	.selected-button {
-		@apply text-sky-600 border-sky-700 shadow-sm shadow-sky-700/50 font-semibold;
+		@apply border-sky-700 font-semibold text-sky-600 shadow-sm shadow-sky-700/50;
 		box-shadow: "0 0 5px #086077";
 	}
 </style>

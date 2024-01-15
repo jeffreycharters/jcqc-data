@@ -12,21 +12,19 @@
 	<a class="btn no-underline" href="/edit">Edit stuff</a>
 </div>
 
-<div class="p-4">
-	<div class="align-center">
-		<h1 class="mx-auto w-fit text-2xl">JCQC Reporting Application</h1>
+<div class="align-center p-4">
+	<h1 class="mx-auto w-fit text-2xl">JCQC Reporting Application</h1>
 
-		<hr class="mx-auto my-4 w-[36rem]" />
+	<hr class="mx-auto my-4 max-w-screen-md" />
 
-		<div class="mx-auto flex w-[800px] place-items-stretch justify-between">
-			<SelectInstrument />
-			<MethodSelect />
-		</div>
+	<div class="flex-start mx-auto flex max-w-screen-lg gap-12">
+		<SelectInstrument />
+		<MethodSelect />
 	</div>
 </div>
 
 {#if $methodStore && !$instrumentStore}
-	<div class="mx-auto flex w-fit gap-2 rounded border border-sky-500 bg-sky-50 px-2 py-1">
+	<div class=" mx-auto flex w-fit gap-2 rounded border border-sky-500 bg-sky-50 px-2 py-1">
 		<IconArrowUpLeftCircle class="relative -top-[2px] -rotate-12 stroke-sky-700 stroke-[1.5]" />
 		<div class="font-semibold text-sky-600">Select an instrument!</div>
 	</div>
