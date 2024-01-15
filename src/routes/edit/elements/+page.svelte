@@ -29,6 +29,7 @@
 
 	function addElement({ detail }: CustomEvent<ElementsResponse>) {
 		elementList = [...elementList, detail].sort((a, b) => (a.mass < b.mass ? -1 : 1))
+		editableList = [...editableList, detail.id]
 	}
 </script>
 
