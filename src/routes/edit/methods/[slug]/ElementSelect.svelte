@@ -18,8 +18,6 @@
 	const usedElementIDs = derived(methodElementsStore, ($methodElementsStore) =>
 		($methodElementsStore ?? []).map((methodElement) => methodElement.elementID)
 	)
-
-	const [send, receive] = crossfade({ duration: 200 })
 </script>
 
 <div class="basic-border my-4 w-full bg-stone-100">
@@ -48,28 +46,17 @@
 	</div>
 
 	{#if open}
-		<div class="mx-8 mb-8 grid grid-cols-8 gap-4" transition:slide={{ duration: 200 }}>
-			{#each ($methodElementsStore ?? []).sort((a, b) => a.mass - b.mass) as methodElement (methodElement.id)}
-				<div
-					class="col-span-2"
-					in:receive|local={{ key: methodElement.elementID }}
-					out:send|local={{ key: methodElement.elementID }}
-					animate:flip={{ duration: 200 }}
-				>
-					<ActiveElement {methodElement} />
-				</div>
-			{/each}
-
-			{#each ($allElements ?? [])
-				.filter((e) => !$usedElementIDs.includes(e.id))
-				.sort((a, b) => a.mass - b.mass) as element (element.id)}
-				<div
-					in:receive|local={{ key: element.id }}
-					out:send|local={{ key: element.id }}
-					animate:flip={{ duration: 200 }}
-				>
+		<div class="mx-8 mb-8 grid grid-cols-4 items-stretch gap-4">
+			{#each ($allElements ?? []).sort((a, b) => a.mass - b.mass) as element (element.id)}
+				{#if $usedElementIDs.includes(element.id)}
+					<ActiveElement
+						methodElement={$methodElementsStore?.find(
+							(methodElement) => methodElement.elementID == element.id
+						)}
+					/>
+				{:else}
 					<InactiveElement {element} />
-				</div>
+				{/if}
 			{/each}
 		</div>
 	{/if}

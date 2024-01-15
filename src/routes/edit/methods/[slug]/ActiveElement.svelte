@@ -23,15 +23,15 @@
 </script>
 
 {#if methodElement}
-	<div class="col-span-2 bg-white">
+	<div class=" bg-white">
 		<div class="active-element relative h-full">
-			<div class="flex flex-col h-full items-center">
+			<div class="flex h-full flex-col items-center">
 				<ElementWithMass symbol={methodElement.symbol} mass={methodElement.mass} />
 				<button class="inactivate-button" on:click={removeElement}>Remove</button>
 			</div>
 
-			<div class="flex flex-col gap-2 items-end">
-				<div class="flex gap-1 items-baseline">
+			<div class="flex flex-col items-end gap-2">
+				<div class="flex items-baseline gap-1">
 					{#each availableUnits as unit}
 						<button
 							class={methodElement.units === unit ? "active" : "inactive"}
@@ -47,12 +47,12 @@
 
 <style lang="postcss">
 	.active-element {
-		@apply border border-gray-800 rounded shadow py-2 px-4 flex items-center justify-around;
+		@apply flex items-center justify-around rounded border border-gray-800 px-4 py-2 shadow;
 	}
 	.active {
-		@apply border border-gray-800 shadow font-bold text-xs pt-0 pb-1 rounded px-2;
+		@apply rounded border border-gray-800 px-2 pb-1 pt-0 text-xs font-bold shadow;
 	}
 	.inactive {
-		@apply border border-gray-400 shadow text-xs pt-0 pb-1 rounded px-2 border-dotted text-gray-500;
+		@apply rounded border border-dotted border-gray-400 px-2 pb-1 pt-0 text-xs text-gray-500 shadow;
 	}
 </style>
