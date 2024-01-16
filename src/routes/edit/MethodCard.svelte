@@ -3,12 +3,13 @@
 	import { pb } from "$lib/pocketbase"
 	import type { MethodsResponse } from "$lib/pocketbase-types"
 	import { crossfade } from "svelte/transition"
+	// @ts-expect-error
+	import IconEdit from "@tabler/icons-svelte/dist/svelte/icons/IconEdit.svelte"
+
 	export let method: MethodsResponse
 
 	const [send, receive] = crossfade({ duration: 200 })
 	const { active } = method
-
-	const accentColour = active ? "gray-900" : "gray-300"
 
 	const toggleMethodActive = async () => {
 		pb.collection("methods")
@@ -18,30 +19,37 @@
 </script>
 
 <div
-	class="border border-{accentColour} w-full p-4 rounded shadow flex items-center justify-around"
+	class="flex w-full flex-col rounded border p-4 shadow {active
+		? 'border-stone-900 text-stone-900'
+		: 'border-stone-300 text-stone-500'}"
 	in:receive={{ key: method.id }}
 	out:send={{ key: method.id }}
 >
-	<div class="text-{accentColour}">
-		<h3>
-			{method.name}
-		</h3>
+	<h3 class="text-xl">
+		{method.name}
+	</h3>
+
+	<div class="">
+		{method.description}
+	</div>
+
+	<hr class="pt-4" />
+
+	<div class="flex gap-2 text-sm">
 		<button
-			class="text-sm border border-gray-400 text-gray-400 px-1 rounded-sm border-dotted"
+			class:w-full={!active}
+			class="rounded border border-dotted border-stone-400 px-2 py-1 text-stone-400"
 			on:click={toggleMethodActive}
 		>
 			{active ? "Inactivate" : "Activate"}
 		</button>
-	</div>
-	<div>
 		{#if active}
 			<a
 				href="/edit/methods/{method.slug}"
-				class="no-underline border-gray-400 border py-1 px-4 rounded hover:bg-gray-200 bg-gray-50"
-				>Edit</a
+				class="flex flex-grow items-center justify-center gap-2 rounded border border-stone-500 bg-stone-50 py-1 text-center no-underline hover:bg-stone-200"
+				><IconEdit class="h-4 w-4" />
+				Edit</a
 			>
-		{:else}
-			<div />
 		{/if}
 	</div>
 </div>

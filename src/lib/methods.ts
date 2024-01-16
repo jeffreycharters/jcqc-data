@@ -24,10 +24,10 @@ export const getActiveMethods = async (): Promise<MethodsResponse[]> => {
 	return pb.collection("methods").getFullList({ filter: "active = true" })
 }
 
-export async function setMethods() {
+export async function setMethods(filter: string = "") {
 	const methodList = await pb.collection("methods").getFullList<MethodsResponse<ExpandedMethod>>({
 		sort: "name",
-		filter: "active=true",
+		filter,
 		expand: expandMethod
 	})
 

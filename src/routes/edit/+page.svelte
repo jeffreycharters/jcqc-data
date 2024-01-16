@@ -23,7 +23,7 @@
 
 <h1 class="mb-6 mt-8">Select method to edit</h1>
 
-<div class="grid max-w-screen-lg grid-cols-4 gap-4">
+<div class="grid max-w-screen-lg grid-cols-3 gap-4">
 	{#each ($methods ?? []).filter((method) => method.active) as method (method.id)}
 		<div
 			animate:flip={{ duration: 250 }}

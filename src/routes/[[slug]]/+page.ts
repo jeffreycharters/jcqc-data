@@ -10,7 +10,7 @@ export const load: PageLoad = (async ({ params }) => {
 	const instrumentList: InstrumentsResponse[] = await pb.collection("instruments").getFullList()
 	instruments.set(instrumentList)
 
-	await setMethods()
+	await setMethods("active=true")
 
 	if (!params.slug) {
 		methodStore.set(null)
