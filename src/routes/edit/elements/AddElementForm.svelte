@@ -3,13 +3,15 @@
 	import TextInput from "$lib/components/TextInput.svelte"
 	import type { ElementsResponse } from "$lib/pocketbase-types"
 	import { pb } from "$lib/pocketbase"
-	import { createEventDispatcher, type EventDispatcher } from "svelte"
+	import { createEventDispatcher, tick, type EventDispatcher } from "svelte"
 	import { z } from "zod"
 
 	let name: string
 	let symbol: string
 	let mass: number
 	let formError = ""
+
+	let symbolInput: HTMLInputElement
 
 	const schema = z.object({
 		symbol: z.string().regex(/^[A-Z][a-z]?$/, "Invalid atomic symbol"),
@@ -41,13 +43,15 @@
 				mass,
 				active: true
 			})
-			.then((newElement) => {
+			.then(async (newElement) => {
 				dispatch("addElement", newElement as ElementsResponse)
+				await tick()
+				symbolInput.focus()
 			})
 			.catch((err) => {
 				throw new Error((err as Error).message)
 			})
-		name = ""
+
 		symbol = ""
 		mass = 1
 	}
@@ -57,7 +61,17 @@
 	<h2 class="-mt-2">Add Element</h2>
 
 	<form on:submit|preventDefault={addElement}>
-		<TextInput name="symbol" label="Chemical Symbol" bind:value={symbol} placeholder="e.g. Fe" />
+		<div class="my-2 flex flex-col text-sm">
+			<label for={name}>Chemical Symbol</label>
+			<input
+				type="text"
+				id={name}
+				class="text-input"
+				bind:value={symbol}
+				bind:this={symbolInput}
+				placeholder="e.g. Fe"
+			/>
+		</div>
 		<div class="flex max-w-xs items-end justify-between gap-4">
 			<NumberInput name="mass" label="Isotope Mass" bind:value={mass} placeholder="e.g. 57" />
 			<button type="submit" class="btn mb-2 h-fit">Add</button>
