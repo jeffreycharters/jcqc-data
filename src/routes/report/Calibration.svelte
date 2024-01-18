@@ -17,7 +17,7 @@
 
 	<tbody>
 		{#each allCalibrations as sample}
-			<tr>
+			<tr class="even:bg-stone-200">
 				<td class="max-w-[175px] truncate text-left">{sample.name}</td>
 				{#each orderedElements as elementID}
 					{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
@@ -33,9 +33,3 @@
 		{/each}
 	</tbody>
 </table>
-
-<style lang="postcss">
-	tr:nth-of-type(even) {
-		@apply bg-stone-200;
-	}
-</style>

@@ -9,6 +9,8 @@
 	// @ts-expect-error
 	import IconAtom2 from "@tabler/icons-svelte/dist/svelte/icons/IconAtom2.svelte"
 	// @ts-expect-error
+	import IconTestPipe from "@tabler/icons-svelte/dist/svelte/icons/IconTestPipe.svelte"
+	// @ts-expect-error
 	import IconCookieMan from "@tabler/icons-svelte/dist/svelte/icons/IconCookieMan.svelte"
 	// @ts-expect-error
 	import IconPlaylistAdd from "@tabler/icons-svelte/dist/svelte/icons/IconPlaylistAdd.svelte"
@@ -56,16 +58,23 @@
 
 <h1 class="-mb-2 mt-10">Other options</h1>
 
-<div class="grid max-w-screen-lg grid-cols-4 gap-4">
+<div class="grid max-w-screen-lg grid-cols-3 items-stretch gap-4">
 	<div class="mt-8 h-fit w-full rounded border border-gray-800 shadow">
-		<a href="/edit/elements" class="inline-flex items-center gap-2 px-6 py-4 no-underline">
-			<IconAtom2 class="rotate-45" />
+		<a href="/edit/elements" class="inline-flex items-center gap-4 px-6 py-4 no-underline">
+			<IconAtom2 class="rotate-45 stroke-fuchsia-600" />
 			<h2>Edit elements</h2>
 		</a>
 	</div>
 
 	<div class="mt-8 h-fit w-full rounded border border-gray-800 shadow">
-		<a href="/" class="inline-flex items-center gap-2 px-6 py-4 no-underline">
+		<a href="/edit/testfiles" class="inline-flex items-center gap-4 px-6 py-4 no-underline">
+			<IconTestPipe class="stroke-emerald-600" />
+			<h2>Generate Test Files</h2>
+		</a>
+	</div>
+
+	<div class="mt-8 h-fit w-full rounded border border-gray-800 shadow">
+		<a href="/" class="inline-flex items-center gap-4 px-6 py-4 no-underline">
 			<IconCookieMan class="-rotate-12 stroke-amber-700" />
 			<h2>Return to Main</h2>
 		</a>

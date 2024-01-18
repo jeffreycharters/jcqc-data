@@ -44,7 +44,7 @@ export const parseCSV = async (inputFile: File) => {
 }
 
 export function findElementOrder(csvRows: InstrumentCSVRow[]) {
-	let elementMap: Record<string, boolean> = {}
+	const elementMap: Record<string, boolean> = {}
 	let elements: ElementID[] = []
 
 	for (let i = 0; i < csvRows.length; i++) {
@@ -108,7 +108,7 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 					name: rawRunlist[i].name,
 					analysisNumber: i,
 					calStandards: rawRunlist
-						.slice(i + 1, i + (method?.calibrationCount ?? 0))
+						.slice(i + 1, i + (method?.calibrationCount ?? 0) + 1)
 						.map((r, index) => {
 							return {
 								name: r.name,
