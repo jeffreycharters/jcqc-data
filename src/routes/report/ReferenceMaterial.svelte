@@ -17,6 +17,8 @@
 		if (low && high && value > low && value < high) return "passes"
 		return "fails"
 	}
+
+	const conditionalSpace = ($methodElementsStore?.length ?? 0) > 10 ? "" : " "
 </script>
 
 <table class="results">
@@ -41,13 +43,15 @@
 					{@const ranges = sample.referenceMaterial?.elements[elementID]}
 					{@const passes = ranges ? checkRanges(sample.results[elementID], ranges) : "neutral"}
 
-					<td class={passes}>
+					<td class="{passes} whitespace-nowrap">
 						{#if passes === "neutral"}
 							- -
 						{:else if passes === "passes"}
 							Yes
 						{:else if ranges}
-							{sample.results[elementID] > ranges.high ? `> ${ranges.high}` : `< ${ranges.low}`}
+							{sample.results[elementID] > ranges.high
+								? `>${conditionalSpace}${roundToSigFigs(ranges.high, 2)}`
+								: `<${conditionalSpace}${roundToSigFigs(ranges.low, 2)}`}
 						{/if}
 					</td>
 				{/if}

@@ -1,6 +1,13 @@
 <script lang="ts">
 	import SpreadRows from "./SpreadRows.svelte"
-	import { calibrationRows, checkStandardRows, rinseRows } from "$lib/testfiles"
+	import {
+		blankRows,
+		calibrationRows,
+		checkStandardRows,
+		referenceMaterialsRows,
+		rinseRows,
+		sampleRows
+	} from "$lib/testfiles"
 
 	const headerRow =
 		"Sample Name,Dilution Factor,Sample Weight or Volume,Analyte,Mass,Concentration,Units\r\n"
@@ -24,4 +31,9 @@
 	<SpreadRows rows={rinseRows()} />
 	<SpreadRows rows={rinseRows()} />
 	<SpreadRows rows={checkStandardRows()} />
+	<SpreadRows rows={blankRows()} />
+	<SpreadRows rows={referenceMaterialsRows()} />
+	<SpreadRows rows={rinseRows()} />
+	<SpreadRows rows={sampleRows()} />
+	<SpreadRows rows={rinseRows()} />
 </div>

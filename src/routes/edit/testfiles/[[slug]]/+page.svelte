@@ -1,10 +1,6 @@
 <script lang="ts">
 	import { methodStore, methods } from "$lib/stores"
 	import Output from "./Output.svelte"
-
-	function generateTestfile(methodID: string) {
-		console.log("mmk: ", methodID)
-	}
 </script>
 
 {#if !$methodStore}

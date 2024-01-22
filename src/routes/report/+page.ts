@@ -26,7 +26,7 @@ export const load = (async () => {
 	let currentBlock: RunListEntry[] = []
 
 	for (let i = 0; i < runlist.length; i++) {
-		if (i === runlist.length - 1 && runlist[i].isSample) {
+		if (i === runlist.length - 1 && runlist[i].isSample && !runlist[i].duplicateSamples) {
 			currentBlock = [...currentBlock, runlist[i]]
 			sampleList = [...sampleList, { type: "sampleBlock", samples: currentBlock }]
 			continue

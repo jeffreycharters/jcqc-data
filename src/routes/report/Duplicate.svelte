@@ -10,11 +10,10 @@
 	const rpdLimit = $methodStore?.rpdLimit ?? 0
 
 	const calculateRPD = (value: number, dupValue: number) => {
-		return (Math.abs(value - dupValue) / (value + dupValue / 2)) * 100
+		return (Math.abs(value - dupValue) / ((value + dupValue) / 2)) * 100
 	}
 
 	const checkIfDupPassing = (average: number, rpd: number, loq: number | undefined) => {
-		console.log({ rpdLimit, loq, average })
 		if (!rpdLimit || !loq || average < 2 * loq) return "neutral"
 		if (rpd > rpdLimit) return "fails"
 		if (rpd < rpdLimit) return "passes"

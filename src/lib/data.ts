@@ -129,15 +129,14 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 		}
 
 		if (dupRegex.test(name)) {
-			const refSampleName = dupRegex.exec(name)?.[1]
+			const refSampleName = dupRegex.exec(name)?.[1] ?? undefined
 			if (!refSampleName) break
 
 			for (let j = runlist.length - 1; j >= 0; j--) {
 				if (runlist[j].name.toLowerCase() === refSampleName.toLowerCase()) {
-					const duplicateSamples = runlist[j].duplicateSamples ?? []
 					runlist[j] = {
 						...runlist[j],
-						duplicateSamples: [...duplicateSamples, runlistEntry],
+						duplicateSamples: [...(runlist[j].duplicateSamples ?? []), runlistEntry],
 						referenceBlank: mostRecentBlank
 					}
 					continue listLoop
@@ -272,6 +271,6 @@ export const roundToSigFigs = (number: number, sigFigs: number) => {
 		result = result / Math.pow(10, sigFigs + orderOfMagnitude - 1)
 		return parseFloat(result.toPrecision(sigFigs))
 	} else {
-		return parseFloat(number.toPrecision(sigFigs))
+		return parseFloat(number?.toPrecision(sigFigs))
 	}
 }
