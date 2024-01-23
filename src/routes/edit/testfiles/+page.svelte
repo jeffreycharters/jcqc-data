@@ -1,5 +1,15 @@
 <script lang="ts">
+	import type { MethodsResponse } from "$lib/pocketbase-types"
 	import { methods } from "$lib/stores"
+	import { methodTestOutput } from "$lib/testfiles"
+	import pkg from "file-saver"
+	const { saveAs } = pkg
+
+	async function download(method: MethodsResponse) {
+		const output = new Blob([await methodTestOutput(method.id)], { type: "text/csv;charset=utf-8" })
+		const now = new Date().toLocaleDateString("en-CA")
+		saveAs(output, `TEST-${now}=${method.name}.txt`)
+	}
 </script>
 
 <div class="mb-6 mt-8 w-full max-w-screen-xl">
@@ -22,11 +32,14 @@
 
 	<div class="grid grid-cols-3 gap-2">
 		{#each $methods ?? [] as method (method.id)}
-			<a class="rounded border border-stone-800 p-4" href="/edit/testfiles/download/{method.slug}">
+			<button
+				class="rounded border border-stone-800 p-4 text-left"
+				on:click={() => download(method)}
+			>
 				<h2 class="text-stone-700">{method.name}</h2>
 				<hr />
 				<p class="text-stone-500">{method.description}</p>
-			</a>
+			</button>
 		{/each}
 	</div>
 </div>

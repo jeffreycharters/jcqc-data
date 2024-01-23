@@ -6,8 +6,45 @@ import {
 	methodStore,
 	referenceMaterialsStore
 } from "./stores"
-import type { ExpandedBlank, InstrumentCSVRow, MethodElement } from "./types"
-import type { BlanksResponse } from "./pocketbase-types"
+import type { ExpandedBlank, ExpandedMethod, InstrumentCSVRow, MethodElement } from "./types"
+import type { BlanksResponse, MethodsResponse } from "./pocketbase-types"
+import { pb } from "./pocketbase"
+import { setMethodStores } from "./methods"
+
+export async function methodTestOutput(methodID: string) {
+	const method = await pb.collection("methods").getOne<MethodsResponse<ExpandedMethod>>(methodID, {
+		expand: "elements"
+	})
+
+	methodStore.set(method)
+	await setMethodStores(method.id)
+
+	const headerRow =
+		"Sample Name,Dilution Factor,Sample Weight or Volume,Analyte,Mass,Concentration,Units\r\n"
+
+	const precalRinseRow = rinseRows(false)
+	const rinseRow = rinseRows(true)
+	const calibration = calibrationRows()
+	const checkStandard = checkStandardRows()
+	const blank = blankRows()
+	const referenceMaterial = referenceMaterialsRows()
+	const samples = sampleRows()
+
+	const output =
+		headerRow +
+		precalRinseRow +
+		calibration +
+		rinseRow +
+		rinseRow +
+		checkStandard +
+		blank +
+		referenceMaterial +
+		rinseRow +
+		samples +
+		rinseRow
+
+	return output
+}
 
 export function SpreadCSVRow(input: InstrumentCSVRow) {
 	const order: Array<keyof InstrumentCSVRow> = [
