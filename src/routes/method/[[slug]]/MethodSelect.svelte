@@ -9,7 +9,7 @@
 		{#each $methods ?? [] as method (method.id)}
 			<a
 				data-sveltekit-preload-data="off"
-				href="/{method.slug}"
+				href="/method/{method.slug}"
 				class="btn no-underline {$page.params.slug === method.slug
 					? 'selected-button'
 					: 'method-button'}">{method.name}</a

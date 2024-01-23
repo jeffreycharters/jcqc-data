@@ -19,11 +19,17 @@ export function SpreadCSVRow(input: InstrumentCSVRow) {
 		"Concentration",
 		"Units"
 	]
+
 	let output: (string | number)[] = []
+
 	for (const item of order) {
 		output = [...output, input[item] ?? ""]
 	}
-	return output.map((s) => (typeof s === "number" ? s.toFixed(5) : s)).join(",") + "\r\n"
+
+	return output
+		.map((s) => (typeof s === "number" ? s.toFixed(5) : s))
+		.join(",")
+		.concat("\r\n")
 }
 
 export function calibrationRows() {
@@ -32,7 +38,7 @@ export function calibrationRows() {
 
 	if (!method || !methodElements) throw new Error("Missing method or method elements")
 
-	let output: string[] = []
+	let output: string = ""
 
 	for (let i = 0; i <= method?.calibrationCount; i++) {
 		for (const methodElement of methodElements) {
@@ -47,7 +53,7 @@ export function calibrationRows() {
 				Concentration: methodElement.units === "ppb" ? i * 10 : i / 100
 			}
 
-			output = [...output, SpreadCSVRow(row)]
+			output = output + SpreadCSVRow(row)
 		}
 	}
 
@@ -66,13 +72,13 @@ export function calibrationSampleName(i: number, calibrationCount: number) {
 	return "Unknown Cal Sample"
 }
 
-export function rinseRows(calibrated = false) {
+export function rinseRows(calibrated = true) {
 	const method = get(methodStore)
 	const methodElements = get(methodElementsStore)?.sort((a, b) => a.mass - b.mass)
 
 	if (!method || !methodElements) throw new Error("Missing method or method elements")
 
-	let output: string[] = []
+	let output: string = ""
 
 	for (const methodElement of methodElements) {
 		const row: InstrumentCSVRow = {
@@ -84,7 +90,7 @@ export function rinseRows(calibrated = false) {
 			Units: methodElement.units
 		}
 		if (calibrated) row.Concentration = Math.random() * 10
-		output = [...output, SpreadCSVRow(row)]
+		output = output + SpreadCSVRow(row)
 	}
 
 	return output
@@ -99,8 +105,7 @@ export function checkStandardRows() {
 
 	if (!checkStandards || !checkStandards.length) return []
 
-	let output: string[] = []
-
+	let output: string = ""
 	for (const checkStandard of checkStandards) {
 		for (const qcType of ["tooHigh", "okHigh", "okLow", "tooLow"]) {
 			for (const methodElement of methodElements) {
@@ -138,7 +143,7 @@ export function checkStandardRows() {
 					Concentration: concentration
 				}
 
-				output = [...output, SpreadCSVRow(row)]
+				output = output + SpreadCSVRow(row)
 			}
 		}
 	}
@@ -155,7 +160,7 @@ export function blankRows(includeDuplicates = true) {
 
 	if (!blanks || !blanks.length) return []
 
-	let output: string[] = []
+	let output: string = ""
 
 	for (let i = 0; i < blanks.length; i++) {
 		for (const qcType of ["tooHigh", "ok"]) {
@@ -188,12 +193,12 @@ export function blankRows(includeDuplicates = true) {
 					Concentration: concentration
 				}
 
-				output = [...output, SpreadCSVRow(row)]
+				output = output + SpreadCSVRow(row)
 			}
 		}
 
 		if (includeDuplicates)
-			output = [...output, ...duplicateRows(method.rpdLimit, blanks[i], methodElements)]
+			output = output + duplicateRows(method.rpdLimit, blanks[i], methodElements)
 	}
 
 	return output
@@ -204,7 +209,7 @@ function duplicateRows(
 	blank: BlanksResponse<ExpandedBlank>,
 	methodElements: MethodElement[]
 ) {
-	let output: string[] = []
+	let output: string = ""
 
 	const qcTypes = ["unacceptable", "acceptable", "noDetect"]
 
@@ -242,7 +247,7 @@ function duplicateRows(
 					Concentration: dups[rep]
 				}
 
-				output = [...output, SpreadCSVRow(row)]
+				output = output + SpreadCSVRow(row)
 			}
 		}
 	}
@@ -264,7 +269,7 @@ export function referenceMaterialsRows() {
 
 	if (!referenceMaterials || !referenceMaterials.length) return []
 
-	let output: string[] = []
+	let output: string = ""
 
 	for (const referenceMaterial of referenceMaterials) {
 		for (const qcType of ["tooHigh", "okHigh", "okLow", "tooLow"]) {
@@ -303,7 +308,7 @@ export function referenceMaterialsRows() {
 					Concentration: concentration
 				}
 
-				output = [...output, SpreadCSVRow(row)]
+				output = output + SpreadCSVRow(row)
 			}
 		}
 	}
@@ -315,7 +320,7 @@ export function sampleRows() {
 	const methodElements = get(methodElementsStore)?.sort((a, b) => a.mass - b.mass)
 	if (!methodElements) throw new Error("Missing method elements")
 
-	let output: string[] = []
+	let output: string = ""
 	for (let i = 1; i < 10; i++) {
 		for (const methodelement of methodElements) {
 			const row = SpreadCSVRow({
@@ -327,7 +332,7 @@ export function sampleRows() {
 				Units: "ppb",
 				Concentration: i
 			})
-			output = [...output, row]
+			output = output + row
 		}
 	}
 

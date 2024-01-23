@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { instrumentStore, methodStore, referenceMaterialsStore } from "$lib/stores"
+	import { instrumentStore, methodStore } from "$lib/stores"
 	import FilePicker from "./FilePicker.svelte"
 	import MethodParams from "./MethodParams.svelte"
 	import SelectInstrument from "./SelectInstrument.svelte"
 	import MethodSelect from "./MethodSelect.svelte"
+
 	// @ts-expect-error
 	import IconArrowUpLeftCircle from "@tabler/icons-svelte/dist/svelte/icons/IconArrowUpLeftCircle.svelte"
 </script>

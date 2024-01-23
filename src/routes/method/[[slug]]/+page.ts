@@ -14,9 +14,7 @@ export const load: PageLoad = (async ({ params }) => {
 
 	if (!params.slug) {
 		methodStore.set(null)
-		return {
-			title: "JCQC Data Processor"
-		}
+		throw redirect(302, "/")
 	}
 
 	const methodResponse: MethodsResponse<ExpandedMethod> = await pb
