@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { roundToSigFigs } from "$lib/data"
 	import { reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import { methodElementsStore } from "$lib/stores"
@@ -15,7 +14,7 @@
 	{#each $reportData?.meta.orderedElements ?? [] as elementID}
 		{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 			<td>
-				{roundToSigFigs(sample.results[elementID], 3)}
+				{sample.results[elementID].toPrecision(3)}
 			</td>
 		{/if}
 	{/each}

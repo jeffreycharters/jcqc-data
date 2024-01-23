@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { roundToSigFigs } from "$lib/data"
 	import { methodElementsStore, reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
@@ -26,7 +25,7 @@
 							"ppm"
 								? sample.results[elementID] * 1000
 								: sample.results[elementID]}
-						<td class="text-center">{roundToSigFigs(prettyValue, 3)}</td>
+						<td class="text-center">{prettyValue.toPrecision(3)}</td>
 					{/if}
 				{/each}
 			</tr>

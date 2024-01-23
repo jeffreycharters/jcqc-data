@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { roundToSigFigs } from "$lib/data"
 	import { methodStore, reportData, blanksStore, methodElementsStore } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
@@ -30,7 +29,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td class="text-center">
-						{roundToSigFigs(sample.results[elementID], 3)}
+						{sample.results[elementID].toPrecision(3)}
 					</td>
 				{/if}
 			{/each}
@@ -42,7 +41,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td class="text-center">
-						{roundToSigFigs(duplicate.results[elementID], 3)}
+						{duplicate.results[elementID].toPrecision(3)}
 					</td>
 				{/if}
 			{/each}
@@ -53,7 +52,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td>
-						{roundToSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2, 3)}
+						{((sample.results[elementID] + duplicate.results[elementID]) / 2).toPrecision(3)}
 					</td>
 				{/if}
 			{/each}

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { roundToSigFigs } from "$lib/data"
 	import HeaderRow from "./HeaderRow.svelte"
 	import { methodElementsStore, methodStore, reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
@@ -42,7 +41,7 @@
 					{@const prettyValue =
 						units === "ppb" ? sample.results[elementID] : sample.results[elementID] * 1000}
 					<td class="text-center">
-						{roundToSigFigs(prettyValue, 3)}
+						{prettyValue.toPrecision(3)}
 					</td>
 				{/if}
 			{/each}

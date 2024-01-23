@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { roundToSigFigs } from "$lib/data"
 	import { methodElementsStore, reportData } from "$lib/stores"
 	import type { ReferenceMaterialRange, RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
@@ -29,9 +28,7 @@
 			<td class="firstCol">{sample.name}</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					<td>
-						{roundToSigFigs(sample.results[elementID], 3)}
-					</td>
+					<td>{sample.results[elementID].toPrecision(3).toString()}</td>
 				{/if}
 			{/each}
 		</tr>
@@ -50,8 +47,8 @@
 							Yes
 						{:else if ranges}
 							{sample.results[elementID] > ranges.high
-								? `>${conditionalSpace}${roundToSigFigs(ranges.high, 2)}`
-								: `<${conditionalSpace}${roundToSigFigs(ranges.low, 2)}`}
+								? `>${conditionalSpace}${ranges.high}`
+								: `<${conditionalSpace}${(ranges.low, 2)}`}
 						{/if}
 					</td>
 				{/if}
