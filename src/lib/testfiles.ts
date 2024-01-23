@@ -211,10 +211,10 @@ export function blankRows(includeDuplicates = true) {
 
 				switch (qcType) {
 					case "tooHigh":
-						concentration = loq * 1.01
+						concentration = loq * 1.05
 						break
 					case "ok":
-						concentration = loq / 1.01
+						concentration = loq / 1.05
 						break
 					default:
 						throw new Error("Invalid qcType")
@@ -320,16 +320,16 @@ export function referenceMaterialsRows() {
 
 				switch (qcType) {
 					case "tooHigh":
-						concentration = (upper ?? 0) * 1.01
+						concentration = (upper ?? 0) * 1.05
 						break
 					case "okHigh":
-						concentration = (upper ?? 0) * 0.99
+						concentration = (upper ?? 0) * 0.95
 						break
 					case "okLow":
-						concentration = (lower ?? 0) * 1.01
+						if (lower) concentration = lower > 0 ? lower * 1.05 : lower / 1.05
 						break
 					case "tooLow":
-						concentration = (lower ?? 0) * 0.99
+						if (lower) concentration = lower > 0 ? lower / 1.05 : lower * 1.05
 						break
 					default:
 						throw new Error("Invalid qcType")
