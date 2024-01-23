@@ -7,7 +7,7 @@
 	export let methodElement: MethodElement | undefined
 
 	// @ts-expect-error
-	import IconTrashX from "@tabler/icons-svelte/dist/svelte/icons/IconTrashX.svelte"
+	import IconSquareRoundedMinus from "@tabler/icons-svelte/dist/svelte/icons/IconSquareRoundedMinus.svelte"
 
 	async function removeElement() {
 		await pb.collection("methodElements").delete(methodElement!.id)
@@ -27,10 +27,14 @@
 
 {#if methodElement}
 	<div
-		class="flex h-full w-full items-center justify-around rounded border border-gray-800 bg-white p-2 shadow"
+		class="flex h-full w-full items-center justify-between rounded border border-gray-800 bg-white p-2 shadow"
 	>
-		<button on:click={removeElement}>
-			<IconTrashX class="h-8 w-8 rounded-full stroke-red-700 p-1 hover:bg-red-100" />
+		<button
+			on:click={removeElement}
+			class="flex items-center gap-1 rounded-full px-2 py-1 hover:bg-red-100"
+		>
+			<IconSquareRoundedMinus class="h-4 w-4 stroke-red-700" title="remove element" />
+			<span class="text-xs text-red-700">Remove</span>
 		</button>
 		<ElementWithMass
 			symbol={methodElement.symbol}
