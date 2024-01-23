@@ -2,6 +2,7 @@
 	import { reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import { methodElementsStore } from "$lib/stores"
+	import { toSigFigs } from "$lib/data"
 
 	export let sample: RunListEntry
 	export let index: number
@@ -14,7 +15,7 @@
 	{#each $reportData?.meta.orderedElements ?? [] as elementID}
 		{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 			<td>
-				{sample.results[elementID].toPrecision(3)}
+				{toSigFigs(sample.results[elementID], 3)}
 			</td>
 		{/if}
 	{/each}

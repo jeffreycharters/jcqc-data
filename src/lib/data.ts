@@ -232,3 +232,17 @@ function simplifiedCheckStandard(cs: CheckStandardsResponse<ExpandedCheckStandar
 		)
 	}
 }
+
+export function toSigFigs(n: number, sigFigs: number) {
+	let orderOfMagnitude = 0
+
+	for (let number = n; number > 10; number /= 10) {
+		orderOfMagnitude += 1
+	}
+
+	if (sigFigs > orderOfMagnitude) {
+		return n.toPrecision(sigFigs)
+	}
+
+	return parseFloat(n.toPrecision(sigFigs)).toString()
+}

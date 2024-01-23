@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { toSigFigs } from "$lib/data"
 	import { methodElementsStore, reportData } from "$lib/stores"
 	import type { ReferenceMaterialRange, RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
@@ -17,7 +18,7 @@
 		return "fails"
 	}
 
-	const conditionalSpace = ($methodElementsStore?.length ?? 0) > 10 ? "" : " "
+	const conditionalSpace = ($methodElementsStore?.length ?? 0) > 11 ? "" : " "
 </script>
 
 <table class="results">
@@ -28,7 +29,7 @@
 			<td class="firstCol">{sample.name}</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					<td>{sample.results[elementID].toPrecision(3).toString()}</td>
+					<td>{toSigFigs(sample.results[elementID], 3)}</td>
 				{/if}
 			{/each}
 		</tr>
@@ -48,7 +49,7 @@
 						{:else if ranges}
 							{sample.results[elementID] > ranges.high
 								? `>${conditionalSpace}${ranges.high}`
-								: `<${conditionalSpace}${(ranges.low, 2)}`}
+								: `<${conditionalSpace}${ranges.low}`}
 						{/if}
 					</td>
 				{/if}

@@ -2,6 +2,7 @@
 	import HeaderRow from "./HeaderRow.svelte"
 	import { methodElementsStore, methodStore, reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
+	import { toSigFigs } from "$lib/data"
 
 	export let sample: RunListEntry
 
@@ -41,7 +42,7 @@
 					{@const prettyValue =
 						units === "ppb" ? sample.results[elementID] : sample.results[elementID] * 1000}
 					<td class="text-center">
-						{prettyValue.toPrecision(3)}
+						{toSigFigs(prettyValue, 3)}
 					</td>
 				{/if}
 			{/each}

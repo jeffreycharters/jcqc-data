@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { toSigFigs } from "$lib/data"
 	import { methodStore, reportData, blanksStore, methodElementsStore } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
@@ -29,7 +30,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td class="text-center">
-						{sample.results[elementID].toPrecision(3)}
+						{toSigFigs(sample.results[elementID], 3)}
 					</td>
 				{/if}
 			{/each}
@@ -41,7 +42,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td class="text-center">
-						{duplicate.results[elementID].toPrecision(3)}
+						{toSigFigs(duplicate.results[elementID], 3)}
 					</td>
 				{/if}
 			{/each}
@@ -52,7 +53,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td>
-						{((sample.results[elementID] + duplicate.results[elementID]) / 2).toPrecision(3)}
+						{toSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2, 3)}
 					</td>
 				{/if}
 			{/each}
@@ -70,7 +71,7 @@
 						{#if !rpd || !loq || average < loq * 2}
 							- -
 						{:else}
-							{parseFloat(rpd.toPrecision(2))}%
+							{toSigFigs(rpd, 2)}%
 						{/if}
 					</td>
 				{/if}
