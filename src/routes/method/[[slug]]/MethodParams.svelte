@@ -134,7 +134,7 @@
 					</tr>
 				{/each}
 
-				{#each $referenceMaterialsStore ?? [] as referenceMaterial (referenceMaterial.id)}
+				{#each $referenceMaterialsStore?.filter((rm) => rm.active) ?? [] as referenceMaterial (referenceMaterial.id)}
 					<tr class="border-b border-gray-400">
 						<td class="first-column flex items-center justify-between gap-2">
 							<div>

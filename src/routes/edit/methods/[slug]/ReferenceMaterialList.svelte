@@ -7,11 +7,27 @@
 	import { pb } from "$lib/pocketbase"
 	import { setReferenceMaterials } from "$lib/methods"
 	import { fade } from "svelte/transition"
+	import { createSwitch, melt } from "@melt-ui/svelte"
 	// @ts-expect-error
 	import IconTrash from "@tabler/icons-svelte/dist/svelte/icons/IconTrash.svelte"
+	import { writable } from "svelte/store"
 
 	export let referenceMaterial: ReferenceMaterialsResponse<ExpandedReferenceMaterial>
 	let { name } = referenceMaterial
+
+	const active = writable(referenceMaterial.active)
+
+	const {
+		elements: { root, input }
+	} = createSwitch({ checked: active })
+
+	active.subscribe((value) => {
+		if (value === referenceMaterial.active) return
+
+		pb.collection("referenceMaterials")
+			.update(referenceMaterial.id, { active: value })
+			.then(async () => await setReferenceMaterials($methodStore!.id))
+	})
 
 	let statusMessage = ""
 	let editing = false
@@ -50,13 +66,39 @@
 				{:else}
 					<h3>{name}</h3>
 				{/if}
-				<button type="button" on:click={() => (editing = !editing)} class={editing ? "btn" : ""}>
+				<button type="button" on:click={() => (editing = !editing)} class:btn={editing}>
 					{#if editing}
 						Cancel
 					{:else}
 						<EditIcon classes="stroke-gray-400 h-5 w-5" strokeWidth="1.75" />
 					{/if}
 				</button>
+				<div class="flex items-center gap-2">
+					<button
+						use:melt={$root}
+						class="relative h-5 cursor-default rounded-full bg-stone-400 transition-colors data-[state=checked]:bg-green-600"
+						id="airplane-mode"
+						aria-labelledby="airplane-mode-label"
+					>
+						<span
+							class="thumb block rounded-full transition {$active
+								? 'bg-green-100'
+								: 'bg-stone-100'}"
+						/>
+					</button>
+					<input use:melt={$input} />
+					{#key $active}
+						<label
+							in:fade={{ duration: 100, delay: 100 }}
+							out:fade={{ duration: 100 }}
+							class="leading-none {$active ? 'text-emerald-600' : 'text-stone-400'}"
+							for="airplane-mode"
+							id="airplane-mode-label"
+						>
+							{$active ? "Active" : "Inactive"}
+						</label>
+					{/key}
+				</div>
 			</form>
 			{#if statusMessage}
 				<div
@@ -68,6 +110,7 @@
 				</div>
 			{/if}
 		</div>
+
 		<button on:click={deleteCheckStandard}>
 			<IconTrash class="h-8 w-8 stroke-red-700 p-1" />
 		</button>
@@ -83,3 +126,21 @@
 		{/each}
 	</div>
 </div>
+
+<style>
+	button {
+		--w: 2.25rem;
+		--padding: 0.125rem;
+		width: var(--w);
+	}
+	.thumb {
+		--size: 1rem;
+		width: var(--size);
+		height: var(--size);
+		transform: translateX(var(--padding));
+	}
+
+	:global([data-state="checked"]) .thumb {
+		transform: translateX(calc(var(--w) - var(--size) - var(--padding)));
+	}
+</style>

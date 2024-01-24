@@ -93,7 +93,8 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 	const blankNames = blanks?.map((b) => b.name.trim().toLowerCase()) ?? []
 
 	const referenceMaterials = get(referenceMaterialsStore)
-	const referenceMaterialNames = referenceMaterials?.map((r) => r.name.trim().toLowerCase()) ?? []
+	const referenceMaterialNames =
+		referenceMaterials?.filter((rm) => rm.active).map((r) => r.name.trim().toLowerCase()) ?? []
 
 	let mostRecentBlank: SimplifiedComparator<BlankLimits> | undefined
 
@@ -240,9 +241,7 @@ export function toSigFigs(n: number, sigFigs: number) {
 		orderOfMagnitude += 1
 	}
 
-	if (sigFigs > orderOfMagnitude) {
-		return n.toPrecision(sigFigs)
-	}
+	if (sigFigs > orderOfMagnitude) return n.toPrecision(sigFigs)
 
 	return parseFloat(n.toPrecision(sigFigs)).toString()
 }

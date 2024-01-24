@@ -15,6 +15,11 @@
 	let open = false
 	let addFormOpen = false
 
+	const sortedMaterials =
+		$referenceMaterialsStore
+			?.sort((a, b) => (a.name < b.name ? 1 : -1))
+			.sort((a, b) => (a.active && !b.active ? -1 : 1)) ?? []
+
 	async function createNewReferenceMaterial() {
 		await pb.collection("referenceMaterials").create({
 			name: newReferenceMaterialName,
@@ -47,7 +52,7 @@
 
 	{#if open}
 		<div class="mx-8 mb-8 flex flex-col gap-4" transition:slide={{ duration: 200 }}>
-			{#each $referenceMaterialsStore ?? [] as referenceMaterial (referenceMaterial.id)}
+			{#each sortedMaterials as referenceMaterial (referenceMaterial.id)}
 				<ReferenceMaterialList {referenceMaterial} />
 			{/each}
 
