@@ -61,7 +61,7 @@
 				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
 						{#if $methodStore}
-							3
+							{$methodStore.reportSigFigs}
 						{:else}
 							??
 						{/if}

@@ -30,7 +30,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td class="text-center">
-						{toSigFigs(sample.results[elementID], 3)}
+						{toSigFigs(sample.results[elementID])}
 					</td>
 				{/if}
 			{/each}
@@ -42,7 +42,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td class="text-center">
-						{toSigFigs(duplicate.results[elementID], 3)}
+						{toSigFigs(duplicate.results[elementID])}
 					</td>
 				{/if}
 			{/each}
@@ -53,7 +53,7 @@
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
 					<td>
-						{toSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2, 3)}
+						{toSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2)}
 					</td>
 				{/if}
 			{/each}

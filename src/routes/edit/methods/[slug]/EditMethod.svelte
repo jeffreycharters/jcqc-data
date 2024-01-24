@@ -15,7 +15,8 @@
 
 	let open = false
 
-	let { name, calibrationCount, description, checkStandardTolerance, rpdLimit } = $methodStore || {}
+	let { name, calibrationCount, description, checkStandardTolerance, rpdLimit, reportSigFigs } =
+		$methodStore || {}
 
 	const addFormMessage = (message: string, timeout: number = 3000) => {
 		if (timer) clearTimeout(timer)
@@ -36,6 +37,7 @@
 				description,
 				checkStandardTolerance,
 				rpdLimit,
+				reportSigFigs,
 				expand: expandMethod
 			})
 			.then((updatedMethod) => {
@@ -115,6 +117,12 @@
 					label="Check Standard Tolerance (%)"
 					bind:value={checkStandardTolerance}
 					placeholder="e.g. 15"
+				/>
+				<NumberInput
+					name="sig-figs"
+					label="Significant figures on report"
+					bind:value={reportSigFigs}
+					placeholder="e.g. 2"
 				/>
 			</div>
 		</form>

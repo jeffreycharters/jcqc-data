@@ -37,7 +37,14 @@
 				invalid_type_error: "Invalid Calibration STD count"
 			})
 			.min(1, "Calibration STD count must be greater than 0")
-			.max(100, "Calibration STD count must be less than 100")
+			.max(100, "Calibration STD count must be less than 100"),
+		reportSigFigs: z.coerce
+			.number({
+				required_error: "Report Sig Figs is required",
+				invalid_type_error: "Invalid Report Sig Figs"
+			})
+			.min(1, "Report Sig Figs must be greater than 0")
+			.max(5, "Report Sig Figs must 5 or less")
 	})
 
 	export let showAddForm: boolean
@@ -45,9 +52,10 @@
 	let formError = ""
 	let name: string
 	let rpdLimit: number
-	let calibrationCount = 1
+	let calibrationCount = 5
 	let description: string
 	let checkStandardTolerance: number
+	let reportSigFigs: number = 2
 
 	const dispatch: EventDispatcher<{ close: unknown }> = createEventDispatcher()
 
@@ -57,7 +65,8 @@
 			rpdLimit,
 			calibrationCount,
 			description,
-			checkStandardTolerance
+			checkStandardTolerance,
+			reportSigFigs
 		})
 
 		if (!fd.success) return (formError = fd.error.issues[0].message)
@@ -72,7 +81,8 @@
 				active: true,
 				calibrationCount,
 				description,
-				checkStandardTolerance
+				checkStandardTolerance,
+				reportSigFigs
 			})
 			.then(async () => {
 				await setMethods()
@@ -93,7 +103,7 @@
 		<div class="flex items-center justify-between">
 			<h2>Add new</h2>
 			<button on:click={() => dispatch("close")}>
-				<IconSquareX size={24} stroke={1.5} class="stroke-stone-500" />
+				<IconSquareX class="h-6 w-6 stroke-stone-500" />
 			</button>
 		</div>
 		<form on:submit|preventDefault={addMethod}>
@@ -119,17 +129,18 @@
 				/>
 			</div>
 
-			<div class="flex items-end justify-between gap-8">
+			<div class="flex max-w-md items-end justify-between gap-8">
 				<NumberInput
 					name="cal-count"
-					label="Number of non-blank calibration standards"
+					label="Non-blank calibration standards"
 					bind:value={calibrationCount}
 				/>
-				<div class="mb-1">
-					<button type="submit" class="btn">Add Method</button>
-				</div>
+				<NumberInput name="sigfigs" label="Report sig figs" bind:value={calibrationCount} />
 			</div>
 
+			<div class="mb-1 w-full">
+				<button type="submit" class="btn w-full">Add Method</button>
+			</div>
 			<div class="w-fit">
 				{#if formError}
 					<div transition:slide={{ duration: 200 }} class="ml-2 text-sm italic text-red-600">

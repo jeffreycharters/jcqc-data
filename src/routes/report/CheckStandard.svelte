@@ -42,7 +42,7 @@
 					{@const prettyValue =
 						units === "ppb" ? sample.results[elementID] : sample.results[elementID] * 1000}
 					<td class="text-center">
-						{toSigFigs(prettyValue, 3)}
+						{toSigFigs(prettyValue)}
 					</td>
 				{/if}
 			{/each}

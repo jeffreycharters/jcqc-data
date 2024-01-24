@@ -234,7 +234,7 @@ function simplifiedCheckStandard(cs: CheckStandardsResponse<ExpandedCheckStandar
 	}
 }
 
-export function toSigFigs(n: number, sigFigs: number) {
+export function toSigFigs(n: number, sigFigs: number = get(methodStore)?.reportSigFigs ?? 2) {
 	let orderOfMagnitude = 0
 
 	for (let number = n; number > 10; number /= 10) {

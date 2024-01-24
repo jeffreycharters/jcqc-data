@@ -97,6 +97,7 @@ export type MethodsRecord = {
 	name?: string
 	rpdLimit?: number
 	slug?: string
+	reportSigFigs?: number
 }
 
 export type ReferenceMaterialsRecord = {

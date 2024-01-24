@@ -15,7 +15,7 @@
 			<td class="firstCol">{sample.name}</td>
 			{#each $reportData?.meta.orderedElements ?? [] as elementID}
 				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					<td>{toSigFigs(sample.results[elementID], 3)}</td>
+					<td>{toSigFigs(sample.results[elementID])}</td>
 				{/if}
 			{/each}
 		</tr>
