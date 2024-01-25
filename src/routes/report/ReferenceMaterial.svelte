@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
+	import { methodElementsID } from "$lib/elements"
 	import { methodElementsStore, reportData } from "$lib/stores"
 	import type { ReferenceMaterialRange, RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
@@ -27,19 +28,21 @@
 	<tbody>
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name}</td>
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					<td>{toSigFigs(sample.results[elementID])}</td>
+			{#each $methodElementsStore ?? [] as methodElement}
+				{#if $methodElementsStore?.find((e) => e.mass === methodElement.mass)}
+					<td>{toSigFigs(sample.results[methodElementsID(methodElement)])}</td>
 				{/if}
 			{/each}
 		</tr>
 		<tr>
 			<td class="firstCol">Within Range</td>
 
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					{@const ranges = sample.referenceMaterial?.elements[elementID]}
-					{@const passes = ranges ? checkRanges(sample.results[elementID], ranges) : "neutral"}
+			{#each $methodElementsStore ?? [] as methodElement}
+				{#if $methodElementsStore?.find((e) => e.mass === methodElement.mass)}
+					{@const ranges = sample.referenceMaterial?.elements[methodElementsID(methodElement)]}
+					{@const passes = ranges
+						? checkRanges(sample.results[methodElementsID(methodElement)], ranges)
+						: "neutral"}
 
 					<td class="{passes} whitespace-nowrap">
 						{#if passes === "neutral"}
@@ -47,7 +50,7 @@
 						{:else if passes === "passes"}
 							Yes
 						{:else if ranges}
-							{sample.results[elementID] > ranges.high
+							{sample.results[methodElementsID(methodElement)] > ranges.high
 								? `>${conditionalSpace}${ranges.high}`
 								: `<${conditionalSpace}${ranges.low}`}
 						{/if}

@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
 	import { methodElementsStore, reportData } from "$lib/stores"
+	import { symbol } from "zod"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let calBlank: RunListEntry
-	const orderedElements = $reportData?.meta.orderedElements ?? []
 
 	const allCalibrations: RunListEntry[] = [calBlank, ...(calBlank?.calStandards ?? [])]
 </script>
@@ -19,15 +19,12 @@
 		{#each allCalibrations as sample}
 			<tr class="even:bg-stone-200">
 				<td class="max-w-[175px] truncate text-left">{sample.name}</td>
-				{#each orderedElements as elementID}
-					{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-						{@const prettyValue =
-							$methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)?.units ===
-							"ppm"
-								? sample.results[elementID] * 1000
-								: sample.results[elementID]}
-						<td class="text-center">{toSigFigs(prettyValue, 3)}</td>
-					{/if}
+				{#each $methodElementsStore ?? [] as methodElement}
+					{@const prettyValue =
+						methodElement.units === "ppm"
+							? sample.results[methodElement.symbol + methodElement.mass] * 1000
+							: sample.results[methodElement.symbol + methodElement.mass]}
+					<td class="text-center">{toSigFigs(prettyValue, 3)}</td>
 				{/each}
 			</tr>
 		{/each}

@@ -41,7 +41,7 @@ export type ReferenceMaterialsStore = ReferenceMaterialsResponse<ExpandedReferen
 export interface ReportMetadata {
 	analysisName: string
 	analysisDate: string
-	orderedElements: ElementID[]
+	elementCount: number
 }
 
 export interface InstrumentCSVRow {
@@ -54,7 +54,6 @@ export interface InstrumentCSVRow {
 	Units: Units
 }
 
-type ElementID = string
 type Concentration = number
 export type ElementConcentrations = Record<ElementID, Concentration>
 

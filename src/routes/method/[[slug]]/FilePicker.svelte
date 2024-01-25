@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
-	import { findElementOrder, flattenAnalytes, parseCSV, parseRun } from "$lib/data"
+	import { countElements, flattenAnalytes, parseCSV, parseRun } from "$lib/data"
 	import { reportData } from "$lib/stores"
 	import { fade } from "svelte/transition"
 	// @ts-expect-error
@@ -22,16 +22,16 @@
 		const analysisDate = analysisName.split("=")[1] ?? undefined
 
 		const structuredOutput = await parseCSV(inputFile)
-		const elementOrder = findElementOrder(structuredOutput)
+		const elementCount = countElements(structuredOutput)
 
-		const rawRunlist = flattenAnalytes(structuredOutput, elementOrder.length)
+		const rawRunlist = flattenAnalytes(structuredOutput, elementCount)
 		const runlist = parseRun(rawRunlist)
 
 		$reportData = {
 			meta: {
 				analysisName,
 				analysisDate,
-				orderedElements: elementOrder
+				elementCount
 			},
 			samples: runlist
 		}

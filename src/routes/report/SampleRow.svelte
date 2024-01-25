@@ -3,6 +3,7 @@
 	import type { RunListEntry } from "../../app"
 	import { methodElementsStore } from "$lib/stores"
 	import { toSigFigs } from "$lib/data"
+	import { methodElementsID } from "$lib/elements"
 
 	export let sample: RunListEntry
 	export let index: number
@@ -12,10 +13,10 @@
 	<td>
 		{sample.name}
 	</td>
-	{#each $reportData?.meta.orderedElements ?? [] as elementID}
-		{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
+	{#each $methodElementsStore ?? [] as methodElement}
+		{#if $methodElementsStore?.find((e) => e.mass === methodElement.mass)}
 			<td>
-				{toSigFigs(sample.results[elementID])}
+				{toSigFigs(sample.results[methodElementsID(methodElement)])}
 			</td>
 		{/if}
 	{/each}

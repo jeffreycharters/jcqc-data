@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
+	import { methodElementsID } from "$lib/elements"
 	import { methodStore, reportData, blanksStore, methodElementsStore } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
@@ -27,54 +28,56 @@
 		<tr class="">
 			<td class="firstCol">{sample.name}</td>
 
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					<td class="text-center">
-						{toSigFigs(sample.results[elementID])}
-					</td>
-				{/if}
+			{#each $methodElementsStore ?? [] as methodElement}
+				<td class="text-center">
+					{toSigFigs(sample.results[methodElementsID(methodElement)])}
+				</td>
 			{/each}
 		</tr>
 
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name} DUP</td>
 
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					<td class="text-center">
-						{toSigFigs(duplicate.results[elementID])}
-					</td>
-				{/if}
+			{#each $methodElementsStore ?? [] as methodElement}
+				<td class="text-center">
+					{toSigFigs(duplicate.results[methodElementsID(methodElement)])}
+				</td>
 			{/each}
 		</tr>
 
 		<tr class="border-b border-gray-500">
 			<td>Average</td>
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					<td>
-						{toSigFigs((sample.results[elementID] + duplicate.results[elementID]) / 2)}
-					</td>
-				{/if}
+			{#each $methodElementsStore ?? [] as methodElement}
+				<td>
+					{toSigFigs(
+						(sample.results[methodElementsID(methodElement)] +
+							duplicate.results[methodElementsID(methodElement)]) /
+							2
+					)}
+				</td>
 			{/each}
 		</tr>
 
 		<tr>
 			<td>RPD</td>
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					{@const rpd = calculateRPD(sample.results[elementID], duplicate.results[elementID])}
-					{@const loq = sample.referenceBlank?.elements[elementID]?.loq}
-					{@const average = (sample.results[elementID] + duplicate.results[elementID]) / 2}
-					{@const passing = checkIfDupPassing(average, rpd, loq)}
-					<td class={passing}>
-						{#if !rpd || !loq || average < loq * 2}
-							- -
-						{:else}
-							{toSigFigs(rpd, 2)}%
-						{/if}
-					</td>
-				{/if}
+			{#each $methodElementsStore ?? [] as methodElement}
+				{@const rpd = calculateRPD(
+					sample.results[methodElementsID(methodElement)],
+					duplicate.results[methodElementsID(methodElement)]
+				)}
+				{@const loq = sample.referenceBlank?.elements[methodElementsID(methodElement)]?.loq}
+				{@const average =
+					(sample.results[methodElementsID(methodElement)] +
+						duplicate.results[methodElementsID(methodElement)]) /
+					2}
+				{@const passing = checkIfDupPassing(average, rpd, loq)}
+				<td class={passing}>
+					{#if !rpd || !loq}
+						- -
+					{:else}
+						{toSigFigs(rpd, 2)}%
+					{/if}
+				</td>
 			{/each}
 		</tr>
 	</tbody>

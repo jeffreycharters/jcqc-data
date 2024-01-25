@@ -3,6 +3,7 @@
 	import { methodElementsStore, methodStore, reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import { toSigFigs } from "$lib/data"
+	import { methodElementsID } from "$lib/elements"
 
 	export let sample: RunListEntry
 
@@ -31,29 +32,23 @@
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name}</td>
 
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{@const methodElement = $methodElementsStore?.find(
-					(e) => `${e.symbol}${e.mass}` === elementID
-				)}
-
-				{#if methodElement}
-					{@const units =
-						$methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)?.units || "ppm"}
-					{@const prettyValue =
-						units === "ppb" ? sample.results[elementID] : sample.results[elementID] * 1000}
-					<td class="text-center">
-						{toSigFigs(prettyValue)}
-					</td>
-				{/if}
+			{#each $methodElementsStore ?? [] as methodElement}
+				{@const value = sample.results[methodElementsID(methodElement)]}
+				{@const prettyValue = methodElement.units === "ppb" ? value : value * 1000}
+				<td class="text-center">
+					{toSigFigs(prettyValue, 3)}
+				</td>
 			{/each}
 		</tr>
 
 		{#if checkStandardLimit}
 			<tr>
 				<td>Recovery</td>
-				{#each $reportData?.meta.orderedElements ?? [] as elementID}
-					{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-						{@const { passes, recovery } = elementPassing(elementID) ?? { passes: undefined }}
+				{#each $methodElementsStore ?? [] as methodElement}
+					{#if $methodElementsStore?.find((e) => e.symbol === methodElement.symbol)}
+						{@const { passes, recovery } = elementPassing(methodElementsID(methodElement)) ?? {
+							passes: undefined
+						}}
 						{#if passes != undefined}
 							<td class={passes ? "passes" : "fails"}>
 								{recovery}%

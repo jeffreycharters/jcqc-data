@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from "$app/environment"
-	import { methodElementsStore, reportData } from "$lib/stores"
+	import { methodElementsStore, methodStore, reportData } from "$lib/stores"
 
 	import HeaderInfo from "./HeaderInfo.svelte"
 	import Calibration from "./Calibration.svelte"
@@ -18,11 +18,11 @@
 	const { sampleList } = data
 
 	const methodElementCount = $methodElementsStore?.length ?? 0
-	const outputElementCount = $reportData?.meta.orderedElements.length ?? 0
+	$methodElementsStore?.sort((a, b) => a.mass - b.mass)
 </script>
 
 <div class="report-container w-fit p-4">
-	{#if $methodElementsStore?.length != outputElementCount}
+	{#if $methodElementsStore?.length != $reportData?.meta.elementCount}
 		<div
 			class="no-print absolute right-8 top-8 mx-auto mb-4 flex w-fit animate-bounce items-center gap-4 rounded border border-red-500 bg-red-200 px-4 py-2 text-sm text-red-600"
 		>
@@ -30,7 +30,8 @@
 			<div>
 				<p class="mb-1 text-lg font-semibold">Warning!</p>
 				<p class="text-sm">
-					Expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {outputElementCount}.
+					Expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {$reportData
+						?.meta.elementCount}.
 				</p>
 				<p class="text-sm font-semibold italic">Possible method mismatch.</p>
 			</div>

@@ -27,3 +27,7 @@ export async function setMethodElements(methodID: string) {
 		})
 	)
 }
+
+export function methodElementsID(methodElement: MethodElement) {
+	return methodElement.symbol + methodElement.mass
+}

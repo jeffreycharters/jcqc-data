@@ -43,18 +43,15 @@ export const parseCSV = async (inputFile: File) => {
 	return result.data
 }
 
-export function findElementOrder(csvRows: InstrumentCSVRow[]) {
+export function countElements(csvRows: InstrumentCSVRow[]) {
 	const elementMap: Record<string, boolean> = {}
-	let elements: ElementID[] = []
 
 	for (let i = 0; i < csvRows.length; i++) {
-		if (elementMap[csvRows[i].Analyte]) return elements
+		if (elementMap[csvRows[i].Analyte]) return i
 
 		elementMap[csvRows[i].Analyte] = true
-		elements = [...elements, `${csvRows[i].Analyte}${csvRows[i].Mass}`]
 	}
-
-	return elements
+	return -1
 }
 
 export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: number) {

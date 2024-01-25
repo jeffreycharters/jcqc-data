@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
-	import { methodElementsStore, reportData } from "$lib/stores"
+	import { methodElementsID } from "$lib/elements"
+	import { methodElementsStore } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
@@ -13,20 +14,18 @@
 	<tbody>
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name}</td>
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					<td>{toSigFigs(sample.results[elementID])}</td>
-				{/if}
+			{#each $methodElementsStore ?? [] as methodElement}
+				<td>{toSigFigs(sample.results[methodElementsID(methodElement)])}</td>
 			{/each}
 		</tr>
 		<tr>
 			<td class="firstCol">Below LOQ</td>
-			{#each $reportData?.meta.orderedElements ?? [] as elementID}
-				{#if $methodElementsStore?.find((e) => `${e.symbol}${e.mass}` === elementID)}
-					{@const loq = sample.blank?.elements[elementID]?.loq ?? 0}
+			{#each $methodElementsStore ?? [] as methodElement}
+				{#if $methodElementsStore?.find((e) => e.mass === methodElement.mass)}
+					{@const loq = sample.blank?.elements[methodElementsID(methodElement)]?.loq ?? 0}
 					{@const tdClass =
-						loq != 0 && sample.results[elementID]
-							? sample.results[elementID] < loq
+						loq != 0 && sample.results[methodElementsID(methodElement)]
+							? sample.results[methodElementsID(methodElement)] < loq
 								? "passes"
 								: "fails"
 							: "neutral"}
