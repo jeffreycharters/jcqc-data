@@ -21,18 +21,16 @@
 		<tr>
 			<td class="firstCol">Below LOQ</td>
 			{#each $methodElementsStore ?? [] as methodElement}
-				{#if $methodElementsStore?.find((e) => e.mass === methodElement.mass)}
-					{@const loq = sample.blank?.elements[methodElementsID(methodElement)]?.loq ?? 0}
-					{@const tdClass =
-						loq != 0 && sample.results[methodElementsID(methodElement)]
-							? sample.results[methodElementsID(methodElement)] < loq
-								? "passes"
-								: "fails"
-							: "neutral"}
-					<td class={tdClass}>
-						{loq != 0 ? loq : "- -"}
-					</td>
-				{/if}
+				{@const loq = sample.blank?.elements[methodElementsID(methodElement)]?.loq ?? 0}
+				{@const tdClass =
+					loq != 0 && sample.results[methodElementsID(methodElement)]
+						? sample.results[methodElementsID(methodElement)] < loq
+							? "passes"
+							: "fails"
+						: "neutral"}
+				<td class={tdClass}>
+					{loq != 0 ? loq : "- -"}
+				</td>
 			{/each}
 		</tr>
 	</tbody>
