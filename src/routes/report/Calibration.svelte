@@ -12,7 +12,7 @@
 
 <h1>Calibration Data</h1>
 
-<table class="results">
+<table class="results calibration">
 	<HeaderRow firstColumnLabel="Standard Name" />
 
 	<tbody>

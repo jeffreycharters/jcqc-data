@@ -17,7 +17,7 @@ h3 {
 
 .text-input,
 .number-input {
-	@apply border border-gray-600 py-1 px-2 rounded max-w-xs shadow-inner;
+	@apply max-w-xs rounded border border-gray-600 px-2 py-1 shadow-inner;
 }
 
 .number-input {
@@ -25,19 +25,19 @@ h3 {
 }
 
 .basic-border {
-	@apply border border-gray-800 rounded shadow;
+	@apply rounded border border-gray-800 shadow;
 }
 
 .btn {
-	@apply border border-gray-900 rounded px-4 py-1 mb-1 bg-gray-100 shadow hover:bg-gray-200 transition-colors;
+	@apply mb-1 rounded border border-gray-900 bg-gray-100 px-4 py-1 shadow transition-colors hover:bg-gray-200;
 }
 
 .inactivate-button {
-	@apply text-sm border border-gray-400 text-gray-400 px-1 rounded-sm border-dotted;
+	@apply rounded-sm border border-dotted border-gray-400 px-1 text-sm text-gray-400;
 }
 
 table.results {
-	@apply border-collapse ml-2 border-b border-b-gray-600;
+	@apply ml-2 border-collapse border-b border-b-gray-600;
 }
 
 .report-container > table.results {
@@ -87,5 +87,18 @@ td.neutral {
 
 	.report-container {
 		@apply px-0 pb-0;
+	}
+
+	table.results {
+		break-inside: avoid;
+	}
+
+	table.results.samples,
+	table.results.calibration {
+		break-inside: auto;
+	}
+
+	table.results thead {
+		display: table-header-group;
 	}
 }
