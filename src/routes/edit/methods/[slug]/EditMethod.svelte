@@ -9,6 +9,7 @@
 	import { fade, slide } from "svelte/transition"
 	// @ts-expect-error
 	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
+	import { z } from "zod"
 
 	let formMessage = ""
 	let timer: NodeJS.Timeout
@@ -18,6 +19,40 @@
 	let { name, calibrationCount, description, checkStandardTolerance, rpdLimit, reportSigFigs } =
 		$methodStore || {}
 
+	const schema = z.object({
+		name: z.string().min(2, "Name must be at least 2 characters"),
+		calibrationCount: z.coerce
+			.number({
+				required_error: "Calibration count is required",
+				invalid_type_error: "Invalid Calibration count"
+			})
+			.min(1, "Calibration count must be at least 1"),
+		description: z
+			.string({
+				required_error: "Description is required",
+				invalid_type_error: "Invalid Description"
+			})
+			.min(2, "Description must be at least 2 characters"),
+		checkStandardTolerance: z.coerce
+			.number({
+				required_error: "Check STD tolerance is required",
+				invalid_type_error: "Invalid Check STD tolerance"
+			})
+			.min(1, "Check STD tolerance must be at least 1"),
+		rpdLimit: z.coerce
+			.number({
+				required_error: "RPD limit is required",
+				invalid_type_error: "Invalid RPD limit"
+			})
+			.min(1, "RPD limit must be at least 1"),
+		reportSigFigs: z.coerce
+			.number({
+				required_error: "Report Sig Figs is required",
+				invalid_type_error: "Invalid Report Sig Figs"
+			})
+			.min(1, "Report Sig Figs must be at least 1")
+	})
+
 	const addFormMessage = (message: string, timeout: number = 3000) => {
 		if (timer) clearTimeout(timer)
 		formMessage = message
@@ -25,19 +60,20 @@
 	}
 
 	const editMethod = async () => {
-		if (!$methodStore?.name || !$methodStore?.calibrationCount) {
-			addFormMessage("Missing something")
-			return
-		}
+		const fd = schema.safeParse({
+			name,
+			calibrationCount,
+			description,
+			checkStandardTolerance,
+			rpdLimit,
+			reportSigFigs
+		})
+
+		if (!fd.success) return (formMessage = fd.error.issues[0].message)
 
 		pb.collection("methods")
-			.update($methodStore.id, {
-				name,
-				calibrationCount,
-				description,
-				checkStandardTolerance,
-				rpdLimit,
-				reportSigFigs,
+			.update($methodStore!.id, {
+				...fd.data,
 				expand: expandMethod
 			})
 			.then((updatedMethod) => {
