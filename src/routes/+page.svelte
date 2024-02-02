@@ -1,5 +1,8 @@
 <script lang="ts">
-	import MethodSelect from "./method/[[slug]]/MethodSelect.svelte"
+	import { setInstrumentsContext } from "$lib/storage"
+
+	const instruments = setInstrumentsContext()
+	// import MethodSelect from "./method/[[slug]]/MethodSelect.svelte"
 	import SelectInstrument from "./method/[[slug]]/SelectInstrument.svelte"
 </script>
 
@@ -14,7 +17,7 @@
 
 	<div class="flex-start mx-auto flex max-w-screen-lg gap-12">
 		<SelectInstrument />
-		<MethodSelect />
+		<!-- <MethodSelect /> -->
 	</div>
 </div>
 

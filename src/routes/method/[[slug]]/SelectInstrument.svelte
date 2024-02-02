@@ -1,19 +1,22 @@
 <script lang="ts">
 	import type { InstrumentsResponse } from "$lib/pocketbase-types"
+	import { getInstrumentsContext } from "$lib/storage"
 	import { instrumentStore, instruments } from "$lib/stores"
 	import { onMount } from "svelte"
 
 	onMount(() => {
-		const id = localStorage.getItem("instrument")
-		if (id) {
-			const savedInstrument = $instruments?.find((i) => i.id === id)
-			if (savedInstrument) $instrumentStore = savedInstrument
-		}
+		const instruments = getInstrumentsContext()
+		// 	const id = localStorage.getItem("instrument")
+		// 	if (id) {
+		// 		const savedInstrument = $instruments?.find((i) => i.id === id)
+		// 		if (savedInstrument) $instrumentStore = savedInstrument
+		// 	}
 	})
 
-	const saveInstrument = async (instrument: InstrumentsResponse) => {
-		$instrumentStore = instrument
-		localStorage.setItem("instrument", instrument.id)
+	const saveInstrument = async (instrumentID: string) => {
+		console.log("save instrument", instrumentID)
+		// $instrumentStore = instrument
+		// localStorage.setItem("instrument", instrument.id)
 	}
 </script>
 
@@ -26,7 +29,7 @@
 				class="btn whitespace-nowrap {$instrumentStore?.id === instrument.id
 					? 'selected-button'
 					: 'method-button'}"
-				on:click={() => saveInstrument(instrument)}
+				on:click={() => saveInstrument(instrument.id)}
 			>
 				{instrument.name}
 			</button>

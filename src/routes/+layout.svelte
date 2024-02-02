@@ -2,11 +2,10 @@
 	import "../app.postcss"
 	import { goto } from "$app/navigation"
 	import { page } from "$app/stores"
-	import { logout } from "$lib/pocketbase"
-	import { currentUser } from "$lib/pocketbase"
+	import { currentUser } from "$lib/stores"
 
 	function logoutAndRedirect() {
-		logout()
+		console.log("logging you out!")
 		goto("/", { invalidateAll: true })
 	}
 </script>
@@ -18,9 +17,9 @@
 <slot />
 
 {#if $page.url.pathname != "/report"}
-	<div class="fixed bottom-4 right-4 no-print">
+	<div class="no-print fixed bottom-4 right-4">
 		{#if $currentUser}
-			Logged in as {$currentUser?.username}.
+			Logged in as {$currentUser}.
 			<button class="btn" on:click={logoutAndRedirect}>Log out</button>
 		{:else}
 			Not logged in.

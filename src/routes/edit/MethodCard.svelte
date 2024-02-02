@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { setMethods } from "$lib/methods"
 	import { pb } from "$lib/pocketbase"
 	import type { MethodsResponse } from "$lib/pocketbase-types"
 	import { crossfade } from "svelte/transition"
 	// @ts-expect-error
 	import IconEdit from "@tabler/icons-svelte/dist/svelte/icons/IconEdit.svelte"
+	// @ts-expect-error
+	import IconFileArrowRight from "@tabler/icons-svelte/dist/svelte/icons/IconFileArrowRight.svelte"
 
 	export let method: MethodsResponse
 
@@ -43,6 +44,12 @@
 		>
 			{active ? "Inactivate" : "Activate"}
 		</button>
+		<button
+			class="flex items-center justify-center gap-2 rounded border border-stone-400 bg-white px-3 py-1 text-center text-stone-500 no-underline hover:bg-stone-100"
+			on:click={() => exportMethod(method.id)}
+			><IconFileArrowRight class="h-4 w-4 stroke-stone-500" />
+			Export</button
+		>
 		{#if active}
 			<a
 				href="/edit/methods/{method.slug}"
