@@ -13,7 +13,7 @@
 <h1>Calibration Data</h1>
 
 <table class="results calibration">
-	<HeaderRow firstColumnLabel="Standard Name" />
+	<HeaderRow firstColumnLabel="Standard Name" ppbUnits={true} />
 
 	<tbody>
 		{#each allCalibrations as sample}

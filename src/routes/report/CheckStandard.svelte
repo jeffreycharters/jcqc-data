@@ -26,7 +26,7 @@
 </script>
 
 <table class="results">
-	<HeaderRow firstColumnLabel="Check Standard" />
+	<HeaderRow firstColumnLabel="Check Standard" ppbUnits={true} />
 
 	<tbody>
 		<tr class="border-b border-b-gray-400">
