@@ -69,6 +69,8 @@
 				<div transition:slide={{ duration: 200 }}>
 					<CheckStandardList {checkStandard} />
 				</div>
+			{:else}
+				<div class="italic text-gray-400 text-sm font-bold ml-8">There aren't any!</div>
 			{/each}
 
 			<div class="basic-border w-fit bg-white px-4 py-2 transition-all">

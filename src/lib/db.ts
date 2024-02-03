@@ -70,6 +70,8 @@ export type Blank = {
 export type ReferenceMaterial = {
 	id: string
 	name: string
+	active: boolean
+	method: string
 	lower: Record<ElementID, number>
 	upper: Record<ElementID, number>
 }

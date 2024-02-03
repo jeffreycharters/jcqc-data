@@ -16,7 +16,7 @@
 	import { getElementsContext, getMethodElementsContext } from "$lib/storage"
 
 	let formMessage: string | undefined = undefined
-	let open = true
+	let open = false
 
 	const elements = getElementsContext()
 	const methodElements = getMethodElementsContext()
@@ -52,7 +52,10 @@
 	</div>
 
 	{#if open}
-		<div class="mx-8 mb-8 grid grid-cols-4 items-stretch gap-4">
+		<div
+			class="mx-8 mb-8 grid grid-cols-4 items-stretch gap-4"
+			transition:slide={{ duration: 200 }}
+		>
 			{#each ($elements ?? []).sort((a, b) => a.mass - b.mass) as element (element.id)}
 				{#if $usedElementIDs.includes(element.id)}
 					<ActiveElement id={element.id} />

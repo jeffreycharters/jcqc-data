@@ -13,7 +13,7 @@
 
 	let newBlankName = ""
 	let blankMessage = ""
-	let open = true
+	let open = false
 	let addFormOpen = false
 
 	const blanks = getBlanksContext()
@@ -65,6 +65,8 @@
 				<div transition:slide={{ duration: 200 }}>
 					<BlanksCard {blank} />
 				</div>
+			{:else}
+				<div class="italic text-gray-400 text-sm font-bold ml-8">There aren't any!</div>
 			{/each}
 
 			<div class="basic-border mb-8 w-fit bg-white px-4 py-2 transition-all">

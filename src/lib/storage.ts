@@ -1,7 +1,15 @@
 import { writable, type Writable } from "svelte/store"
 import { getContext, setContext } from "svelte"
 import { browser } from "$app/environment"
-import type { Instrument, Method, Element, MethodElement, CheckStandard, Blank } from "./db"
+import {
+	type Instrument,
+	type Method,
+	type Element,
+	type MethodElement,
+	type CheckStandard,
+	type Blank,
+	type ReferenceMaterial
+} from "./db"
 
 export function contextFactory<Titem = unknown>(
 	contextKey: string
@@ -38,6 +46,9 @@ const METHODELEMENTS_CTX = "METHODELEMENTS_CTX"
 const CHECKSTANDARD_CTX = "CHECKSTANDARD_CTX"
 const CHECKSTANDARDS_CTX = "CHECKSTANDARDS_CTX"
 
+const REFERENCEMATERIAL_CTX = "REFERENCEMATERIAL_CTX"
+const REFERENCEMATERIALS_CTX = "REFERENCEMATERIALS_CTX"
+
 export const [setInstrumentsContext, getInstrumentsContext] =
 	contextFactory<Instrument[]>(INSTRUMENTS_CTX)
 
@@ -64,3 +75,9 @@ export const [setCheckStandardContext, getCheckStandardContext] =
 export const [setBlankContext, getBlankContext] = contextFactory<Blank>(BLANK_CTX)
 
 export const [setBlanksContext, getBlanksContext] = contextFactory<Blank[]>(BLANKS_CTX)
+
+export const [setReferenceMaterialContext, getReferenceMaterialContext] =
+	contextFactory<ReferenceMaterial>(REFERENCEMATERIAL_CTX)
+
+export const [setReferenceMaterialsContext, getReferenceMaterialsContext] =
+	contextFactory<ReferenceMaterial[]>(REFERENCEMATERIALS_CTX)

@@ -1,35 +1,53 @@
 <script lang="ts">
-	import { methodStore, referenceMaterialsStore } from "$lib/stores"
 	import { fade, slide } from "svelte/transition"
 	import TextInput from "$lib/components/TextInput.svelte"
-	import ReferenceMaterialList from "./ReferenceMaterialList.svelte"
-	import { pb } from "$lib/pocketbase"
-	import { setReferenceMaterials } from "$lib/methods"
+	import ReferenceMaterialCard from "./ReferenceMaterialCard.svelte"
+
 	// @ts-expect-error
 	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
 	// @ts-expect-error
 	import IconPlus from "@tabler/icons-svelte/dist/svelte/icons/IconPlus.svelte"
+	import { getMethodContext, getReferenceMaterialsContext } from "$lib/storage"
+	import { derived } from "svelte/store"
+	import { db } from "$lib/db"
+	import { createId } from "@paralleldrive/cuid2"
+
+	const referenceMaterials = getReferenceMaterialsContext()
+	const method = getMethodContext()
 
 	let newReferenceMaterialName = ""
 	let formMessage: string
 	let open = false
 	let addFormOpen = false
 
-	const sortedMaterials =
-		$referenceMaterialsStore
-			?.sort((a, b) => (a.name < b.name ? 1 : -1))
-			.sort((a, b) => (a.active && !b.active ? -1 : 1)) ?? []
+	const sortedMaterials = derived(
+		referenceMaterials,
+		($referenceMaterialsStore) =>
+			$referenceMaterialsStore
+				?.toSorted((a, b) => (a.name < b.name ? 1 : -1))
+				.toSorted((a, b) => (a.active && !b.active ? -1 : 1)) ?? []
+	)
 
 	async function createNewReferenceMaterial() {
-		await pb.collection("referenceMaterials").create({
-			name: newReferenceMaterialName,
-			method: $methodStore!.id,
-			active: true
-		})
+		if (!newReferenceMaterialName) return (formMessage = "Please enter a name!")
 
-		await setReferenceMaterials($methodStore!.id)
-		newReferenceMaterialName = ""
-		addFormOpen = false
+		const newMaterial = {
+			id: createId(),
+			method: $method?.slug ?? "",
+			name: newReferenceMaterialName,
+			active: true,
+			lower: {},
+			upper: {}
+		}
+
+		db.referenceMaterials
+			.add(newMaterial)
+			.then(() => {
+				$referenceMaterials = [...($referenceMaterials ?? []), newMaterial]
+				newReferenceMaterialName = ""
+				addFormOpen = false
+			})
+			.catch((err) => console.error(err))
 	}
 </script>
 
@@ -52,8 +70,10 @@
 
 	{#if open}
 		<div class="mx-8 mb-8 flex flex-col gap-4" transition:slide={{ duration: 200 }}>
-			{#each sortedMaterials as referenceMaterial (referenceMaterial.id)}
-				<ReferenceMaterialList {referenceMaterial} />
+			{#each $sortedMaterials ?? [] as referenceMaterial (referenceMaterial.id)}
+				<ReferenceMaterialCard {referenceMaterial} />
+			{:else}
+				<div class="italic text-gray-400 text-sm font-bold ml-8">There aren't any!</div>
 			{/each}
 
 			<div class="basic-border w-fit bg-white px-4 py-2 transition-all">

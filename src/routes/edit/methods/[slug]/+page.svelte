@@ -1,6 +1,6 @@
 <script lang="ts">
 	import CheckStandards from "./CheckStandards.svelte"
-	// import ReferenceMaterials from "./ReferenceMaterials.svelte"
+	import ReferenceMaterials from "./ReferenceMaterials.svelte"
 	import EditMethod from "./EditMethod.svelte"
 	import ElementSelect from "./ElementSelect.svelte"
 	import type { PageData } from "./$types"
@@ -9,7 +9,8 @@
 		setCheckStandardsContext,
 		setElementsContext,
 		setMethodContext,
-		setMethodElementsContext
+		setMethodElementsContext,
+		setReferenceMaterialsContext
 	} from "$lib/storage"
 	import Blanks from "./Blanks.svelte"
 
@@ -20,6 +21,7 @@
 	setMethodElementsContext(data.methodElements ?? [])
 	setCheckStandardsContext(data.checkStandards ?? [])
 	setBlanksContext(data.blanks ?? [])
+	setReferenceMaterialsContext(data.referenceMaterials ?? [])
 </script>
 
 <div class="mb-6 mt-8 w-full max-w-screen-xl">
@@ -32,6 +34,6 @@
 	<CheckStandards />
 
 	<Blanks />
-	<!-- 
-	<ReferenceMaterials /> -->
+
+	<ReferenceMaterials />
 </div>

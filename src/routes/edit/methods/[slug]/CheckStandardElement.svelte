@@ -23,6 +23,7 @@
 		<div class="w-16">
 			<input
 				type="number"
+				step="any"
 				placeholder="- -"
 				bind:value
 				class="number-input mb-2 mt-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"

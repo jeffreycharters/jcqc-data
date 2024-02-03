@@ -15,13 +15,18 @@ export const load = (async ({ params }) => {
 		await db.checkStandards.where("method").equals(params.slug).toArray()
 	).toSorted((a, b) => (a.name < b.name ? -1 : 1))
 	const blanks = await db.blanks.where("method").equals(params.slug).toArray()
+	const referenceMaterials = await db.referenceMaterials
+		.where("method")
+		.equals(params.slug)
+		.toArray()
 
 	return {
-		blanks,
 		currentMethod,
 		elementList,
-		methodElements,
 		checkStandards,
+		blanks,
+		methodElements,
+		referenceMaterials,
 		title: `${currentMethod?.name}: ${currentMethod?.description}`
 	}
 }) satisfies PageLoad
