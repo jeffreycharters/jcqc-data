@@ -11,9 +11,13 @@ export const load = (async ({ params }) => {
 	const currentMethod = await db.methods.where({ slug: params.slug }).first()
 	const elementList = (await db.elements.toArray()).filter((e) => e.active)
 	const methodElements = await db.methodElements.where("method").equals(params.slug).toArray()
-	const checkStandards = await db.checkStandards.where("method").equals(params.slug).toArray()
+	const checkStandards = (
+		await db.checkStandards.where("method").equals(params.slug).toArray()
+	).toSorted((a, b) => (a.name < b.name ? -1 : 1))
+	const blanks = await db.blanks.where("method").equals(params.slug).toArray()
 
 	return {
+		blanks,
 		currentMethod,
 		elementList,
 		methodElements,

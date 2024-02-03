@@ -1,13 +1,12 @@
 <script lang="ts">
 	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
 	import type { Element } from "$lib/db"
-	import { getCheckStandardContext, getMethodElementsContext } from "$lib/storage"
+	import { getMethodElementsContext } from "$lib/storage"
 	import { derived } from "svelte/store"
 
 	export let element: Element
 	export let value: number
 
-	const checkStandard = getCheckStandardContext()
 	const methodElements = getMethodElementsContext()
 	const methodElement = derived(methodElements, ($methodElements) =>
 		$methodElements?.find((e) => e.element === element.id)

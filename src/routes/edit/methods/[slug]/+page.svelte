@@ -1,16 +1,17 @@
 <script lang="ts">
-	// import LOQs from "./LOQs.svelte"
 	import CheckStandards from "./CheckStandards.svelte"
 	// import ReferenceMaterials from "./ReferenceMaterials.svelte"
 	import EditMethod from "./EditMethod.svelte"
 	import ElementSelect from "./ElementSelect.svelte"
 	import type { PageData } from "./$types"
 	import {
+		setBlanksContext,
 		setCheckStandardsContext,
 		setElementsContext,
 		setMethodContext,
 		setMethodElementsContext
 	} from "$lib/storage"
+	import Blanks from "./Blanks.svelte"
 
 	export let data: PageData
 
@@ -18,6 +19,7 @@
 	setElementsContext(data.elementList ?? [])
 	setMethodElementsContext(data.methodElements ?? [])
 	setCheckStandardsContext(data.checkStandards ?? [])
+	setBlanksContext(data.blanks ?? [])
 </script>
 
 <div class="mb-6 mt-8 w-full max-w-screen-xl">
@@ -29,8 +31,7 @@
 
 	<CheckStandards />
 
+	<Blanks />
 	<!-- 
-	<LOQs />
-
 	<ReferenceMaterials /> -->
 </div>

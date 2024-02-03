@@ -60,26 +60,18 @@ export type CheckStandard = {
 	values: Record<ElementID, number>
 }
 
-export type DetectionLimits = {
-	mdl?: number
-	loq?: number
-}
-
 export type Blank = {
 	id: string
 	name: string
-	detectionLimits: Record<ElementID, DetectionLimits>
-}
-
-export type ReferenceRanges = {
-	lower?: number
-	upper?: number
+	mdls: Record<ElementID, number>
+	loqs: Record<ElementID, number>
 }
 
 export type ReferenceMaterial = {
 	id: string
 	name: string
-	ranges: Record<ElementID, ReferenceRanges>
+	lower: Record<ElementID, number>
+	upper: Record<ElementID, number>
 }
 
 export type Instrument = {

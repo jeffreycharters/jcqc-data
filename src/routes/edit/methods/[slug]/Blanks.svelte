@@ -1,10 +1,11 @@
 <script lang="ts">
 	import TextInput from "$lib/components/TextInput.svelte"
-	import { blanksStore, methodStore } from "$lib/stores"
 	import { fade, slide } from "svelte/transition"
-	import BlankList from "./BlankList.svelte"
-	import { pb } from "$lib/pocketbase"
-	import { setBlanks } from "$lib/methods"
+	import BlanksCard from "./BlanksCard.svelte"
+	import { getBlanksContext, getMethodContext } from "$lib/storage"
+	import { db } from "$lib/db"
+	import { createId } from "@paralleldrive/cuid2"
+
 	// @ts-expect-error
 	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
 	// @ts-expect-error
@@ -12,22 +13,31 @@
 
 	let newBlankName = ""
 	let blankMessage = ""
-	let open = false
+	let open = true
 	let addFormOpen = false
 
-	const createNewBlank = async () => {
+	const blanks = getBlanksContext()
+	const method = getMethodContext()
+
+	const createNewBlank = () => {
 		if (!newBlankName) {
 			blankMessage = "Please add a blank name"
 			return
 		}
 
-		await pb.collection("blanks").create({
+		const newBlank = {
+			id: createId(),
 			name: newBlankName,
-			method: $methodStore!.id
+			method: $method!.slug,
+			mdls: {},
+			loqs: {}
+		}
+
+		db.blanks.add(newBlank).then(() => {
+			$blanks = [...($blanks ?? []), newBlank]
+			newBlankName = ""
+			addFormOpen = false
 		})
-		await setBlanks($methodStore!.id)
-		newBlankName = ""
-		addFormOpen = false
 	}
 </script>
 
@@ -51,8 +61,10 @@
 
 	{#if open}
 		<div class="mx-8 flex flex-col gap-4" transition:slide={{ duration: 200 }}>
-			{#each $blanksStore ?? [] as blank (blank.id)}
-				<BlankList {blank} />
+			{#each $blanks ?? [] as blank (blank.id)}
+				<div transition:slide={{ duration: 200 }}>
+					<BlanksCard {blank} />
+				</div>
 			{/each}
 
 			<div class="basic-border mb-8 w-fit bg-white px-4 py-2 transition-all">

@@ -1,7 +1,7 @@
 import { writable, type Writable } from "svelte/store"
 import { getContext, setContext } from "svelte"
 import { browser } from "$app/environment"
-import type { Instrument, Method, Element, MethodElement, CheckStandard } from "./db"
+import type { Instrument, Method, Element, MethodElement, CheckStandard, Blank } from "./db"
 
 export function contextFactory<Titem = unknown>(
 	contextKey: string
@@ -20,6 +20,9 @@ export function contextFactory<Titem = unknown>(
 
 	return [setter, getter]
 }
+
+const BLANK_CTX = "BLANK_CTX"
+const BLANKS_CTX = "BLANKS_CTX"
 
 const ELEMENTS_CTX = "ELEMENTS_CTX"
 const EDITABLE_ELEMENTS_CTX = "EDITABLE_ELEMENTS_CTX"
@@ -57,3 +60,7 @@ export const [setCheckStandardsContext, getCheckStandardsContext] =
 
 export const [setCheckStandardContext, getCheckStandardContext] =
 	contextFactory<CheckStandard>(CHECKSTANDARD_CTX)
+
+export const [setBlankContext, getBlankContext] = contextFactory<Blank>(BLANK_CTX)
+
+export const [setBlanksContext, getBlanksContext] = contextFactory<Blank[]>(BLANKS_CTX)

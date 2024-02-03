@@ -3,8 +3,6 @@
 
 	const method = getMethodContext()
 	const methods = getMethodsContext()
-
-	$: console.log({ method: $method, methods: $methods })
 </script>
 
 <div class="flex-grow rounded border border-gray-500 px-4 py-2">
