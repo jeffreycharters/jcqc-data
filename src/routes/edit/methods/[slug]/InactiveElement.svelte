@@ -1,22 +1,26 @@
 <script lang="ts">
 	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
-	import { setMethodElements } from "$lib/elements"
-	import { pb } from "$lib/pocketbase"
-	import type { ElementsResponse } from "$lib/pocketbase-types"
-	import { methodStore } from "$lib/stores"
+	import { db, type Element } from "$lib/db"
+	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
+	import type { Units } from "$lib/types"
+
 	// @ts-expect-error
 	import IconSquareRoundedPlus from "@tabler/icons-svelte/dist/svelte/icons/IconSquareRoundedPlus.svelte"
 
-	export let element: ElementsResponse
+	export let element: Element
+	const method = getMethodContext()
+	const methodElements = getMethodElementsContext()
 
 	async function addElement() {
-		await pb.collection("methodElements").create({
+		const newMethodElement = {
 			element: element.id,
-			method: $methodStore!.id,
-			units: "ppm"
-		})
+			method: $method?.slug ?? "",
+			units: "ppm" as Units
+		}
 
-		await setMethodElements($methodStore!.id)
+		db.methodElements.add(newMethodElement).then(() => {
+			$methodElements = [...($methodElements ?? []), newMethodElement]
+		})
 	}
 </script>
 

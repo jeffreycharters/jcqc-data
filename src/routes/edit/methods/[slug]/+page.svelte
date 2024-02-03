@@ -1,14 +1,27 @@
 <script lang="ts">
-	import { methodStore } from "$lib/stores"
-	import LOQs from "./LOQs.svelte"
+	// import LOQs from "./LOQs.svelte"
 	import CheckStandards from "./CheckStandards.svelte"
-	import ReferenceMaterials from "./ReferenceMaterials.svelte"
+	// import ReferenceMaterials from "./ReferenceMaterials.svelte"
 	import EditMethod from "./EditMethod.svelte"
 	import ElementSelect from "./ElementSelect.svelte"
+	import type { PageData } from "./$types"
+	import {
+		setCheckStandardsContext,
+		setElementsContext,
+		setMethodContext,
+		setMethodElementsContext
+	} from "$lib/storage"
+
+	export let data: PageData
+
+	const method = setMethodContext(data.currentMethod ?? null)
+	setElementsContext(data.elementList ?? [])
+	setMethodElementsContext(data.methodElements ?? [])
+	setCheckStandardsContext(data.checkStandards ?? [])
 </script>
 
-<div class="w-full max-w-screen-xl mt-8 mb-6">
-	<h1>{$methodStore?.name}: {$methodStore?.description}</h1>
+<div class="mb-6 mt-8 w-full max-w-screen-xl">
+	<h1>{$method?.name}: {$method?.description}</h1>
 
 	<EditMethod />
 
@@ -16,7 +29,8 @@
 
 	<CheckStandards />
 
+	<!-- 
 	<LOQs />
 
-	<ReferenceMaterials />
+	<ReferenceMaterials /> -->
 </div>

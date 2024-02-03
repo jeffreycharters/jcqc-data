@@ -1,14 +1,19 @@
 <script lang="ts">
 	import TextInput from "$lib/components/TextInput.svelte"
-	import { checkStandardsStore, methodStore } from "$lib/stores"
 	import { fade, slide } from "svelte/transition"
-	import CheckStandardList from "./CheckStandardList.svelte"
-	import { pb } from "$lib/pocketbase"
-	import { setCheckStandards } from "$lib/methods"
+	import CheckStandardList from "./CheckStandardCard.svelte"
+
 	// @ts-expect-error
 	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
 	// @ts-expect-error
 	import IconPlus from "@tabler/icons-svelte/dist/svelte/icons/IconPlus.svelte"
+	import { getCheckStandardsContext, getMethodContext } from "$lib/storage"
+	import { db } from "$lib/db"
+	import { createId } from "@paralleldrive/cuid2"
+	import ActiveElement from "./ActiveElement.svelte"
+
+	const method = getMethodContext()
+	const checkStandards = getCheckStandardsContext()
 
 	let newCalName = ""
 	let calMessage = ""
@@ -21,13 +26,17 @@
 			return
 		}
 
-		pb.collection("checkStandards")
-			.create({
-				name: newCalName,
-				method: $methodStore!.id
-			})
+		const newCalCheck = {
+			id: createId(),
+			name: newCalName,
+			method: $method!.slug,
+			values: {}
+		}
+
+		db.checkStandards
+			.add(newCalCheck)
 			.then(async () => {
-				await setCheckStandards($methodStore!.id)
+				$checkStandards = [...($checkStandards ?? []), newCalCheck]
 				newCalName = ""
 				addFormOpen = false
 			})
@@ -56,8 +65,10 @@
 
 	{#if open}
 		<div class="mx-8 mb-8 flex flex-col gap-4" transition:slide={{ duration: 200 }}>
-			{#each ($checkStandardsStore ?? []).sort( (a, b) => (a.name > b.name ? 1 : -1) ) as checkStandard (checkStandard.id)}
-				<CheckStandardList {checkStandard} />
+			{#each ($checkStandards ?? []).sort( (a, b) => (a.name > b.name ? 1 : -1) ) as checkStandard (checkStandard.name)}
+				<div transition:slide={{ duration: 200 }}>
+					<CheckStandardList {checkStandard} />
+				</div>
 			{/each}
 
 			<div class="basic-border w-fit bg-white px-4 py-2 transition-all">

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { methods } from "$lib/stores"
 	import AddMethodForm from "./AddMethodForm.svelte"
 	import MethodCard from "./MethodCard.svelte"
 	import { flip } from "svelte/animate"
@@ -14,6 +13,13 @@
 	import IconCookieMan from "@tabler/icons-svelte/dist/svelte/icons/IconCookieMan.svelte"
 	// @ts-expect-error
 	import IconPlaylistAdd from "@tabler/icons-svelte/dist/svelte/icons/IconPlaylistAdd.svelte"
+	import type { PageData } from "./$types"
+	import { setMethodsContext } from "$lib/storage"
+
+	export let data: PageData
+	const { methods } = data
+
+	const methodList = setMethodsContext(methods ?? [])
 
 	const [send, receive] = crossfade({
 		duration: 250,
@@ -26,20 +32,20 @@
 <h1 class="mb-6 mt-8">Select method to edit</h1>
 
 <div class="grid max-w-screen-lg grid-cols-3 gap-4">
-	{#each ($methods ?? []).filter((method) => method.active) as method (method.id)}
+	{#each ($methodList ?? []).filter((method) => method.active) as method (method.slug)}
 		<div
 			animate:flip={{ duration: 250 }}
-			in:send={{ key: method.id }}
-			out:receive={{ key: method.id }}
+			in:send={{ key: method.slug }}
+			out:receive={{ key: method.slug }}
 		>
 			<MethodCard {method} />
 		</div>
 	{/each}
-	{#each ($methods ?? []).filter((method) => !method.active) as method (method.id)}
+	{#each ($methodList ?? []).filter((method) => !method.active) as method (method.slug)}
 		<div
 			animate:flip={{ duration: 250 }}
-			in:send={{ key: method.id }}
-			out:receive={{ key: method.id }}
+			in:send={{ key: method.slug }}
+			out:receive={{ key: method.slug }}
 		>
 			<MethodCard {method} />
 		</div>

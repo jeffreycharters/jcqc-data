@@ -1,19 +1,23 @@
 <script lang="ts">
 	import NumberInput from "$lib/components/NumberInput.svelte"
 	import TextInput from "$lib/components/TextInput.svelte"
-	import { pb } from "$lib/pocketbase"
-	import type { ElementsResponse } from "$lib/pocketbase-types"
-	import { createEventDispatcher, type EventDispatcher } from "svelte"
 	import { fade } from "svelte/transition"
 	import { z } from "zod"
 	import { createTooltip, melt } from "@melt-ui/svelte"
 
 	// @ts-expect-error
 	import IconEdit from "@tabler/icons-svelte/dist/svelte/icons/IconEdit.svelte"
+	import { db, type Element } from "$lib/db"
+	import { getEditableElementsContext, getElementsContext } from "$lib/storage"
+	import { derived } from "svelte/store"
 
-	export let editable: boolean = false
-	export let element: ElementsResponse
+	export let element: Element
+	const elements = getElementsContext()
+
 	let { symbol, mass } = element
+
+	const editableList = getEditableElementsContext()
+	const editable = derived(editableList, ($editableList) => $editableList?.includes(element.id))
 
 	let formMessage: string
 
@@ -24,8 +28,6 @@
 			.min(1, "Mass must be greater than 1")
 			.max(250, "Mass must be less than 250")
 	})
-
-	const dispatch: EventDispatcher<{ toggleActive: ElementsResponse }> = createEventDispatcher()
 
 	const addFormMessage = (message: string, timeout: number = 2000) => {
 		formMessage = message
@@ -51,28 +53,28 @@
 		const fd = schema.safeParse({ symbol, mass })
 		if (!fd.success) return addFormMessage(fd.error.issues[0].message)
 
-		let exists = await pb
-			.collection("elements")
-			.getFirstListItem(`symbol="${symbol}"&&mass="${mass}"&&id!="${element.id}"`)
-			.then((_) => {
-				return true
-			})
-			.catch((err) => {
-				if (!(err as Error).message.includes("wasn't found")) throw err
-				return false
-			})
+		let exists = (await db.elements.where({ id: `${fd.data.symbol}${fd.data.mass}` }).count()) > 0
 
 		if (exists) {
 			return addFormMessage("Element+Mass already exists")
 		}
 
-		pb.collection("elements")
-			.update(element.id, {
-				symbol,
-				mass
-			})
+		const updated = {
+			id: `${fd.data.symbol}${fd.data.mass}`,
+			symbol: fd.data.symbol,
+			mass: fd.data.mass
+		}
+
+		db.elements
+			.update(element.id, updated)
 			.then(() => {
+				$elements = [
+					...($elements ?? []).filter((e) => e.id !== element.id),
+					{ ...updated, active: element.active }
+				]
+				$editableList = [...($editableList ?? []).filter((e) => e !== element.id), updated.id]
 				editing = false
+
 				addFormMessage("Saved!")
 			})
 			.catch((err) => {
@@ -82,12 +84,15 @@
 	}
 
 	async function toggleElementActive() {
-		pb.collection("elements")
+		db.elements
 			.update(element.id, {
 				active: !element.active
 			})
-			.then((updated) => {
-				dispatch("toggleActive", updated as ElementsResponse)
+			.then(() => {
+				$elements = [
+					...($elements ?? []).filter((e) => e.id !== element.id),
+					{ ...element, active: !element.active }
+				]
 			})
 			.catch((err) => {
 				throw new Error(err)
@@ -132,8 +137,8 @@
 				use:melt={$trigger}
 				aria-label="editing disallowed for element in use by a method"
 				class="btn flex items-center gap-1 disabled:border-stone-300 disabled:text-stone-400"
-				on:click={() => editable && (editing = true)}
-				disabled={!editable}
+				on:click={() => $editable && (editing = true)}
+				disabled={!$editable}
 			>
 				<IconEdit class="h-4 w-4" />
 				Edit

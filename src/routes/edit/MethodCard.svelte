@@ -1,21 +1,22 @@
 <script lang="ts">
-	import { pb } from "$lib/pocketbase"
-	import type { MethodsResponse } from "$lib/pocketbase-types"
 	import { crossfade } from "svelte/transition"
+	import { db, type Method } from "$lib/db"
+
 	// @ts-expect-error
 	import IconEdit from "@tabler/icons-svelte/dist/svelte/icons/IconEdit.svelte"
-	// @ts-expect-error
-	import IconFileArrowRight from "@tabler/icons-svelte/dist/svelte/icons/IconFileArrowRight.svelte"
+	import { getMethodsContext } from "$lib/storage"
 
-	export let method: MethodsResponse
+	export let method: Method
+	const methods = getMethodsContext()
 
 	const [send, receive] = crossfade({ duration: 200 })
+
 	const { active } = method
 
 	const toggleMethodActive = async () => {
-		pb.collection("methods")
-			.update(method.id, { active: !active })
-			.then(async () => await setMethods())
+		await db.methods.update(method.slug, { active: !active })
+		method = { ...method, active: !active }
+		$methods = [...($methods?.filter((m) => m.slug !== method.slug) ?? []), method]
 	}
 </script>
 
@@ -23,8 +24,8 @@
 	class="flex w-full flex-col rounded border p-4 shadow {active
 		? 'border-stone-900 text-stone-900'
 		: 'border-stone-300 text-stone-500'}"
-	in:receive={{ key: method.id }}
-	out:send={{ key: method.id }}
+	in:receive={{ key: method.slug }}
+	out:send={{ key: method.slug }}
 >
 	<h3 class="text-xl">
 		{method.name}
@@ -44,12 +45,7 @@
 		>
 			{active ? "Inactivate" : "Activate"}
 		</button>
-		<button
-			class="flex items-center justify-center gap-2 rounded border border-stone-400 bg-white px-3 py-1 text-center text-stone-500 no-underline hover:bg-stone-100"
-			on:click={() => exportMethod(method.id)}
-			><IconFileArrowRight class="h-4 w-4 stroke-stone-500" />
-			Export</button
-		>
+
 		{#if active}
 			<a
 				href="/edit/methods/{method.slug}"

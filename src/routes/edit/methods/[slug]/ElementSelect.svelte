@@ -1,22 +1,28 @@
 <script lang="ts">
-	import { allElements, methodElementsStore } from "$lib/stores"
 	import { flip } from "svelte/animate"
 	import { crossfade, fade, slide } from "svelte/transition"
 	import ActiveElement from "./ActiveElement.svelte"
 	import InactiveElement from "./InactiveElement.svelte"
 	import { derived } from "svelte/store"
+
 	// @ts-expect-error
 	import IconAtom2Filled from "@tabler/icons-svelte/dist/svelte/icons/IconAtom2Filled.svelte"
+
 	// @ts-expect-error
 	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
+
 	// @ts-expect-error
 	import IconX from "@tabler/icons-svelte/dist/svelte/icons/IconX.svelte"
+	import { getElementsContext, getMethodElementsContext } from "$lib/storage"
 
 	let formMessage: string | undefined = undefined
-	let open = false
+	let open = true
 
-	const usedElementIDs = derived(methodElementsStore, ($methodElementsStore) =>
-		($methodElementsStore ?? []).map((methodElement) => methodElement.elementID)
+	const elements = getElementsContext()
+	const methodElements = getMethodElementsContext()
+
+	const usedElementIDs = derived(methodElements, ($methodElements) =>
+		($methodElements ?? []).map((methodElement) => methodElement.element)
 	)
 </script>
 
@@ -30,7 +36,7 @@
 				<span class="flex items-center font-semibold text-gray-400">
 					<IconAtom2Filled class="h-6 w-6" />
 					<IconX class="mx-1 h-3 w-3"></IconX>
-					{$methodElementsStore?.length != undefined ? $methodElementsStore?.length : 0}</span
+					{$methodElements?.length != undefined ? $methodElements?.length : 0}</span
 				>
 			</h2>
 		</button>
@@ -47,13 +53,9 @@
 
 	{#if open}
 		<div class="mx-8 mb-8 grid grid-cols-4 items-stretch gap-4">
-			{#each ($allElements ?? []).sort((a, b) => a.mass - b.mass) as element (element.id)}
+			{#each ($elements ?? []).sort((a, b) => a.mass - b.mass) as element (element.id)}
 				{#if $usedElementIDs.includes(element.id)}
-					<ActiveElement
-						methodElement={$methodElementsStore?.find(
-							(methodElement) => methodElement.elementID == element.id
-						)}
-					/>
+					<ActiveElement id={element.id} />
 				{:else}
 					<InactiveElement {element} />
 				{/if}

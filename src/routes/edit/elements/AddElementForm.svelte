@@ -1,14 +1,16 @@
 <script lang="ts">
 	import NumberInput from "$lib/components/NumberInput.svelte"
-	import TextInput from "$lib/components/TextInput.svelte"
-	import type { ElementsResponse } from "$lib/pocketbase-types"
-	import { pb } from "$lib/pocketbase"
-	import { createEventDispatcher, tick, type EventDispatcher } from "svelte"
+	import { db } from "$lib/db"
+	import { getEditableElementsContext, getElementsContext } from "$lib/storage"
+	import { tick } from "svelte"
 	import { z } from "zod"
+
+	const elements = getElementsContext()
+	const editableList = getEditableElementsContext()
 
 	let name: string
 	let symbol: string
-	let mass: number
+	let mass: number | undefined
 	let formError = ""
 
 	let symbolInput: HTMLInputElement
@@ -21,30 +23,28 @@
 			.max(250, "Mass must be less than 250")
 	})
 
-	const dispatch: EventDispatcher<{ addElement: ElementsResponse }> = createEventDispatcher()
-
 	async function addElement() {
 		const fd = schema.safeParse({ name, symbol, mass })
 
 		if (!fd.success) return (formError = fd.error.issues[0].message)
 		formError = ""
 
-		const exists = await pb
-			.collection("elements")
-			.getFirstListItem(`symbol="${symbol}" && mass="${mass}"`)
-			.then(() => true)
-			.catch(() => false)
+		const exists = (await db.elements.where({ symbol, mass }).count()) > 0
 
 		if (exists) return (formError = "Element+Mass already exists")
 
-		pb.collection("elements")
-			.create({
-				symbol,
-				mass,
-				active: true
-			})
-			.then(async (newElement) => {
-				dispatch("addElement", newElement as ElementsResponse)
+		const newElement = {
+			id: `${symbol}${mass}`,
+			symbol: fd.data.symbol,
+			mass: fd.data.mass,
+			active: true
+		}
+
+		db.elements
+			.add(newElement)
+			.then(async () => {
+				$elements = [...($elements ?? []), newElement]
+				$editableList = [...($editableList ?? []), newElement.id]
 				await tick()
 				symbolInput.focus()
 			})
@@ -53,7 +53,7 @@
 			})
 
 		symbol = ""
-		mass = 1
+		mass = undefined
 	}
 </script>
 

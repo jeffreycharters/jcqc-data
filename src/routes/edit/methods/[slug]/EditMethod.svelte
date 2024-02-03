@@ -1,15 +1,19 @@
 <script lang="ts">
 	import NumberInput from "$lib/components/NumberInput.svelte"
 	import TextInput from "$lib/components/TextInput.svelte"
-	import { expandMethod } from "$lib/methods"
-	import { pb } from "$lib/pocketbase"
-	import type { MethodsResponse } from "$lib/pocketbase-types"
-	import { methodStore } from "$lib/stores"
-	import type { ExpandedMethod } from "$lib/types"
 	import { fade, slide } from "svelte/transition"
+	import { z } from "zod"
+	import { getMethodContext } from "$lib/storage"
+
 	// @ts-expect-error
 	import IconChevronsRight from "@tabler/icons-svelte/dist/svelte/icons/IconChevronsRight.svelte"
-	import { z } from "zod"
+
+	// @ts-expect-error
+	import IconDeviceFloppy from "@tabler/icons-svelte/dist/svelte/icons/IconDeviceFloppy.svelte"
+	import { db } from "$lib/db"
+	import slugify from "slugify"
+
+	const method = getMethodContext()
 
 	let formMessage = ""
 	let timer: NodeJS.Timeout
@@ -17,7 +21,7 @@
 	let open = false
 
 	let { name, calibrationCount, description, checkStandardTolerance, rpdLimit, reportSigFigs } =
-		$methodStore || {}
+		$method || {}
 
 	const schema = z.object({
 		name: z.string().min(2, "Name must be at least 2 characters"),
@@ -69,33 +73,21 @@
 			reportSigFigs
 		})
 
-		if (!fd.success) return (formMessage = fd.error.issues[0].message)
+		if (!fd.success) return addFormMessage(fd.error.issues[0].message)
 
-		pb.collection("methods")
-			.update($methodStore!.id, {
+		db.methods
+			.update($method?.slug, {
 				...fd.data,
-				expand: expandMethod
+				active: $method?.active,
+				slug: slugify(fd.data.name, { lower: true })
 			})
-			.then((updatedMethod) => {
-				$methodStore = updatedMethod as MethodsResponse<ExpandedMethod>
-				addFormMessage("Saved!")
+			.then(() => {
+				addFormMessage("Method parameters saved!")
 			})
 			.catch((err) => {
 				addFormMessage((err as Error).message)
 			})
 	}
-
-	function debounce(callback: () => void, timeout = 1000) {
-		return (...args: any) => {
-			addFormMessage("Changes pending...")
-			clearTimeout(timer)
-			timer = setTimeout(() => {
-				callback.apply(debounce, args)
-			}, timeout)
-		}
-	}
-
-	const processUpdate = () => debounce(editMethod)
 </script>
 
 <div class="basic-border my-4 w-full bg-stone-100">
@@ -104,22 +96,12 @@
 			<IconChevronsRight class="h-5 w-5 stroke-gray-400 transition-all {open ? 'rotate-90' : ''}" />
 
 			<h2>Edit Method</h2>
-			{#if formMessage}
-				<div
-					class="w-fit text-sm italic text-amber-600"
-					in:fade={{ duration: 200 }}
-					out:fade={{ duration: 150 }}
-				>
-					{formMessage}
-				</div>
-			{/if}
 		</button>
 	</div>
 
 	{#if open}
 		<form
-			on:input={processUpdate()}
-			on:submit|preventDefault
+			on:submit|preventDefault={editMethod}
 			transition:slide={{ duration: 200 }}
 			class="mx-8 mb-8"
 		>
@@ -160,6 +142,27 @@
 					bind:value={reportSigFigs}
 					placeholder="e.g. 2"
 				/>
+			</div>
+
+			<div class="mt-4 flex items-center gap-4">
+				<button
+					type="submit"
+					class="flex items-center gap-2 rounded bg-green-600 px-4 py-2 text-sm text-white"
+				>
+					<IconDeviceFloppy class="h-5 w-5 stroke-[1.5]" />
+					Save
+				</button>
+
+				{#if formMessage}
+					<div
+						class="w-fit text-sm italic text-{formMessage.includes('saved') ? 'green' : 'red'}-600"
+						class:font-semibold={formMessage.includes("saved")}
+						in:fade={{ duration: 200 }}
+						out:fade={{ duration: 150 }}
+					>
+						{formMessage}
+					</div>
+				{/if}
 			</div>
 		</form>
 	{/if}

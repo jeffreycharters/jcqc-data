@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"@melt-ui/pp": "^0.3.0",
 		"@melt-ui/svelte": "^0.70.0",
+		"@paralleldrive/cuid2": "^2.2.2",
 		"@sveltejs/adapter-static": "^3.0.1",
 		"@sveltejs/kit": "^2.0.6",
 		"@tabler/icons-svelte": "^2.45.0",
@@ -44,6 +45,7 @@
 	"type": "module",
 	"dependencies": {
 		"@sveltejs/vite-plugin-svelte": "^3.0.1",
+		"dexie": "4.0.1-beta.7",
 		"file-saver": "^2.0.5",
 		"papaparse": "^5.4.1",
 		"prettier-plugin-tailwindcss": "^0.5.11"

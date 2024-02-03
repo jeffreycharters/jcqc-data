@@ -1,5 +1,5 @@
 const config = {
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	content: ["./src/**/*.{html,js,svelte,ts}"],
 
 	theme: {
 		extend: {}
@@ -7,10 +7,7 @@ const config = {
 
 	plugins: [],
 
-	safelist: [
-		'text-gray-300',
-		'border-gray-300'
-	]
-};
+	safelist: ["text-gray-300", "border-gray-300", "text-red-600", "text-green-600"]
+}
 
-module.exports = config;
+module.exports = config

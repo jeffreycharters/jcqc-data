@@ -1,0 +1,91 @@
+import Dexie, { type Table } from "dexie"
+import type { ElementID } from "../app"
+
+export class JCQCDexie extends Dexie {
+	instruments!: Table<Instrument>
+	elements!: Table<Element>
+	methods!: Table<Method>
+	methodElements!: Table<MethodElement>
+	checkStandards!: Table<CheckStandard>
+	referenceMaterials!: Table<ReferenceMaterial>
+	blanks!: Table<Blank>
+
+	constructor() {
+		super("habaneros")
+		this.version(1).stores({
+			instruments: "&id, slug",
+			elements: "&id, [mass+symbol]",
+			methods: "&slug, slug",
+			methodElements: "&[element+method], method",
+			checkStandards: "&id, method",
+			referenceMaterials: "&id, method",
+			blanks: "&id, method"
+		})
+	}
+}
+
+export const db = new JCQCDexie()
+
+export type Method = {
+	name: string
+	description: string
+	slug: string
+	active: boolean
+	rpdLimit: number
+	calibrationCount: number
+	checkStandardTolerance: number
+	reportSigFigs: number
+	elements?: Element[]
+	checkStandards?: CheckStandard[]
+	blanks?: Blank[]
+	referenceMaterials?: ReferenceMaterial[]
+}
+
+export type Element = {
+	id: string
+	symbol: string
+	mass: number
+	active: boolean
+}
+
+export type MethodElement = {
+	element: string
+	method: string
+	units: "ppb" | "ppm"
+}
+
+export type CheckStandard = {
+	id: string
+	name: string
+	values: Record<ElementID, number>
+}
+
+export type DetectionLimits = {
+	mdl?: number
+	loq?: number
+}
+
+export type Blank = {
+	id: string
+	name: string
+	detectionLimits: Record<ElementID, DetectionLimits>
+}
+
+export type ReferenceRanges = {
+	lower?: number
+	upper?: number
+}
+
+export type ReferenceMaterial = {
+	id: string
+	name: string
+	ranges: Record<ElementID, ReferenceRanges>
+}
+
+export type Instrument = {
+	id: string
+	autosamplerInfo: string
+	name: string
+	serial: string
+	softwareVersion: string
+}

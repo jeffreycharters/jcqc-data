@@ -1,33 +1,54 @@
 <script lang="ts">
 	import ElementWithMass from "$lib/components/ElementWithMass.svelte"
-	import { pb } from "$lib/pocketbase"
-	import { availableUnits, setMethodElements } from "$lib/elements"
-	import type { MethodElement, Units } from "$lib/types"
-	import { methodStore } from "$lib/stores"
-	export let methodElement: MethodElement | undefined
+	import { db, type MethodElement } from "$lib/db"
+	import { getElementsContext, getMethodElementsContext } from "$lib/storage"
+	import type { Units } from "$lib/types"
 
 	// @ts-expect-error
 	import IconSquareRoundedMinus from "@tabler/icons-svelte/dist/svelte/icons/IconSquareRoundedMinus.svelte"
+	import { derived } from "svelte/store"
+
+	export let id: string
+	const elements = getElementsContext()
+	const methodElements = getMethodElementsContext()
+
+	const methodElement = derived(methodElements, ($methodElements) =>
+		$methodElements?.find((e) => e.element === id)
+	)
+	const element = $elements?.find((e) => e.id === $methodElement?.element)
 
 	async function removeElement() {
-		await pb.collection("methodElements").delete(methodElement!.id)
-
-		await setMethodElements($methodStore!.id)
+		db.methodElements.delete([$methodElement?.element, $methodElement?.method]).then(() => {
+			$methodElements = ($methodElements ?? []).filter((e) => e.element !== $methodElement?.element)
+		})
 	}
 
-	const setUnits = async (newUnits: Units) => {
-		await pb.collection("methodElements").update(methodElement!.id!, {
-			units: newUnits,
-			expand: "element"
-		})
+	const setUnits = async (newUnits: string) => {
+		const units = newUnits as Units
+		const updated = {
+			method: $methodElement?.method ?? "",
+			element: $methodElement?.element ?? "",
+			units,
+			active: true
+		}
 
-		await setMethodElements($methodStore!.id)
+		db.methodElements
+			.update([$methodElement?.element, $methodElement?.method], updated)
+			.then(() => {
+				$methodElements = [
+					...($methodElements ?? []).filter((me) => me.element !== $methodElement?.element),
+					updated
+				]
+			})
+			.catch((err) => {
+				console.log(err)
+			})
 	}
 </script>
 
-{#if methodElement}
+{#if $methodElement}
 	<div
-		class="flex h-full w-full items-center justify-between rounded border border-gray-800 bg-white p-2 shadow"
+		class="flex h-full w-full flex-wrap items-center justify-between rounded border border-gray-800 bg-white p-2 shadow"
 	>
 		<button
 			on:click={removeElement}
@@ -37,18 +58,18 @@
 			<span class="text-xs text-red-700">Remove</span>
 		</button>
 		<ElementWithMass
-			symbol={methodElement.symbol}
-			mass={methodElement.mass}
+			symbol={element?.symbol ?? "??"}
+			mass={element?.mass ?? 666}
 			class="text-2xl font-bold"
 		/>
 
 		<div class="flex flex-col items-end gap-2">
 			<div class="mx-auto flex items-baseline gap-1">
-				{#each availableUnits as unit}
+				{#each ["ppb", "ppm"] as unit}
 					<button
-						class={methodElement.units === unit ? "active" : "inactive"}
+						class={$methodElement.units === unit ? "active" : "inactive"}
 						on:click={() => setUnits(unit)}
-						disabled={methodElement.units === unit}>{unit}</button
+						disabled={$methodElement.units === unit}>{unit}</button
 					>
 				{/each}
 			</div>

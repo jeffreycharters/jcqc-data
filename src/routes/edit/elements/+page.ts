@@ -1,20 +1,15 @@
-import { pb } from "$lib/pocketbase"
-import type { ElementsResponse } from "$lib/pocketbase-types"
+import { browser } from "$app/environment"
+import { db } from "$lib/db"
 import type { PageLoad } from "./$types"
 
 export const load = (async () => {
-	const elementList: ElementsResponse[] = await pb
-		.collection("elements")
-		.getFullList(undefined, { sort: "mass" })
+	if (!browser) return
 
+	const elementList = await db.elements.orderBy("mass").toArray()
 	let editableList: string[] = []
 
 	for (const element of elementList) {
-		const inUse = await pb
-			.collection("methodElements")
-			.getFirstListItem(`element="${element.id}"`)
-			.then(() => true)
-			.catch(() => false)
+		const inUse = (await db.methodElements.where({ element: element.id }).count()) > 0
 
 		if (!inUse) editableList = [...editableList, element.id]
 	}

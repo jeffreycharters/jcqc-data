@@ -1,14 +1,14 @@
 <script lang="ts">
 	import NumberInput from "$lib/components/NumberInput.svelte"
 	import TextInput from "$lib/components/TextInput.svelte"
-	import { pb } from "$lib/pocketbase"
 	import { createEventDispatcher, type EventDispatcher } from "svelte"
 	import slugify from "slugify"
 	import { slide } from "svelte/transition"
-	import { setMethods } from "$lib/methods"
 	import { z } from "zod"
 	// @ts-expect-error
 	import IconSquareX from "@tabler/icons-svelte/dist/svelte/icons/IconSquareX.svelte"
+	import { db } from "$lib/db"
+	import { getMethodsContext, setMethodsContext } from "$lib/storage"
 
 	const schema = z.object({
 		name: z
@@ -52,11 +52,12 @@
 	let formError = ""
 	let name: string
 	let rpdLimit: number
-	let calibrationCount = 5
+	let calibrationCount: number
 	let description: string
 	let checkStandardTolerance: number
-	let reportSigFigs: number = 2
+	let reportSigFigs: number
 
+	const methods = getMethodsContext()
 	const dispatch: EventDispatcher<{ close: unknown }> = createEventDispatcher()
 
 	const addMethod = async () => {
@@ -73,19 +74,21 @@
 
 		formError = ""
 
-		pb.collection("methods")
-			.create({
-				name,
-				slug: slugify(name, { lower: true }),
-				rpdLimit,
-				active: true,
-				calibrationCount,
-				description,
-				checkStandardTolerance,
-				reportSigFigs
-			})
-			.then(async () => {
-				await setMethods()
+		const newMethod = {
+			name,
+			slug: slugify(name, { lower: true }),
+			rpdLimit,
+			active: true,
+			calibrationCount,
+			description,
+			checkStandardTolerance,
+			reportSigFigs
+		}
+
+		db.methods
+			.add(newMethod)
+			.then(() => {
+				$methods = [...($methods ?? []), newMethod]
 				name = ""
 				description = ""
 			})
@@ -133,9 +136,15 @@
 				<NumberInput
 					name="cal-count"
 					label="Non-blank calibration standards"
+					placeholder="e.g. 6"
 					bind:value={calibrationCount}
 				/>
-				<NumberInput name="sigfigs" label="Report sig figs" bind:value={calibrationCount} />
+				<NumberInput
+					name="sigfigs"
+					label="Report sig figs"
+					placeholder="e.g. 2"
+					bind:value={reportSigFigs}
+				/>
 			</div>
 
 			<div class="mb-1 w-full">

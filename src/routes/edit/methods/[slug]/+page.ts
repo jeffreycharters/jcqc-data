@@ -1,24 +1,23 @@
 import { redirect } from "@sveltejs/kit"
 import type { PageLoad } from "./$types"
-import { allElements, methodStore } from "$lib/stores"
-import { pb } from "$lib/pocketbase"
-import type { ElementsResponse, MethodsResponse } from "$lib/pocketbase-types"
-import type { ExpandedMethod } from "$lib/types"
-import { setMethodStores } from "$lib/methods"
+import { db } from "$lib/db"
+import { browser } from "$app/environment"
 
 export const load = (async ({ params }) => {
 	if (!params.slug) throw redirect(302, "/edit")
-	const slug = params.slug
 
-	const method = await pb.collection("methods").getFirstListItem(`slug = "${slug}"`)
-	methodStore.set(method as MethodsResponse<ExpandedMethod>)
-	await setMethodStores(method.id)
+	if (!browser) return {}
 
-	pb.collection("elements")
-		.getFullList({ filter: "active = true" })
-		.then((list) => allElements.set(list as ElementsResponse[]))
+	const currentMethod = await db.methods.where({ slug: params.slug }).first()
+	const elementList = (await db.elements.toArray()).filter((e) => e.active)
+	const methodElements = await db.methodElements.where("method").equals(params.slug).toArray()
+	const checkStandards = await db.checkStandards.where("method").equals(params.slug).toArray()
 
 	return {
-		title: `${method.name}: ${method.description}`
+		currentMethod,
+		elementList,
+		methodElements,
+		checkStandards,
+		title: `${currentMethod?.name}: ${currentMethod?.description}`
 	}
 }) satisfies PageLoad
