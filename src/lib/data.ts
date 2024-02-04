@@ -1,33 +1,10 @@
 import Papa from "papaparse"
-import type {
-	InstrumentCSVRow,
-	RawRunlist,
-	ElementConcentrations,
-	ExpandedReferenceMaterial,
-	ExpandedCheckStandard,
-	ExpandedBlank
-} from "./types"
-import type {
-	BlankLimits,
-	CheckStandardValue,
-	ElementID,
-	ReferenceMaterialRange,
-	RunListEntry,
-	SimplifiedComparator
-} from "../app"
-import {
-	blanksStore,
-	checkStandardsStore,
-	methodElementsStore,
-	methodStore,
-	referenceMaterialsStore
-} from "./stores"
+import type { InstrumentCSVRow, RawRunlist, ElementConcentrations } from "./types"
+import type { RunListEntry } from "../app"
 import { get } from "svelte/store"
-import type {
-	BlanksResponse,
-	CheckStandardsResponse,
-	ReferenceMaterialsResponse
-} from "./pocketbase-types"
+import type { Blank, Method } from "./db"
+import { getMethodContext } from "./storage"
+import { browser } from "$app/environment"
 
 const qcRegex = /^(qc:)/i
 const sampleRegex = /\d{2}-\d{6}-\d{4}/
@@ -80,20 +57,22 @@ export function flattenAnalytes(csvRows: InstrumentCSVRow[], elementCount: numbe
 }
 
 export function parseRun(rawRunlist: RawRunlist[]) {
-	const method = get(methodStore)
 	let runlist: RunListEntry[] = []
 
-	const checkStandards = get(checkStandardsStore)
-	const checkStandardNames = checkStandards?.map((c) => c.name.trim().toLowerCase()) ?? []
+	if (!browser) return runlist
 
-	const blanks = get(blanksStore)
-	const blankNames = blanks?.map((b) => b.name.trim().toLowerCase()) ?? []
+	const savedMethod = localStorage.getItem("fullMethod")
+	if (!savedMethod) return runlist
 
-	const referenceMaterials = get(referenceMaterialsStore)
+	const method = JSON.parse(savedMethod) as Method | undefined
+
+	const checkStandardNames = method?.checkStandards?.map((c) => c.name.trim().toLowerCase()) ?? []
+	const blankNames = method?.blanks?.map((b) => b.name.trim().toLowerCase()) ?? []
 	const referenceMaterialNames =
-		referenceMaterials?.filter((rm) => rm.active).map((r) => r.name.trim().toLowerCase()) ?? []
+		method?.referenceMaterials?.filter((rm) => rm.active).map((r) => r.name.trim().toLowerCase()) ??
+		[]
 
-	let mostRecentBlank: SimplifiedComparator<BlankLimits> | undefined
+	let mostRecentBlank: Blank | undefined
 
 	listLoop: for (let i = 0; i < rawRunlist.length; i++) {
 		const name = rawRunlist[i].name?.trim().toLowerCase()
@@ -143,21 +122,21 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 		}
 
 		if (checkStandardNames.includes(name)) {
-			const cs = checkStandards?.find((c) => c.name.toLowerCase() === name)
-			if (cs) runlistEntry = { ...runlistEntry, checkStandard: simplifiedCheckStandard(cs) }
+			const cs = method?.checkStandards?.find((c) => c.name.toLowerCase() === name)
+			if (cs) runlistEntry = { ...runlistEntry, checkStandard: cs }
 		}
 
 		if (blankNames.includes(name)) {
-			const blk = blanks?.find((b) => b.name.toLowerCase() === name)
+			const blk = method?.blanks?.find((b) => b.name.toLowerCase() === name)
 			if (blk) {
-				runlistEntry = { ...runlistEntry, blank: simplifiedBlank(blk) }
-				mostRecentBlank = simplifiedBlank(blk)
+				runlistEntry = { ...runlistEntry, blank: blk }
+				mostRecentBlank = blk
 			}
 		}
 
 		if (referenceMaterialNames.includes(name)) {
-			const rm = referenceMaterials?.find((r) => r.name.toLowerCase() === name)
-			if (rm) runlistEntry = { ...runlistEntry, referenceMaterial: simplifiedReferenceMaterial(rm) }
+			const rm = method?.referenceMaterials?.find((r) => r.name.toLowerCase() === name)
+			if (rm) runlistEntry = { ...runlistEntry, referenceMaterial: rm }
 		}
 
 		if (sampleRegex.test(name) || qcRegex.test(name))
@@ -171,67 +150,10 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 	return runlist
 }
 
-function simplifiedReferenceMaterial(rm: ReferenceMaterialsResponse<ExpandedReferenceMaterial>) {
-	const methodElements = get(methodElementsStore)
-
-	return {
-		name: rm.name,
-		elements: (rm.expand?.["referenceMaterialsRanges(referenceMaterial)"] ?? []).reduce(
-			(acc, curr) => {
-				const element = methodElements?.find((e) => e.elementID === curr.element)
-				if (!element) return acc
-
-				const elementID = `${element?.symbol}${element?.mass}` as ElementID
-				acc[elementID] = { low: curr.lower, high: curr.upper }
-
-				return acc
-			},
-			{} as Record<ElementID, ReferenceMaterialRange>
-		)
-	}
-}
-
-function simplifiedBlank(b: BlanksResponse<ExpandedBlank>) {
-	const methodElements = get(methodElementsStore)
-
-	return {
-		name: b.name,
-		elements: (b.expand?.["detectionLimits(blank)"] ?? []).reduce(
-			(acc, curr) => {
-				const element = methodElements?.find((e) => e.elementID === curr.element)
-				if (!element) return acc
-
-				const elementID = `${element?.symbol}${element?.mass}` as ElementID
-				acc[elementID] = { mdl: curr.mdl, loq: curr.loq }
-
-				return acc
-			},
-			{} as Record<ElementID, BlankLimits>
-		)
-	}
-}
-
-function simplifiedCheckStandard(cs: CheckStandardsResponse<ExpandedCheckStandard>) {
-	const methodElements = get(methodElementsStore)
-
-	return {
-		name: cs.name,
-		elements: (cs.expand?.["checkValues(checkStandard)"] ?? []).reduce(
-			(acc, curr) => {
-				const element = methodElements?.find((e) => e.elementID === curr.element)
-				if (!element) return acc
-
-				const elementID = `${element?.symbol}${element?.mass}` as ElementID
-				acc[elementID] = { expected: curr.value }
-
-				return acc
-			},
-			{} as Record<ElementID, CheckStandardValue>
-		)
-	}
-}
-
-export function toSigFigs(n: number, sigFigs: number = get(methodStore)?.reportSigFigs ?? 2) {
+export function toSigFigs(
+	n: number,
+	sigFigs: number = get(getMethodContext())?.reportSigFigs ?? 2
+) {
 	let orderOfMagnitude = 0
 
 	for (let number = n; number > 10; number /= 10) {

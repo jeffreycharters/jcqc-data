@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
-	import { methodElementsID } from "$lib/elements"
-	import { methodStore, reportData, blanksStore, methodElementsStore } from "$lib/stores"
+	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry
 	export let duplicate: RunListEntry
 
-	const rpdLimit = $methodStore?.rpdLimit ?? 0
+	const method = getMethodContext()
+
+	const rpdLimit = $method?.rpdLimit ?? 0
 
 	const calculateRPD = (value: number, dupValue: number) => {
 		return (Math.abs(value - dupValue) / ((value + dupValue) / 2)) * 100
@@ -28,9 +29,9 @@
 		<tr class="">
 			<td class="firstCol">{sample.name}</td>
 
-			{#each $methodElementsStore ?? [] as methodElement}
+			{#each $method?.elements ?? [] as element}
 				<td class="text-center">
-					{toSigFigs(sample.results[methodElementsID(methodElement)])}
+					{toSigFigs(sample.results[element.id])}
 				</td>
 			{/each}
 		</tr>
@@ -38,38 +39,28 @@
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name} DUP</td>
 
-			{#each $methodElementsStore ?? [] as methodElement}
+			{#each $method?.elements ?? [] as element}
 				<td class="text-center">
-					{toSigFigs(duplicate.results[methodElementsID(methodElement)])}
+					{toSigFigs(duplicate.results[element.id])}
 				</td>
 			{/each}
 		</tr>
 
 		<tr class="border-b border-gray-500">
 			<td>Average</td>
-			{#each $methodElementsStore ?? [] as methodElement}
+			{#each $method?.elements ?? [] as element}
 				<td>
-					{toSigFigs(
-						(sample.results[methodElementsID(methodElement)] +
-							duplicate.results[methodElementsID(methodElement)]) /
-							2
-					)}
+					{toSigFigs((sample.results[element.id] + duplicate.results[element.id]) / 2)}
 				</td>
 			{/each}
 		</tr>
 
 		<tr>
 			<td>RPD</td>
-			{#each $methodElementsStore ?? [] as methodElement}
-				{@const rpd = calculateRPD(
-					sample.results[methodElementsID(methodElement)],
-					duplicate.results[methodElementsID(methodElement)]
-				)}
-				{@const loq = sample.referenceBlank?.elements[methodElementsID(methodElement)]?.loq}
-				{@const average =
-					(sample.results[methodElementsID(methodElement)] +
-						duplicate.results[methodElementsID(methodElement)]) /
-					2}
+			{#each $method?.elements ?? [] as element}
+				{@const rpd = calculateRPD(sample.results[element.id], duplicate.results[element.id])}
+				{@const loq = sample.referenceBlank?.loqs[element.id]}
+				{@const average = (sample.results[element.id] + duplicate.results[element.id]) / 2}
 				{@const passing = checkIfDupPassing(average, rpd, loq)}
 				<td class={passing}>
 					{#if !rpd || !loq}
@@ -82,7 +73,7 @@
 		</tr>
 	</tbody>
 </table>
-{#if ($blanksStore?.length ?? 0) > 1}
+{#if ($method?.blanks?.length ?? 0) > 1}
 	<div class="-mt-4 w-full pb-2 pr-8 text-right text-xs italic text-stone-500">
 		LOQs taken from <span class="font-bold">{sample.referenceBlank?.name ?? "unknown"}</span>. If
 		this is incorrect be sure to verify RPDs.

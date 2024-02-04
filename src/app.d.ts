@@ -1,6 +1,7 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 // and what to do when importing types
+import type { Blank, CheckStandard, ReferenceMaterial } from "$lib/db"
 import PocketBase from "pocketbase"
 declare global {
 	declare namespace App {
@@ -35,17 +36,17 @@ interface RunListEntry {
 	analysisNumber: number
 	isSample?: boolean
 	calStandards?: RunlistEntry[]
-	checkStandard?: SimplifiedComparator<CheckStandardValue>
-	blank?: SimplifiedComparator<BlankLimits>
-	referenceMaterial?: SimplifiedComparator<ReferenceMaterialRange>
+	checkStandard?: CheckStandard
+	blank?: Blank
+	referenceMaterial?: ReferenceMaterial
 	duplicateSamples?: RunListEntry[]
-	referenceBlank?: SimplifiedComparator<BlankLimits>
+	referenceBlank?: Blank
 	results: Record<ElementID, MeasuredConcentration>
 }
 
 type ReferenceMaterialRange = {
-	low: number
-	high: number
+	low?: number
+	high?: number
 }
 
 type CheckStandardValue = {
@@ -60,4 +61,13 @@ type BlankLimits = {
 type SimplifiedComparator<Tcomp = unknown> = {
 	name: ElementID
 	elements: Record<ElementID, Tcomp>
+}
+
+export type Runlist = {
+	meta: {
+		analysisName
+		analysisDate
+		elementCount
+	}
+	samples: runlist
 }

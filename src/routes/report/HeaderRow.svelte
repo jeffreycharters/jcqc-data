@@ -1,8 +1,11 @@
 <script lang="ts">
-	import { methodElementsStore, reportData } from "$lib/stores"
+	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
 
 	export let firstColumnLabel = ""
 	export let ppbUnits = false
+
+	const method = getMethodContext()
+	const methodElements = getMethodElementsContext()
 </script>
 
 <thead>
@@ -11,22 +14,22 @@
 			class="text-left! m-[3px] w-[105px] min-w-[175px] border-b-2 border-b-stone-900 align-bottom"
 			>{firstColumnLabel}</th
 		>
-		{#each $methodElementsStore ?? [] as methodElement}
+		{#each $method?.elements ?? [] as element}
 			<th class="heading font-semibold">
 				<div
-					class="flex {($reportData?.meta.elementCount ?? 0) > 10
+					class="flex {($method?.elements?.length ?? 0) > 10
 						? 'flex-col gap-0'
 						: ' items-end justify-center gap-1'}"
 				>
 					<div
 						class="flex justify-center"
-						class:translate-y-[0.35rem]={($reportData?.meta.elementCount ?? 0) > 10}
+						class:translate-y-[0.35rem]={($method?.elements?.length ?? 0) > 10}
 					>
-						<div class="-translate-y-[0.1rem] text-[0.6rem]">{methodElement?.mass}</div>
-						<span>{methodElement?.symbol}</span>
+						<div class="-translate-y-[0.1rem] text-[0.6rem]">{element.mass}</div>
+						<span>{element.symbol}</span>
 					</div>
 					<div class="text-[0.7rem] font-normal text-gray-500">
-						{ppbUnits ? "ppb" : methodElement?.units}
+						{ppbUnits ? "ppb" : $methodElements?.find((me) => me.element === element.id)?.units}
 					</div>
 				</div>
 			</th>

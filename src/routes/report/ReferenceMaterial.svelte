@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
-	import { methodElementsID } from "$lib/elements"
-	import { methodElementsStore, reportData } from "$lib/stores"
+	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
 	import type { ReferenceMaterialRange, RunListEntry } from "../../app"
+	import Element from "../edit/elements/Element.svelte"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry
+
+	const method = getMethodContext()
+	const methodElements = getMethodElementsContext()
 
 	type PassesString = "passes" | "fails" | "neutral"
 
@@ -19,7 +22,7 @@
 		return "fails"
 	}
 
-	const conditionalSpace = ($methodElementsStore?.length ?? 0) > 11 ? "" : " "
+	const conditionalSpace = ($methodElements?.length ?? 0) > 11 ? "" : " "
 </script>
 
 <table class="results">
@@ -28,29 +31,30 @@
 	<tbody>
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name}</td>
-			{#each $methodElementsStore ?? [] as methodElement}
-				{#if $methodElementsStore?.find((e) => e.mass === methodElement.mass)}
-					<td>{toSigFigs(sample.results[methodElementsID(methodElement)])}</td>
+			{#each $method?.elements ?? [] as element}
+				{#if $methodElements?.find((me) => me.element === element.id)}
+					<td>{toSigFigs(sample.results[element.id])}</td>
 				{/if}
 			{/each}
 		</tr>
 		<tr>
 			<td class="firstCol">Within Range</td>
 
-			{#each $methodElementsStore ?? [] as methodElement}
-				{#if $methodElementsStore?.find((e) => e.mass === methodElement.mass)}
-					{@const ranges = sample.referenceMaterial?.elements[methodElementsID(methodElement)]}
-					{@const passes = ranges
-						? checkRanges(sample.results[methodElementsID(methodElement)], ranges)
-						: "neutral"}
+			{#each $method?.elements ?? [] as element}
+				{#if $methodElements?.find((me) => me.element === element.id)}
+					{@const ranges = {
+						low: sample.referenceMaterial?.lower[element.id],
+						high: sample.referenceMaterial?.upper[element.id]
+					}}
+					{@const passes = ranges ? checkRanges(sample.results[element.id], ranges) : "neutral"}
 
 					<td class="{passes} whitespace-nowrap">
 						{#if passes === "neutral"}
 							- -
 						{:else if passes === "passes"}
 							Yes
-						{:else if ranges}
-							{sample.results[methodElementsID(methodElement)] > ranges.high
+						{:else if ranges.low && ranges.high}
+							{sample.results[element.id] > ranges?.high
 								? `>${conditionalSpace}${ranges.high}`
 								: `<${conditionalSpace}${ranges.low}`}
 						{/if}

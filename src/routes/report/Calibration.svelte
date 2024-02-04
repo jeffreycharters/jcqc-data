@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
-	import { methodElementsStore, reportData } from "$lib/stores"
-	import { symbol } from "zod"
+	import { getElementsContext, getMethodContext, getMethodElementsContext } from "$lib/storage"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let calBlank: RunListEntry
+
+	const method = getMethodContext()
+	const methodElements = getMethodElementsContext()
 
 	const allCalibrations: RunListEntry[] = [calBlank, ...(calBlank?.calStandards ?? [])]
 </script>
@@ -19,11 +21,11 @@
 		{#each allCalibrations as sample}
 			<tr class="even:bg-stone-200">
 				<td class="max-w-[175px] truncate text-left">{sample.name}</td>
-				{#each $methodElementsStore ?? [] as methodElement}
+				{#each $method?.elements ?? [] as element}
 					{@const prettyValue =
-						methodElement.units === "ppm"
-							? sample.results[methodElement.symbol + methodElement.mass] * 1000
-							: sample.results[methodElement.symbol + methodElement.mass]}
+						$methodElements?.find((me) => me.element === element.id)?.units === "ppm"
+							? sample.results[element.symbol + element.mass] * 1000
+							: sample.results[element.symbol + element.mass]}
 					<td class="text-center">{toSigFigs(prettyValue, 3)}</td>
 				{/each}
 			</tr>

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
-	import { methodElementsID } from "$lib/elements"
-	import { methodElementsStore } from "$lib/stores"
+	import { getMethodContext } from "$lib/storage"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry
+
+	const method = getMethodContext()
 </script>
 
 <table class="results">
@@ -14,17 +15,17 @@
 	<tbody>
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name}</td>
-			{#each $methodElementsStore ?? [] as methodElement}
-				<td>{toSigFigs(sample.results[methodElementsID(methodElement)])}</td>
+			{#each $method?.elements ?? [] as element}
+				<td>{toSigFigs(sample.results[element.id])}</td>
 			{/each}
 		</tr>
 		<tr>
 			<td class="firstCol">Below LOQ</td>
-			{#each $methodElementsStore ?? [] as methodElement}
-				{@const loq = sample.blank?.elements[methodElementsID(methodElement)]?.loq ?? 0}
+			{#each $method?.elements ?? [] as element}
+				{@const loq = sample.blank?.loqs[element.id] ?? Infinity}
 				{@const tdClass =
-					loq != 0 && sample.results[methodElementsID(methodElement)]
-						? sample.results[methodElementsID(methodElement)] < loq
+					loq != 0 && sample.results[element.id]
+						? sample.results[element.id] < loq
 							? "passes"
 							: "fails"
 						: "neutral"}

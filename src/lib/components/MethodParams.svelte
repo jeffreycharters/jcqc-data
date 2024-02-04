@@ -4,12 +4,14 @@
 
 	const method = getMethodContext()
 
+	let lowElementCount: boolean
 	let fullMethod: Method | undefined
 	let methodElements: MethodElement[]
 
 	method.subscribe(async (value) => {
 		if (!value) return (fullMethod = undefined)
 		methodElements = await db.methodElements.where("method").equals(value.slug).toArray()
+
 		const usedElementIDs = methodElements.map((methodElement) => methodElement.element)
 		const usedElements = (await db.elements.where("id").anyOf(usedElementIDs).toArray()).toSorted(
 			(a, b) => a.mass - b.mass
@@ -21,6 +23,8 @@
 			.equals(value.slug)
 			.toArray()
 
+		lowElementCount = (fullMethod?.elements ?? []).length < 15
+
 		fullMethod = {
 			...value,
 			elements: usedElements ?? [],
@@ -31,8 +35,6 @@
 
 		localStorage.setItem("fullMethod", JSON.stringify(fullMethod))
 	})
-
-	$: lowElementCount = (fullMethod?.elements ?? []).length < 15
 </script>
 
 {#if fullMethod}

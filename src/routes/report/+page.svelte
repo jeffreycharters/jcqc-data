@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { browser } from "$app/environment"
-	import { methodElementsStore, methodStore, reportData } from "$lib/stores"
-
 	import HeaderInfo from "./HeaderInfo.svelte"
 	import Calibration from "./Calibration.svelte"
 	import CheckStandard from "./CheckStandard.svelte"
@@ -16,16 +13,23 @@
 
 	// @ts-expect-error
 	import IconArrowBackUpDouble from "@tabler/icons-svelte/dist/svelte/icons/IconArrowBackUpDouble.svelte"
+	import {
+		setElementsContext,
+		setInstrumentContext,
+		setMethodContext,
+		setMethodElementsContext
+	} from "$lib/storage"
+	import type { PageData } from "./$types"
 
-	export let data
-	const { sampleList } = data
+	export let data: PageData
+	const { sampleList, runlist, method, methodElements } = data
 
-	const methodElementCount = $methodElementsStore?.length ?? 0
-	$methodElementsStore?.sort((a, b) => a.mass - b.mass)
+	setMethodContext(method ?? null)
+	setMethodElementsContext(methodElements ?? [])
 </script>
 
 <div class="report-container w-fit p-4">
-	{#if $methodElementsStore?.length != $reportData?.meta.elementCount}
+	{#if method?.elements?.length != runlist?.meta.elementCount}
 		<div class="flex flex-col gap-4">
 			<div
 				class="no-print mx-auto mt-8 flex w-fit animate-bounce items-center gap-4 rounded border border-red-500 bg-red-200 px-4 py-2 text-sm text-red-600"
@@ -34,8 +38,8 @@
 				<div>
 					<p class="mb-1 text-lg font-semibold">Warning!</p>
 					<p class="text-sm">
-						Expected {methodElementCount} element{methodElementCount === 1 ? "" : "s"}, found {$reportData
-							?.meta.elementCount}.
+						Expected {method?.elements?.length} element{method?.elements?.length === 1 ? "" : "s"},
+						found {runlist?.meta.elementCount}.
 					</p>
 					<p class="text-sm font-semibold italic">Possible method mismatch.</p>
 				</div>
@@ -49,9 +53,9 @@
 			</button>
 		</div>
 	{:else}
-		<HeaderInfo />
+		<HeaderInfo {data} />
 
-		{#if browser && $reportData}
+		{#if sampleList}
 			{#each sampleList ?? [] as block}
 				{#if block.type === "qc" && block.sample.calStandards}
 					<Calibration calBlank={block.sample} />

@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { createTooltip, melt } from "@melt-ui/svelte"
 	import { fade } from "svelte/transition"
-	import { instrumentStore, methodStore, reportData } from "$lib/stores"
 
 	// @ts-expect-error
 	import IconPrinter from "@tabler/icons-svelte/dist/svelte/icons/IconPrinterOff.svelte"
 	// @ts-expect-error
 	import IconPrinterOff from "@tabler/icons-svelte/dist/svelte/icons/IconPrinter.svelte"
+	import type { PageData } from "./$types"
+
+	export let data: PageData
+	const { instrument, sampleList, method, runlist } = data
 
 	const {
 		elements: { trigger: dateTrigger, content: dateContent, arrow: dateArrow },
@@ -39,7 +42,7 @@
 </script>
 
 <div class="header-info mb-4">
-	<h1 class="mb-2">Sequence Information - {$methodStore?.name}</h1>
+	<h1 class="mb-2">Sequence Information - {method?.name}</h1>
 
 	<div class="ml-4 max-w-xs">
 		<div class="headerItem mt-2 py-1">
@@ -50,7 +53,7 @@
 		<div class="headerItem py-1">
 			Analysis Date: <div class="autofilled">
 				<span class:no-print={!printAnalysisDate} class:text-stone-300={!printAnalysisDate}
-					>{$reportData?.meta.analysisDate}</span
+					>{runlist?.meta.analysisDate}</span
 				>
 			</div>
 			<button
@@ -84,7 +87,7 @@
 		<div class="headerItem py-1">
 			Sequence ID: <div class="autofilled">
 				<span class:no-print={!printAnalysisName} class:text-stone-300={!printAnalysisName}
-					>{$reportData?.meta.analysisName}</span
+					>{runlist?.meta.analysisName}</span
 				>
 			</div>
 			<button
@@ -120,16 +123,16 @@
 		<div class="headerItem py-[1px]">
 			Instrument Name:
 			<span class="font-normal">
-				{$instrumentStore?.name}
-				(Serial number: {$instrumentStore?.serial})
+				{instrument?.name}
+				(Serial number: {instrument?.serial})
 			</span>
 		</div>
 		<div class="headerItem py-[1px]">
 			Software Version:
-			<span class="font-normal">{$instrumentStore?.softwareVersion}</span>
+			<span class="font-normal">{instrument?.softwareVersion}</span>
 		</div>
 		<div class="headerItem py-[1px]">
-			Autosampler: <span class="font-normal">{$instrumentStore?.autosamplerInfo}</span>
+			Autosampler: <span class="font-normal">{instrument?.autosamplerInfo}</span>
 		</div>
 	</div>
 </div>

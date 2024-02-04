@@ -1,12 +1,13 @@
 <script lang="ts">
+	import type { Instrument } from "$lib/db"
 	import { getInstrumentContext, getInstrumentsContext } from "$lib/storage"
 
 	const instruments = getInstrumentsContext()
 	const selectedInstrument = getInstrumentContext()
 
-	const saveInstrument = async (instrumentID: string) => {
-		localStorage.setItem("instrument", instrumentID)
-		$selectedInstrument = instrumentID
+	const saveInstrument = async (instrument: Instrument) => {
+		localStorage.setItem("instrument", JSON.stringify(instrument))
+		$selectedInstrument = instrument.id
 	}
 </script>
 
@@ -19,7 +20,7 @@
 				class="btn whitespace-nowrap {$selectedInstrument === instrument_i.id
 					? 'selected-button'
 					: 'method-button'}"
-				on:click={() => saveInstrument(instrument_i.id)}
+				on:click={() => saveInstrument(instrument_i)}
 			>
 				{instrument_i.name}
 			</button>

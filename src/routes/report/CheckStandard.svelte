@@ -1,16 +1,17 @@
 <script lang="ts">
 	import HeaderRow from "./HeaderRow.svelte"
-	import { methodElementsStore, methodStore, reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
 	import { toSigFigs } from "$lib/data"
-	import { methodElementsID } from "$lib/elements"
+	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
 
 	export let sample: RunListEntry
 
-	const checkStandardLimit = ($methodStore?.checkStandardTolerance ?? 0) / 100
+	const method = getMethodContext()
+	const methodElements = getMethodElementsContext()
+	const checkStandardLimit = ($method?.checkStandardTolerance ?? 0) / 100
 
 	function elementPassing(elementID: string) {
-		const expected = sample.checkStandard?.elements[elementID]?.expected
+		const expected = sample.checkStandard?.values[elementID]
 		const value = sample.results[elementID]
 
 		if (!expected || !value) return undefined
@@ -32,9 +33,12 @@
 		<tr class="border-b border-b-gray-400">
 			<td class="firstCol">{sample.name}</td>
 
-			{#each $methodElementsStore ?? [] as methodElement}
-				{@const value = sample.results[methodElementsID(methodElement)]}
-				{@const prettyValue = methodElement.units === "ppb" ? value : value * 1000}
+			{#each $method?.elements ?? [] as element}
+				{@const value = sample.results[element.id]}
+				{@const prettyValue =
+					$methodElements?.find((me) => me.element === element.id)?.units === "ppb"
+						? value
+						: value * 1000}
 				<td class="text-center">
 					{toSigFigs(prettyValue, 3)}
 				</td>
@@ -44,9 +48,9 @@
 		{#if checkStandardLimit}
 			<tr>
 				<td>Recovery</td>
-				{#each $methodElementsStore ?? [] as methodElement}
-					{#if $methodElementsStore?.find((e) => e.symbol === methodElement.symbol)}
-						{@const { passes, recovery } = elementPassing(methodElementsID(methodElement)) ?? {
+				{#each $method?.elements ?? [] as element}
+					{#if $methodElements?.find((me) => me.element === element.id)}
+						{@const { passes, recovery } = elementPassing(element.id) ?? {
 							passes: undefined
 						}}
 						{#if passes != undefined}

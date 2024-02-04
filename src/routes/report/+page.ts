@@ -1,7 +1,8 @@
-import { methodStore, reportData } from "$lib/stores"
-import { get } from "svelte/store"
 import type { PageLoad } from "./$types"
-import type { RunListEntry } from "../../app"
+import type { RunListEntry, Runlist } from "../../app"
+import { browser } from "$app/environment"
+import { redirect } from "@sveltejs/kit"
+import { db, type Instrument, type Method } from "$lib/db"
 
 type Block = QC | SampleBlock
 
@@ -16,24 +17,38 @@ type SampleBlock = {
 }
 
 export const load = (async () => {
-	const runlist = get(reportData)?.samples
+	if (!browser) return { title: "ha ha stupid" }
 
-	const title = `${get(methodStore)?.name} report`
+	const storedRunlist = localStorage.getItem("reportData")
+	const storedMethod = localStorage.getItem("fullMethod")
+	const storedInstrument = localStorage.getItem("instrument")
+
+	if (!storedRunlist || !storedMethod || !storedInstrument) redirect(302, "/")
+
+	const method = JSON.parse(storedMethod) as Method
+	const runlist = JSON.parse(storedRunlist) as Runlist
+	const instrument = await db.instruments.get(storedInstrument)
+	const { samples } = runlist
+
+	const usedElements = method.elements?.map((e) => e.id) ?? []
+	const methodElements = await db.methodElements.where("element").anyOf(usedElements).toArray()
+
+	const title = `${method.name} report`
 
 	if (!runlist) return { title }
 
 	let sampleList: Block[] = []
 	let currentBlock: RunListEntry[] = []
 
-	for (let i = 0; i < runlist.length; i++) {
-		if (i === runlist.length - 1 && runlist[i].isSample && !runlist[i].duplicateSamples) {
-			currentBlock = [...currentBlock, runlist[i]]
+	for (let i = 0; i < runlist.samples.length; i++) {
+		if (i === samples.length - 1 && samples[i].isSample && !samples[i].duplicateSamples) {
+			currentBlock = [...currentBlock, samples[i]]
 			sampleList = [...sampleList, { type: "sampleBlock", samples: currentBlock }]
 			continue
 		}
 
-		if (runlist[i].isSample && !runlist[i].duplicateSamples) {
-			currentBlock = [...currentBlock, runlist[i]]
+		if (samples[i].isSample && !samples[i].duplicateSamples) {
+			currentBlock = [...currentBlock, samples[i]]
 			continue
 		}
 
@@ -42,11 +57,15 @@ export const load = (async () => {
 			currentBlock = []
 		}
 
-		sampleList = [...sampleList, { type: "qc", sample: runlist[i] }]
+		sampleList = [...sampleList, { type: "qc", sample: samples[i] }]
 	}
 
 	return {
+		methodElements,
+		runlist,
+		instrument,
 		title,
+		method,
 		sampleList
 	}
 }) satisfies PageLoad

@@ -1,22 +1,23 @@
 <script lang="ts">
-	import { reportData } from "$lib/stores"
 	import type { RunListEntry } from "../../app"
-	import { methodElementsStore } from "$lib/stores"
 	import { toSigFigs } from "$lib/data"
-	import { methodElementsID } from "$lib/elements"
+	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
 
 	export let sample: RunListEntry
 	export let index: number
+
+	const method = getMethodContext()
+	const methodElements = getMethodElementsContext()
 </script>
 
 <tr class:bg-stone-200={index % 2 === 1}>
 	<td>
 		{sample.name}
 	</td>
-	{#each $methodElementsStore ?? [] as methodElement}
-		{#if $methodElementsStore?.find((e) => e.mass === methodElement.mass)}
+	{#each $method?.elements ?? [] as element}
+		{#if $methodElements?.find((me) => me.element === element.id)}
 			<td>
-				{toSigFigs(sample.results[methodElementsID(methodElement)])}
+				{toSigFigs(sample.results[element.id])}
 			</td>
 		{/if}
 	{/each}
