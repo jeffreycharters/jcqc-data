@@ -1,5 +1,5 @@
 import Dexie, { type Table } from "dexie"
-import type { ElementID } from "../app"
+import type { ElementID, RunListEntry } from "../app"
 
 export class JCQCDexie extends Dexie {
 	instruments!: Table<Instrument>
@@ -82,4 +82,13 @@ export type Instrument = {
 	autosamplerInfo: string
 	serial: string
 	softwareVersion: string
+}
+
+export type ReportData = {
+	meta: {
+		analysisName: string
+		analysisDate: string
+		elementCount: number
+	}
+	samples: RunListEntry[]
 }

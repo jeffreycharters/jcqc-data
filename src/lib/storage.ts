@@ -8,7 +8,8 @@ import {
 	type MethodElement,
 	type CheckStandard,
 	type Blank,
-	type ReferenceMaterial
+	type ReferenceMaterial,
+	type ReportData
 } from "./db"
 
 export function contextFactory<Titem = unknown>(
@@ -49,6 +50,8 @@ const CHECKSTANDARDS_CTX = "CHECKSTANDARDS_CTX"
 const REFERENCEMATERIAL_CTX = "REFERENCEMATERIAL_CTX"
 const REFERENCEMATERIALS_CTX = "REFERENCEMATERIALS_CTX"
 
+const REPORTDATA_CTX = "REPORTDATA_CTX"
+
 export const [setInstrumentsContext, getInstrumentsContext] =
 	contextFactory<Instrument[]>(INSTRUMENTS_CTX)
 
@@ -81,3 +84,6 @@ export const [setReferenceMaterialContext, getReferenceMaterialContext] =
 
 export const [setReferenceMaterialsContext, getReferenceMaterialsContext] =
 	contextFactory<ReferenceMaterial[]>(REFERENCEMATERIALS_CTX)
+
+export const [setReportDataContext, getReportDataContext] =
+	contextFactory<ReportData>(REPORTDATA_CTX)

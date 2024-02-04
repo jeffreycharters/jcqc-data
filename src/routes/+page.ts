@@ -8,17 +8,14 @@ export const load: PageLoad = (async () => {
 	if (!browser) return {}
 
 	const selectedInstrument: string = localStorage.getItem("instrument") ?? ""
+	const selectedMethod: string = localStorage.getItem("method") ?? ""
 	const instruments = await db.instruments.toArray()
 	const methods = await db.methods.toArray()
-	// console.log(selectedInstrument, instruments)
-
-	// if (url.searchParams.has("slug")) {
-	// 	// TODO: Grab method and return to page
-	// }
 
 	return {
 		title,
 		methods,
+		selectedMethod,
 		instruments,
 		selectedInstrument
 	}

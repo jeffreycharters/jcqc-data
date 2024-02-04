@@ -1,17 +1,41 @@
 <script lang="ts">
-	import {
-		blanksStore,
-		checkStandardsStore,
-		methodElementsStore,
-		methodStore,
-		referenceMaterialsStore
-	} from "$lib/stores"
+	import { db, type Method, type MethodElement } from "$lib/db"
+	import { getMethodContext } from "$lib/storage"
 
-	const elements = $methodElementsStore?.sort((a, b) => a.mass - b.mass) ?? []
-	const lowElementCount = elements && elements?.length < 15
+	const method = getMethodContext()
+
+	let fullMethod: Method | undefined
+	let methodElements: MethodElement[]
+
+	method.subscribe(async (value) => {
+		if (!value) return (fullMethod = undefined)
+		methodElements = await db.methodElements.where("method").equals(value.slug).toArray()
+		const usedElementIDs = methodElements.map((methodElement) => methodElement.element)
+		const usedElements = (await db.elements.where("id").anyOf(usedElementIDs).toArray()).toSorted(
+			(a, b) => a.mass - b.mass
+		)
+		const checkStandards = await db.checkStandards.where("method").equals(value.slug).toArray()
+		const blanks = await db.blanks.where("method").equals(value.slug).toArray()
+		const referenceMaterials = await db.referenceMaterials
+			.where("method")
+			.equals(value.slug)
+			.toArray()
+
+		fullMethod = {
+			...value,
+			elements: usedElements ?? [],
+			checkStandards,
+			blanks,
+			referenceMaterials
+		}
+
+		localStorage.setItem("fullMethod", JSON.stringify(fullMethod))
+	})
+
+	$: lowElementCount = (fullMethod?.elements ?? []).length < 15
 </script>
 
-{#if $methodStore}
+{#if fullMethod}
 	<div class="mx-auto w-fit">
 		<div
 			class="flex {lowElementCount
@@ -19,17 +43,13 @@
 				: 'justify-between gap-8'} my-8 flex-wrap items-end"
 		>
 			<h2 class="flex-grow border-b text-2xl {lowElementCount ? 'self-start' : 'self-end'}">
-				{$methodStore.name}: {$methodStore.description}
+				{fullMethod.name}: {fullMethod.description}
 			</h2>
 
 			<div class="flex items-stretch gap-4">
 				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
-						{#if $methodStore.checkStandardTolerance}
-							{$methodStore.checkStandardTolerance}%
-						{:else}
-							- -
-						{/if}
+						{fullMethod.checkStandardTolerance}%
 					</div>
 					<div class="text-center text-sm font-semibold text-gray-400">
 						Check Standard Tolerance
@@ -38,33 +58,21 @@
 
 				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
-						{#if $methodStore.rpdLimit}
-							{$methodStore.rpdLimit}%
-						{:else}
-							- -
-						{/if}
+						{fullMethod.rpdLimit}%
 					</div>
 					<div class="text-center text-sm font-semibold text-gray-400">Duplicate RPD</div>
 				</div>
 
 				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
-						{#if $methodStore.calibrationCount}
-							{$methodStore.calibrationCount}
-						{:else}
-							- -
-						{/if}
+						{fullMethod.calibrationCount}
 					</div>
 					<div class="text-center text-sm font-semibold text-gray-400">Non-blank Standards</div>
 				</div>
 
 				<div class="rouded flex flex-col items-center bg-gray-50 px-4 py-2 shadow">
 					<div class="text-xl font-bold text-gray-500">
-						{#if $methodStore}
-							{$methodStore.reportSigFigs}
-						{:else}
-							??
-						{/if}
+						{fullMethod.reportSigFigs}
 					</div>
 					<div class="text-center text-sm font-semibold text-gray-400">Sig figs on Report</div>
 				</div>
@@ -74,7 +82,7 @@
 			<thead>
 				<tr class="border-b border-gray-400">
 					<th class="first-column max-w-xs text-sm">Elements</th>
-					{#each elements as element}
+					{#each fullMethod.elements ?? [] as element}
 						<th class="px-2 text-center text-sm font-semibold">
 							<sup>{element.mass}</sup>{element.symbol}
 						</th>
@@ -83,27 +91,25 @@
 			</thead>
 
 			<tbody>
-				{#if elements.length > 0}
+				{#if (fullMethod.elements ?? []).length > 0}
 					<tr>
 						<td class="first-column">Units</td>
-						{#each elements as element}
-							<td class="text-center">{element.units}</td>
+						{#each fullMethod.elements ?? [] as element}
+							{@const methodElement = methodElements?.find((e) => e.element === element.id)}
+							<td class="text-center">{methodElement?.units}</td>
 						{/each}
 					</tr>
 				{/if}
-				{#each $checkStandardsStore ?? [] as checkStandard (checkStandard.id)}
+				{#each fullMethod.checkStandards ?? [] as checkStandard (checkStandard.id)}
 					<tr class="border-b border-gray-400">
 						<td class="first-column">{checkStandard.name}</td>
-						{#each elements as element}
-							{@const values = checkStandard.expand?.["checkValues(checkStandard)"].find(
-								(cv) => cv.element === element.elementID
-							)}
-							<td class="text-center">{values?.value ?? "- -"}</td>
+						{#each fullMethod.elements ?? [] as element}
+							<td class="text-center">{checkStandard.values[element.id] ?? "- -"}</td>
 						{/each}
 					</tr>
 				{/each}
 
-				{#each $blanksStore ?? [] as blank (blank.id)}
+				{#each fullMethod.blanks ?? [] as blank (blank.id)}
 					<tr class="border-b border-gray-400">
 						<td class="first-column flex items-center justify-between gap-2">
 							<div>
@@ -114,19 +120,16 @@
 								<div>LOQ</div>
 							</div>
 						</td>
-						{#each elements as element}
-							{@const values = blank.expand?.["detectionLimits(blank)"].find(
-								(dl) => dl.element === element.elementID
-							)}
+						{#each fullMethod.elements ?? [] as element}
 							<td class="text-center">
 								<div class="mx-auto table">
 									<div class="table-row">
 										<div class="table-cell text-center">
-											{!values?.mdl ? "- -" : values.mdl}
+											{blank.mdls[element.id] ?? "- -"}
 										</div>
 									</div>
 									<div>
-										{!values?.loq ? "- -" : values.loq}
+										{blank.loqs[element.id] ?? "- -"}
 									</div>
 								</div>
 							</td>
@@ -134,7 +137,7 @@
 					</tr>
 				{/each}
 
-				{#each $referenceMaterialsStore?.filter((rm) => rm.active) ?? [] as referenceMaterial (referenceMaterial.id)}
+				{#each fullMethod.referenceMaterials?.filter((rm) => rm.active) ?? [] as referenceMaterial (referenceMaterial.id)}
 					<tr class="border-b border-gray-400">
 						<td class="first-column flex items-center justify-between gap-2">
 							<div>
@@ -145,19 +148,16 @@
 								<div>High</div>
 							</div>
 						</td>
-						{#each elements as element}
-							{@const values = referenceMaterial.expand?.[
-								"referenceMaterialsRanges(referenceMaterial)"
-							].find((rmr) => rmr.element === element.elementID)}
+						{#each fullMethod.elements ?? [] as element}
 							<td class="text-center">
 								<div class="mx-auto table">
 									<div class="table-row">
 										<div class="table-cell text-center">
-											{!values?.lower ? "- -" : values?.lower}
+											{referenceMaterial.lower[element.id] ?? "- -"}
 										</div>
 									</div>
 									<div>
-										{!values?.upper ? "- -" : values?.upper}
+										{referenceMaterial.upper[element.id] ?? "- -"}
 									</div>
 								</div>
 							</td>

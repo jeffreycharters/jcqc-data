@@ -5,7 +5,8 @@
 	const selectedInstrument = getInstrumentContext()
 
 	const saveInstrument = async (instrumentID: string) => {
-		console.log("save instrument", instrumentID)
+		localStorage.setItem("instrument", instrumentID)
+		$selectedInstrument = instrumentID
 	}
 </script>
 

@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { goto } from "$app/navigation"
-	import { countElements, flattenAnalytes, parseCSV, parseRun } from "$lib/data"
-	import { reportData } from "$lib/stores"
+	// import { goto } from "$app/navigation"
+	// import { countElements, flattenAnalytes, parseCSV, parseRun } from "$lib/data"
 	import { fade } from "svelte/transition"
+	// import { setReportDataContext } from "$lib/storage"
+
 	// @ts-expect-error
 	import IconFileUpload from "@tabler/icons-svelte/dist/svelte/icons/IconFileUpload.svelte"
 
@@ -10,33 +11,27 @@
 	let errorMessage: string = ""
 
 	const parseInput = async (files: HTMLInputElement["files"]) => {
-		if (!files || !files[0]) return
-
-		const inputFile = files[0]
-		if (inputFile.type != "text/plain") {
-			errorMessage = "Incorrect file type"
-			return
-		}
-
-		const analysisName = inputFile.name.split(".")[0]
-		const analysisDate = analysisName.split("=")[1] ?? undefined
-
-		const structuredOutput = await parseCSV(inputFile)
-		const elementCount = countElements(structuredOutput)
-
-		const rawRunlist = flattenAnalytes(structuredOutput, elementCount)
-		const runlist = parseRun(rawRunlist)
-
-		$reportData = {
-			meta: {
-				analysisName,
-				analysisDate,
-				elementCount
-			},
-			samples: runlist
-		}
-
-		goto("/report")
+		// if (!files || !files[0]) return
+		// const inputFile = files[0]
+		// if (inputFile.type != "text/plain") {
+		// 	errorMessage = "Incorrect file type"
+		// 	return
+		// }
+		// const analysisName = inputFile.name.split(".")[0]
+		// const analysisDate = analysisName.split("=")[1] ?? undefined
+		// const structuredOutput = await parseCSV(inputFile)
+		// const elementCount = countElements(structuredOutput)
+		// const rawRunlist = flattenAnalytes(structuredOutput, elementCount)
+		// const runlist = parseRun(rawRunlist)
+		// setReportDataContext({
+		// 	meta: {
+		// 		analysisName,
+		// 		analysisDate,
+		// 		elementCount
+		// 	},
+		// 	samples: runlist
+		// })
+		// goto("/report")
 	}
 </script>
 

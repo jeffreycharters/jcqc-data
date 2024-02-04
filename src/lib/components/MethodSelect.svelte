@@ -16,9 +16,7 @@
 					: 'method-button'}">{method_i.name}</button
 			>
 		{/each}
-		<button class="btn method-button no-underline" on:click={() => setMethodContext(null)}
-			>Clear</button
-		>
+		<button class="btn method-button no-underline" on:click={() => ($method = null)}>Clear</button>
 	</div>
 </div>
 

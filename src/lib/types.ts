@@ -1,3 +1,5 @@
+import type { Blank, CheckStandard, ReferenceMaterial } from "./db"
+
 export type Units = "ppb" | "ppm"
 
 export type MethodElement = {
@@ -32,4 +34,18 @@ export type ElementConcentrations = Record<ElementID, Concentration>
 export interface RawRunlist {
 	name: string
 	measurements: Record<ElementID, Concentration>
+}
+
+type MeasuredConcentration = number
+export interface RunListEntry {
+	name: string
+	analysisNumber: number
+	isSample?: boolean
+	calStandards?: RunListEntry[]
+	checkStandards: CheckStandard[]
+	blank?: Blank[]
+	referenceMaterial?: ReferenceMaterial[]
+	duplicateSamples?: RunListEntry[]
+	referenceBlank?: Blank
+	results: Record<ElementID, MeasuredConcentration>
 }
