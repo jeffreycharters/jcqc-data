@@ -13,20 +13,27 @@
 	import IconCookieMan from "@tabler/icons-svelte/dist/svelte/icons/IconCookieMan.svelte"
 	// @ts-expect-error
 	import IconPlaylistAdd from "@tabler/icons-svelte/dist/svelte/icons/IconPlaylistAdd.svelte"
+	// @ts-expect-error
+	import IconBatteryAutomotive from "@tabler/icons-svelte/dist/svelte/icons/IconBatteryAutomotive.svelte"
+
 	import type { PageData } from "./$types"
-	import { setMethodsContext } from "$lib/storage"
+	import { setInstrumentsContext, setMethodsContext } from "$lib/storage"
+	import AddInstrumentForm from "./AddInstrumentForm.svelte"
+	import InstrumentCard from "./InstrumentCard.svelte"
 
 	export let data: PageData
-	const { methods } = data
+	const { methods, instruments } = data
 
 	const methodList = setMethodsContext(methods ?? [])
+	const instrumentList = setInstrumentsContext(instruments ?? [])
 
 	const [send, receive] = crossfade({
 		duration: 250,
 		easing: quintOut
 	})
 
-	let showAddForm = false
+	let showAddMethodForm = false
+	let showAddInstrumentForm = false
 </script>
 
 <h1 class="mb-6 mt-8">Select method to edit</h1>
@@ -52,7 +59,7 @@
 	{/each}
 
 	<button
-		on:click={() => (showAddForm = !showAddForm)}
+		on:click={() => (showAddMethodForm = !showAddMethodForm)}
 		class="flex w-full items-center justify-center gap-2 rounded border border-gray-500 p-4 font-bold shadow-lg"
 	>
 		<IconPlaylistAdd class=" h-8 w-8 stroke-[1.5]" />
@@ -60,7 +67,24 @@
 	</button>
 </div>
 
-<AddMethodForm {showAddForm} on:close={() => (showAddForm = false)} />
+<AddMethodForm showAddForm={showAddMethodForm} on:close={() => (showAddMethodForm = false)} />
+
+<h1 class="mb-6 mt-8">Edit Instruments</h1>
+<div class="grid max-w-screen-lg grid-cols-3 gap-4">
+	{#each $instrumentList ?? [] as instrument (instrument.id)}
+		<InstrumentCard {instrument} />
+	{/each}
+
+	<button
+		on:click={() => (showAddInstrumentForm = !showAddInstrumentForm)}
+		class="flex w-full items-center justify-center gap-2 rounded border border-gray-500 p-4 font-bold shadow-lg"
+	>
+		<IconBatteryAutomotive class=" h-6 w-6 stroke-[1.5]" />
+		Add Instrument
+	</button>
+</div>
+
+<AddInstrumentForm show={showAddInstrumentForm} on:close={() => (showAddInstrumentForm = false)} />
 
 <h1 class="-mb-2 mt-10">Other options</h1>
 

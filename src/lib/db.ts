@@ -78,8 +78,8 @@ export type ReferenceMaterial = {
 
 export type Instrument = {
 	id: string
-	autosamplerInfo: string
 	name: string
+	autosamplerInfo: string
 	serial: string
 	softwareVersion: string
 }

@@ -19,9 +19,17 @@
 	const blanks = getBlanksContext()
 	const method = getMethodContext()
 
+	let timer: NodeJS.Timeout
+	function formMessage(message: string) {
+		blankMessage = message
+		timer = setTimeout(() => {
+			blankMessage = ""
+		}, 1500)
+	}
+
 	const createNewBlank = () => {
 		if (!newBlankName) {
-			blankMessage = "Please add a blank name"
+			formMessage("Please add a blank name")
 			return
 		}
 

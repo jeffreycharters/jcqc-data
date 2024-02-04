@@ -37,6 +37,12 @@
 	let statusMessage = ""
 	let editing = false
 
+	let timer: NodeJS.Timeout
+	function setStatusMessage(message: string) {
+		statusMessage = message
+		timer = setTimeout(() => (statusMessage = ""), 1500)
+	}
+
 	const deleteBlank = async () => {
 		db.blanks.delete(blank.id).then(() => {
 			$blanks = $blanks?.filter((b) => b.id !== blank.id) ?? []
@@ -54,7 +60,7 @@
 
 	function updateDetectionLimits() {
 		db.blanks.update(blank.id, blank).then(() => {
-			statusMessage = "Changes saved!"
+			setStatusMessage("Changes saved!")
 		})
 	}
 </script>

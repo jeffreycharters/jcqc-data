@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { flip } from "svelte/animate"
-	import { crossfade, fade, slide } from "svelte/transition"
+	import { fade, slide } from "svelte/transition"
 	import ActiveElement from "./ActiveElement.svelte"
 	import InactiveElement from "./InactiveElement.svelte"
 	import { derived } from "svelte/store"
+	import { getElementsContext, getMethodElementsContext } from "$lib/storage"
 
 	// @ts-expect-error
 	import IconAtom2Filled from "@tabler/icons-svelte/dist/svelte/icons/IconAtom2Filled.svelte"
@@ -13,7 +13,6 @@
 
 	// @ts-expect-error
 	import IconX from "@tabler/icons-svelte/dist/svelte/icons/IconX.svelte"
-	import { getElementsContext, getMethodElementsContext } from "$lib/storage"
 
 	let formMessage: string | undefined = undefined
 	let open = false

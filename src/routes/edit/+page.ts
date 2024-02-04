@@ -10,9 +10,13 @@ export const load = (async () => {
 	if (dev && (await db.elements.toArray()).length === 0) await addSomeElements()
 
 	const methods = (await db.methods.toArray()).toSorted((a, b) => (a.name < b.name ? -1 : 1))
+	const instruments = (await db.instruments.toArray()).toSorted((a, b) =>
+		a.name < b.name ? -1 : 1
+	)
 
 	return {
 		methods,
+		instruments,
 		title: "Edit Stuff"
 	}
 }) satisfies PageLoad
