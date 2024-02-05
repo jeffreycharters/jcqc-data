@@ -13,17 +13,13 @@
 
 	// @ts-expect-error
 	import IconArrowBackUpDouble from "@tabler/icons-svelte/dist/svelte/icons/IconArrowBackUpDouble.svelte"
-	import {
-		setElementsContext,
-		setInstrumentContext,
-		setMethodContext,
-		setMethodElementsContext
-	} from "$lib/storage"
+	import { setInstrumentContext, setMethodContext, setMethodElementsContext } from "$lib/storage"
 	import type { PageData } from "./$types"
 
 	export let data: PageData
-	const { sampleList, runlist, method, methodElements } = data
+	const { sampleList, runlist, method, methodElements, instrument } = data
 
+	setInstrumentContext(instrument ?? null)
 	setMethodContext(method ?? null)
 	setMethodElementsContext(methodElements ?? [])
 </script>

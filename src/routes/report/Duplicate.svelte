@@ -63,7 +63,7 @@
 				{@const average = (sample.results[element.id] + duplicate.results[element.id]) / 2}
 				{@const passing = checkIfDupPassing(average, rpd, loq)}
 				<td class={passing}>
-					{#if !rpd || !loq}
+					{#if !rpd}
 						- -
 					{:else}
 						{toSigFigs(rpd, 2)}%

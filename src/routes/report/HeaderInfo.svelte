@@ -7,9 +7,11 @@
 	// @ts-expect-error
 	import IconPrinterOff from "@tabler/icons-svelte/dist/svelte/icons/IconPrinter.svelte"
 	import type { PageData } from "./$types"
+	import { getInstrumentContext } from "$lib/storage"
 
 	export let data: PageData
-	const { instrument, sampleList, method, runlist } = data
+	const { method, runlist } = data
+	const instrument = getInstrumentContext()
 
 	const {
 		elements: { trigger: dateTrigger, content: dateContent, arrow: dateArrow },
@@ -44,7 +46,7 @@
 <div class="header-info mb-4">
 	<h1 class="mb-2">Sequence Information - {method?.name}</h1>
 
-	<div class="ml-4 max-w-xs">
+	<div class="ml-4 w-fit">
 		<div class="headerItem mt-2 py-1">
 			<div>Analyst:</div>
 			<div class="autofilled">&nbsp;</div>
@@ -85,7 +87,7 @@
 		</div>
 
 		<div class="headerItem py-1">
-			Sequence ID: <div class="autofilled">
+			Sequence ID: <div class="autofilled pr-4">
 				<span class:no-print={!printAnalysisName} class:text-stone-300={!printAnalysisName}
 					>{runlist?.meta.analysisName}</span
 				>
@@ -123,16 +125,16 @@
 		<div class="headerItem py-[1px]">
 			Instrument Name:
 			<span class="font-normal">
-				{instrument?.name}
-				(Serial number: {instrument?.serial})
+				{$instrument?.name}
+				(Serial number: {$instrument?.serial})
 			</span>
 		</div>
 		<div class="headerItem py-[1px]">
 			Software Version:
-			<span class="font-normal">{instrument?.softwareVersion}</span>
+			<span class="font-normal">{$instrument?.softwareVersion}</span>
 		</div>
 		<div class="headerItem py-[1px]">
-			Autosampler: <span class="font-normal">{instrument?.autosamplerInfo}</span>
+			Autosampler: <span class="font-normal">{$instrument?.autosamplerInfo}</span>
 		</div>
 	</div>
 </div>

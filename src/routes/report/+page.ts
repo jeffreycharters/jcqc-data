@@ -25,9 +25,9 @@ export const load = (async () => {
 
 	if (!storedRunlist || !storedMethod || !storedInstrument) redirect(302, "/")
 
+	const instrument = JSON.parse(storedInstrument) as Instrument
 	const method = JSON.parse(storedMethod) as Method
 	const runlist = JSON.parse(storedRunlist) as Runlist
-	const instrument = await db.instruments.get(storedInstrument)
 	const { samples } = runlist
 
 	const usedElements = method.elements?.map((e) => e.id) ?? []
@@ -63,8 +63,8 @@ export const load = (async () => {
 	return {
 		methodElements,
 		runlist,
-		instrument,
 		title,
+		instrument,
 		method,
 		sampleList
 	}
