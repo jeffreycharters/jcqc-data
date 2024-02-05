@@ -15,8 +15,10 @@
 
 	export let data: PageData
 	const { instruments, selectedInstrument, methods, selectedMethod } = data
-	const instrument = setInstrumentContext(selectedInstrument ?? "")
+
 	const method = setMethodContext(methods?.find((m) => m.slug === selectedMethod) ?? null)
+	const instrument = setInstrumentContext(selectedInstrument ?? "")
+
 	setMethodsContext(methods ?? [])
 	setInstrumentsContext(instruments ?? [])
 </script>

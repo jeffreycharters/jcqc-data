@@ -7,7 +7,7 @@
 
 	const saveInstrument = async (instrument: Instrument) => {
 		localStorage.setItem("instrument", JSON.stringify(instrument))
-		$selectedInstrument = instrument.id
+		$selectedInstrument = instrument
 	}
 </script>
 
@@ -17,7 +17,7 @@
 	<div class="flex justify-center gap-4">
 		{#each $instruments ?? [] as instrument_i (instrument_i.id)}
 			<button
-				class="btn whitespace-nowrap {$selectedInstrument === instrument_i.id
+				class="btn whitespace-nowrap {$selectedInstrument?.id === instrument_i.id
 					? 'selected-button'
 					: 'method-button'}"
 				on:click={() => saveInstrument(instrument_i)}

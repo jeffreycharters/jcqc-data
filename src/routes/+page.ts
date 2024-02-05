@@ -5,9 +5,10 @@ import type { PageLoad } from "./$types"
 export const load: PageLoad = (async () => {
 	const title = "JCQC Method"
 
-	if (!browser) return {}
+	if (!browser) return { title }
 
-	const selectedInstrument: string = localStorage.getItem("instrument") ?? ""
+	const storedInstrument = localStorage.getItem("instrument")
+	const selectedInstrument = JSON.parse(storedInstrument ?? "")
 	const selectedMethod: string = localStorage.getItem("method") ?? ""
 	const instruments = await db.instruments.toArray()
 	const methods = await db.methods.toArray()
@@ -16,7 +17,7 @@ export const load: PageLoad = (async () => {
 		title,
 		methods,
 		selectedMethod,
-		instruments,
-		selectedInstrument
+		selectedInstrument,
+		instruments
 	}
 }) satisfies PageLoad

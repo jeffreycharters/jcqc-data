@@ -5,8 +5,6 @@ export async function methodTestOutput(methodID: string) {
 	let method = await db.methods.get(methodID)
 	if (!method) throw new Error("Method not found")
 
-	console.log(method)
-
 	const methodElements = await db.methodElements.where("method").equals(methodID).toArray()
 	const usedElements = methodElements.map((me) => me.element)
 
@@ -41,8 +39,6 @@ export async function methodTestOutput(methodID: string) {
 		rinseRow +
 		samples +
 		rinseRow
-
-	console.log(output)
 
 	return output
 }
@@ -133,7 +129,7 @@ export function checkStandardRows(method: Method, methodElements: MethodElement[
 	for (const checkStandard of method.checkStandards) {
 		for (const qcType of ["tooHigh", "okHigh", "okLow", "tooLow"]) {
 			for (const element of method.elements ?? []) {
-				const expected = checkStandard.values[element.id]
+				const expected = checkStandard.values[element.id] ?? 0
 
 				let concentration = 0
 
@@ -185,9 +181,9 @@ export function blankRows(
 	for (let i = 0; i < method.blanks.length; i++) {
 		for (const qcType of ["tooHigh", "ok"]) {
 			for (const element of method.elements ?? []) {
-				const loq = method.blanks[i].loqs[element.id]
+				const loq = method.blanks[i].loqs[element.id] ?? 0
 
-				let concentration = 0
+				let concentration = Math.random() * 10
 
 				switch (qcType) {
 					case "tooHigh":
@@ -236,7 +232,7 @@ function duplicateRows(
 	for (let i = 0; i < qcTypes.length; i++) {
 		for (const rep of [0, 1]) {
 			for (const element of method.elements ?? []) {
-				const loq = blank.loqs[element.id]
+				const loq = blank.loqs[element.id] ?? 0
 
 				let dups: [number, number]
 
@@ -287,10 +283,10 @@ export function referenceMaterialsRows(method: Method, methodElements: MethodEle
 	for (const referenceMaterial of method.referenceMaterials) {
 		for (const qcType of ["tooHigh", "okHigh", "okLow", "tooLow"]) {
 			for (const element of method.elements ?? []) {
-				const lower = referenceMaterial.lower[element.id]
-				const upper = referenceMaterial.upper[element.id]
+				const lower = referenceMaterial.lower[element.id] ?? 0
+				const upper = referenceMaterial.upper[element.id] ?? 0
 
-				let concentration = 0
+				let concentration = Math.random() * 10
 
 				switch (qcType) {
 					case "tooHigh":

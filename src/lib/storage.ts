@@ -55,7 +55,8 @@ const REPORTDATA_CTX = "REPORTDATA_CTX"
 export const [setInstrumentsContext, getInstrumentsContext] =
 	contextFactory<Instrument[]>(INSTRUMENTS_CTX)
 
-export const [setInstrumentContext, getInstrumentContext] = contextFactory<string>(INSTRUMENT_CTX)
+export const [setInstrumentContext, getInstrumentContext] =
+	contextFactory<Instrument>(INSTRUMENT_CTX)
 
 export const [setMethodContext, getMethodContext] = contextFactory<Method>(METHOD_CTX)
 
