@@ -20,7 +20,7 @@
 		console.log(jsonDB)
 
 		const now = new Date().toLocaleDateString("en-CA")
-		saveAs(jsonDB, `${now}-dexie-export.json`)
+		saveAs(jsonDB, `${now}-jcqc-export.json`)
 	}
 
 	async function importExistingDB(files: FileList | null) {

@@ -14,9 +14,7 @@ const config = {
 		preprocessMeltUI()
 	]),
 	kit: {
-		adapter: adapter({
-			fallback: "index.html"
-		})
+		adapter: adapter()
 	}
 }
 export default config

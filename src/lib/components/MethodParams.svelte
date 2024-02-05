@@ -11,6 +11,7 @@
 	method.subscribe(async (value) => {
 		if (!value) return (fullMethod = undefined)
 		methodElements = await db.methodElements.where("method").equals(value.slug).toArray()
+		lowElementCount = (methodElements ?? []).length < 15
 
 		const usedElementIDs = methodElements.map((methodElement) => methodElement.element)
 		const usedElements = (await db.elements.where("id").anyOf(usedElementIDs).toArray()).toSorted(
@@ -22,8 +23,6 @@
 			.where("method")
 			.equals(value.slug)
 			.toArray()
-
-		lowElementCount = (fullMethod?.elements ?? []).length < 15
 
 		fullMethod = {
 			...value,
