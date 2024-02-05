@@ -13,19 +13,15 @@
 	import IconCookieMan from "@tabler/icons-svelte/dist/svelte/icons/IconCookieMan.svelte"
 	// @ts-expect-error
 	import IconPlaylistAdd from "@tabler/icons-svelte/dist/svelte/icons/IconPlaylistAdd.svelte"
-	// @ts-expect-error
-	import IconBatteryAutomotive from "@tabler/icons-svelte/dist/svelte/icons/IconBatteryAutomotive.svelte"
 
 	import type { PageData } from "./$types"
 	import { setInstrumentsContext, setMethodsContext } from "$lib/storage"
-	import AddInstrumentForm from "./AddInstrumentForm.svelte"
-	import InstrumentCard from "./InstrumentCard.svelte"
 
 	export let data: PageData
 	const { methods, instruments } = data
 
 	const methodList = setMethodsContext(methods ?? [])
-	const instrumentList = setInstrumentsContext(instruments ?? [])
+	setInstrumentsContext(instruments ?? [])
 
 	const [send, receive] = crossfade({
 		duration: 250,
@@ -33,7 +29,6 @@
 	})
 
 	let showAddMethodForm = false
-	let showAddInstrumentForm = false
 </script>
 
 <h1 class="mb-6 mt-8">Select method to edit</h1>
@@ -68,24 +63,7 @@
 </div>
 
 <AddMethodForm showAddForm={showAddMethodForm} on:close={() => (showAddMethodForm = false)} />
-
-<h1 class="mb-6 mt-8">Edit Instruments</h1>
-<div class="grid max-w-screen-lg grid-cols-2 gap-4">
-	{#each $instrumentList ?? [] as instrument (instrument.id)}
-		<InstrumentCard {instrument} />
-	{/each}
-
-	<button
-		on:click={() => (showAddInstrumentForm = !showAddInstrumentForm)}
-		class="flex w-full items-center justify-center gap-2 rounded border border-gray-500 p-4 font-bold shadow-lg"
-	>
-		<IconBatteryAutomotive class=" h-6 w-6 stroke-[1.5]" />
-		Add Instrument
-	</button>
-</div>
-
-<AddInstrumentForm show={showAddInstrumentForm} on:close={() => (showAddInstrumentForm = false)} />
-
+<!-- 
 <h1 class="-mb-2 mt-10">Other options</h1>
 
 <div class="grid max-w-screen-lg grid-cols-3 items-stretch gap-4">
@@ -109,4 +87,4 @@
 			<h2>Return to Main</h2>
 		</a>
 	</div>
-</div>
+</div> -->

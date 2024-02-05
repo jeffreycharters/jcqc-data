@@ -1,17 +1,15 @@
 <script lang="ts">
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
+	import { onMount } from "svelte"
+	import { db } from "$lib/db"
 
 	import pkg from "file-saver"
 	const { saveAs } = pkg
 
-	import { onMount } from "svelte"
-	import { JCQCDexie, db } from "$lib/db"
-	import { goto } from "$app/navigation"
-
 	onMount(async () => {
 		// @ts-expect-error no typing
-		await import("dexie-export-import")
+		await import("dexie-export-import") // only load in browser
 	})
 
 	async function exportLocalDB() {
@@ -49,7 +47,10 @@
 
 	const menuLinks = [
 		{ text: "JCQC Main", href: "/" },
-		{ text: "Edit Methods", href: "/edit" }
+		{ text: "Edit Methods", href: "/edit" },
+		{ text: "Edit Elements", href: "/edit/elements" },
+		{ text: "Edit Instruments", href: "/edit/instruments" },
+		{ text: "Generate Test Files", href: "/edit/testfiles" }
 	]
 
 	let files: HTMLInputElement["files"]

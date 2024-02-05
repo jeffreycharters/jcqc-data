@@ -4,17 +4,17 @@
 	import { fade } from "svelte/transition"
 	import { z } from "zod"
 	import { createTooltip, melt } from "@melt-ui/svelte"
-
-	// @ts-expect-error
-	import IconEdit from "@tabler/icons-svelte/dist/svelte/icons/IconEdit.svelte"
 	import { db, type Element } from "$lib/db"
 	import { getEditableElementsContext, getElementsContext } from "$lib/storage"
 	import { derived } from "svelte/store"
 
-	export let element: Element
-	const elements = getElementsContext()
+	// @ts-expect-error
+	import IconEdit from "@tabler/icons-svelte/dist/svelte/icons/IconEdit.svelte"
 
+	export let element: Element
 	let { symbol, mass } = element
+
+	const elements = getElementsContext()
 
 	const editableList = getEditableElementsContext()
 	const editable = derived(editableList, ($editableList) => $editableList?.includes(element.id))
@@ -56,7 +56,7 @@
 		let exists = (await db.elements.where({ id: `${fd.data.symbol}${fd.data.mass}` }).count()) > 0
 
 		if (exists) {
-			return addFormMessage("Element+Mass already exists")
+			return addFormMessage("Element+Mass already exists. Cancel?")
 		}
 
 		const updated = {
@@ -143,7 +143,7 @@
 				<IconEdit class="h-4 w-4" />
 				Edit
 			</button>
-			{#if $open && !editable}
+			{#if $open && !$editable}
 				<div
 					use:melt={$content}
 					transition:fade={{ duration: 100 }}

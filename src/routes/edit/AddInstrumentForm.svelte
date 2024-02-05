@@ -1,15 +1,14 @@
 <script lang="ts">
-	import NumberInput from "$lib/components/NumberInput.svelte"
 	import TextInput from "$lib/components/TextInput.svelte"
 	import { createEventDispatcher, type EventDispatcher } from "svelte"
-	import slugify from "slugify"
 	import { slide } from "svelte/transition"
+	import { db } from "$lib/db"
+	import { getInstrumentsContext } from "$lib/storage"
+	import { createId } from "@paralleldrive/cuid2"
 	import { z } from "zod"
+
 	// @ts-expect-error
 	import IconSquareX from "@tabler/icons-svelte/dist/svelte/icons/IconSquareX.svelte"
-	import { db } from "$lib/db"
-	import { getInstrumentsContext, getMethodsContext, setMethodsContext } from "$lib/storage"
-	import { createId } from "@paralleldrive/cuid2"
 
 	const schema = z.object({
 		name: z
@@ -35,7 +34,6 @@
 	let serial: string
 	let softwareVersion: string
 
-	const methods = getMethodsContext()
 	const dispatch: EventDispatcher<{ close: unknown }> = createEventDispatcher()
 
 	const addMethod = async () => {
