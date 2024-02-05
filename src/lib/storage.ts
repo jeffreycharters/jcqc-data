@@ -14,17 +14,17 @@ import {
 
 export function contextFactory<Titem = unknown>(
 	contextKey: string
-): [(item: Titem | null) => Writable<Titem | null>, () => Writable<Titem | null>] {
-	const setter = (item: Titem | null): Writable<Titem | null> => {
-		if (!browser) return writable(null)
+): [(item: Titem | undefined) => Writable<Titem | undefined>, () => Writable<Titem | undefined>] {
+	const setter = (item: Titem | undefined): Writable<Titem | undefined> => {
+		if (!browser) return writable(undefined)
 		const itemStore = writable(item)
 		setContext(contextKey, itemStore)
 		return itemStore
 	}
 
-	const getter = (): Writable<Titem | null> => {
-		if (!browser) return writable(null)
-		return getContext<Writable<Titem | null>>(contextKey)
+	const getter = (): Writable<Titem | undefined> => {
+		if (!browser) return writable(undefined)
+		return getContext<Writable<Titem | undefined>>(contextKey)
 	}
 
 	return [setter, getter]

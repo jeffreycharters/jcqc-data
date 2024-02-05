@@ -24,6 +24,11 @@
 			>
 				{instrument_i.name}
 			</button>
+		{:else}
+			<div class="flex flex-col items-center">
+				<div>No instruments found.</div>
+				<a class="text-green-600 font-semibold underline" href="/edit/instruments">Go add some.</a>
+			</div>
 		{/each}
 	</div>
 </div>

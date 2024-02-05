@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getMethodContext, getMethodsContext, setMethodContext } from "$lib/storage"
+	import { getMethodContext, getMethodsContext } from "$lib/storage"
 
 	const method = getMethodContext()
 	const methods = getMethodsContext()
@@ -10,13 +10,26 @@
 	<div class="mx-auto my-2 flex flex-wrap justify-center gap-x-2 gap-y-1">
 		{#each $methods ?? [] as method_i (method_i.slug)}
 			<button
-				on:click={() => ($method = method_i)}
+				on:click={() => {
+					$method = method_i
+					localStorage.setItem("method", method_i.slug)
+				}}
 				class="btn no-underline {method_i.slug === $method?.slug
 					? 'selected-button'
 					: 'method-button'}">{method_i.name}</button
 			>
+		{:else}
+			<div class="flex flex-col items-center">
+				<div>No methods found.</div>
+				<a class="text-green-600 font-semibold underline" href="/edit">Go add some.</a>
+			</div>
 		{/each}
-		<button class="btn method-button no-underline" on:click={() => ($method = null)}>Clear</button>
+
+		{#if $methods?.length}
+			<button class="btn method-button no-underline" on:click={() => ($method = undefined)}
+				>Clear</button
+			>
+		{/if}
 	</div>
 </div>
 

@@ -8,18 +8,20 @@ export const load: PageLoad = (async () => {
 	if (!browser) return { title }
 
 	const storedInstrument = localStorage.getItem("instrument")
-	const selectedInstrument = JSON.parse(storedInstrument ?? "")
-	const selectedMethod: string = localStorage.getItem("method") ?? ""
+	const selectedInstrument = JSON.parse(storedInstrument ?? "{}")
+
 	const instruments = (await db.instruments.toArray()).toSorted((a, b) =>
 		a.name < b.name ? -1 : 1
 	)
+
 	const methods = await db.methods.toArray()
+	const selectedMethod = methods.find((m) => m.slug === localStorage.getItem("method"))
 
 	return {
 		title,
 		methods,
 		selectedMethod,
-		selectedInstrument,
+		selectedInstrument: selectedInstrument.name ? selectedInstrument : undefined,
 		instruments
 	}
 }) satisfies PageLoad
