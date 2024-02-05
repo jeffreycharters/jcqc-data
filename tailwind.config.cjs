@@ -7,7 +7,7 @@ const config = {
 
 	plugins: [],
 
-	safelist: ["text-gray-300", "border-gray-300", "text-red-600", "text-green-600"]
+	safelist: ["text-gray-300", "border-gray-300", "text-red-600", "text-green-600", "bg-teal-100"]
 }
 
 module.exports = config

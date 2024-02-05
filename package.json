@@ -46,6 +46,7 @@
 	"dependencies": {
 		"@sveltejs/vite-plugin-svelte": "^3.0.1",
 		"dexie": "4.0.1-beta.7",
+		"dexie-export-import": "^4.1.0",
 		"file-saver": "^2.0.5",
 		"papaparse": "^5.4.1",
 		"prettier-plugin-tailwindcss": "^0.5.11"

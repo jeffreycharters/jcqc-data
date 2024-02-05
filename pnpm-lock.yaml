@@ -11,6 +11,9 @@ dependencies:
   dexie:
     specifier: 4.0.1-beta.7
     version: 4.0.1-beta.7
+  dexie-export-import:
+    specifier: ^4.1.0
+    version: 4.1.0(dexie@4.0.1-beta.7)
   file-saver:
     specifier: ^2.0.5
     version: 2.0.5
@@ -1109,6 +1112,14 @@ packages:
   /devalue@4.3.2:
     resolution: {integrity: sha512-KqFl6pOgOW+Y6wJgu80rHpo2/3H07vr8ntR9rkkFIRETewbf5GaYYcakYfiKz89K+sLsuPkQIZaXDMjUObZwWg==}
     dev: true
+
+  /dexie-export-import@4.1.0(dexie@4.0.1-beta.7):
+    resolution: {integrity: sha512-rPnd1SgnmtFipluN1X+Vw3RYjvk8A/B8C7A1aygJaapqrDC9MlZW22yu0Ynt5kVgOrIERNX+BNa8fSQsKsWj0g==}
+    peerDependencies:
+      dexie: ^2.0.4 || ^3.0.0 || ^4.0.1-alpha.5
+    dependencies:
+      dexie: 4.0.1-beta.7
+    dev: false
 
   /dexie@4.0.1-beta.7:
     resolution: {integrity: sha512-jWR02VWpPOZNMQo0YlOQzUXdpHQu2NDbUTW/HUNDjhYnP4j3LVsLtghb3TrFpilHJeL3Nn86wzrmx3Sd8svfKg==}

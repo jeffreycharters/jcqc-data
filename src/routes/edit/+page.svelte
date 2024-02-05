@@ -70,7 +70,7 @@
 <AddMethodForm showAddForm={showAddMethodForm} on:close={() => (showAddMethodForm = false)} />
 
 <h1 class="mb-6 mt-8">Edit Instruments</h1>
-<div class="grid max-w-screen-lg grid-cols-3 gap-4">
+<div class="grid max-w-screen-lg grid-cols-2 gap-4">
 	{#each $instrumentList ?? [] as instrument (instrument.id)}
 		<InstrumentCard {instrument} />
 	{/each}

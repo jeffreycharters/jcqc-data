@@ -10,7 +10,9 @@ export const load: PageLoad = (async () => {
 	const storedInstrument = localStorage.getItem("instrument")
 	const selectedInstrument = JSON.parse(storedInstrument ?? "")
 	const selectedMethod: string = localStorage.getItem("method") ?? ""
-	const instruments = await db.instruments.toArray()
+	const instruments = (await db.instruments.toArray()).toSorted((a, b) =>
+		a.name < b.name ? -1 : 1
+	)
 	const methods = await db.methods.toArray()
 
 	return {
