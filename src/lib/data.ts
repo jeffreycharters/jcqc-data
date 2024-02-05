@@ -156,6 +156,8 @@ export function toSigFigs(
 ) {
 	let orderOfMagnitude = 0
 
+	if (typeof n != "number") return "- -"
+
 	for (let number = n; number > 10; number /= 10) {
 		orderOfMagnitude += 1
 	}

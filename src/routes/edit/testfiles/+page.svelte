@@ -1,12 +1,20 @@
 <script lang="ts">
-	import type { MethodsResponse } from "$lib/pocketbase-types"
-	import { methods } from "$lib/stores"
+	import type { Method } from "$lib/db"
+	import { setMethodsContext } from "$lib/storage"
 	import { methodTestOutput } from "$lib/testfiles"
+
 	import pkg from "file-saver"
+	import type { PageData } from "./$types"
 	const { saveAs } = pkg
 
-	async function download(method: MethodsResponse) {
-		const output = new Blob([await methodTestOutput(method.id)], { type: "text/csv;charset=utf-8" })
+	export let data: PageData
+	const { methodList } = data
+	const methods = setMethodsContext(methodList ?? null)
+
+	async function download(method: Method) {
+		const output = new Blob([await methodTestOutput(method.slug)], {
+			type: "text/csv;charset=utf-8"
+		})
 		const now = new Date().toLocaleDateString("en-CA")
 		saveAs(output, `TEST-${now}=${method.name}.txt`)
 	}
@@ -31,7 +39,7 @@
 	</div>
 
 	<div class="grid grid-cols-3 gap-2">
-		{#each $methods ?? [] as method (method.id)}
+		{#each $methods ?? [] as method (method.slug)}
 			<button
 				class="rounded border border-stone-800 p-4 text-left"
 				on:click={() => download(method)}

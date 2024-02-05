@@ -1,34 +1,33 @@
-import { get } from "svelte/store"
-import {
-	blanksStore,
-	checkStandardsStore,
-	methodElementsStore,
-	methodStore,
-	referenceMaterialsStore
-} from "./stores"
-import type { ExpandedBlank, ExpandedMethod, InstrumentCSVRow, MethodElement } from "./types"
-import type { BlanksResponse, MethodsResponse } from "./pocketbase-types"
-import { pb } from "./pocketbase"
-import { setMethodStores } from "./methods"
+import { db, type Blank, type Method, type MethodElement } from "./db"
+import type { InstrumentCSVRow } from "./types"
 
 export async function methodTestOutput(methodID: string) {
-	const method = await pb.collection("methods").getOne<MethodsResponse<ExpandedMethod>>(methodID, {
-		expand: "elements"
-	})
+	let method = await db.methods.get(methodID)
+	if (!method) throw new Error("Method not found")
 
-	methodStore.set(method)
-	await setMethodStores(method.id)
+	console.log(method)
+
+	const methodElements = await db.methodElements.where("method").equals(methodID).toArray()
+	const usedElements = methodElements.map((me) => me.element)
+
+	const elements = await db.elements.where("id").anyOf(usedElements).toArray()
+
+	const blanks = await db.blanks.where("method").equals(methodID).toArray()
+	const checkStandards = await db.checkStandards.where("method").equals(methodID).toArray()
+	const referenceMaterials = await db.referenceMaterials.where("method").equals(methodID).toArray()
+
+	method = { ...method, elements, blanks, checkStandards, referenceMaterials }
 
 	const headerRow =
 		"Sample Name,Dilution Factor,Sample Weight or Volume,Analyte,Mass,Concentration,Units\r\n"
 
-	const precalRinseRow = rinseRows(false)
-	const rinseRow = rinseRows(true)
-	const calibration = calibrationRows()
-	const checkStandard = checkStandardRows()
-	const blank = blankRows()
-	const referenceMaterial = referenceMaterialsRows()
-	const samples = sampleRows()
+	const precalRinseRow = rinseRows(method, methodElements, false)
+	const calibration = calibrationRows(method, methodElements)
+	const rinseRow = rinseRows(method, methodElements)
+	const checkStandard = checkStandardRows(method, methodElements)
+	const blank = blankRows(method, methodElements)
+	const referenceMaterial = referenceMaterialsRows(method, methodElements)
+	const samples = sampleRows(method)
 
 	const output =
 		headerRow +
@@ -42,6 +41,8 @@ export async function methodTestOutput(methodID: string) {
 		rinseRow +
 		samples +
 		rinseRow
+
+	console.log(output)
 
 	return output
 }
@@ -69,25 +70,21 @@ export function SpreadCSVRow(input: InstrumentCSVRow) {
 		.concat("\r\n")
 }
 
-export function calibrationRows() {
-	const method = get(methodStore)
-	const methodElements = get(methodElementsStore)?.sort((a, b) => a.mass - b.mass)
-
-	if (!method || !methodElements) throw new Error("Missing method or method elements")
-
+export function calibrationRows(method: Method, methodElements: MethodElement[]) {
 	let output: string = ""
 
 	for (let i = 0; i <= method?.calibrationCount; i++) {
-		for (const methodElement of methodElements) {
+		for (const element of method.elements ?? []) {
+			const methodElement = methodElements.find((me) => me.element === element.id)
 			const sampleName = calibrationSampleName(i, method.calibrationCount)
 			const row: InstrumentCSVRow = {
 				"Sample Name": sampleName,
 				"Dilution Factor": 1,
 				"Sample Weight or Volume": 1,
-				Analyte: methodElement.symbol,
-				Mass: methodElement.mass,
-				Units: methodElement.units,
-				Concentration: methodElement.units === "ppb" ? i * 10 : i / 100
+				Analyte: element.symbol,
+				Mass: element.mass,
+				Units: methodElement?.units ?? "ppm",
+				Concentration: (methodElement?.units ?? "ppm") === "ppb" ? i * 10 : i / 100
 			}
 
 			output = output + SpreadCSVRow(row)
@@ -109,22 +106,18 @@ export function calibrationSampleName(i: number, calibrationCount: number) {
 	return "Unknown Cal Sample"
 }
 
-export function rinseRows(calibrated = true) {
-	const method = get(methodStore)
-	const methodElements = get(methodElementsStore)?.sort((a, b) => a.mass - b.mass)
-
-	if (!method || !methodElements) throw new Error("Missing method or method elements")
-
+export function rinseRows(method: Method, methodElements: MethodElement[], calibrated = true) {
 	let output: string = ""
 
-	for (const methodElement of methodElements) {
+	for (const element of method?.elements ?? []) {
+		const methodElement = methodElements.find((me) => me.element === element.id)
 		const row: InstrumentCSVRow = {
 			"Sample Name": "rinse",
 			"Dilution Factor": 1,
 			"Sample Weight or Volume": 1,
-			Analyte: methodElement.symbol,
-			Mass: methodElement.mass,
-			Units: methodElement.units
+			Analyte: element.symbol,
+			Mass: element.mass,
+			Units: methodElement?.units ?? "ppm"
 		}
 		if (calibrated) row.Concentration = Math.random() * 10
 		output = output + SpreadCSVRow(row)
@@ -133,23 +126,14 @@ export function rinseRows(calibrated = true) {
 	return output
 }
 
-export function checkStandardRows() {
-	const method = get(methodStore)
-	const methodElements = get(methodElementsStore)?.sort((a, b) => a.mass - b.mass)
-	const checkStandards = get(checkStandardsStore)
-
-	if (!method || !methodElements) throw new Error("Missing method or method elements")
-
-	if (!checkStandards || !checkStandards.length) return []
+export function checkStandardRows(method: Method, methodElements: MethodElement[]) {
+	if (!method.checkStandards || !method.checkStandards.length) return []
 
 	let output: string = ""
-	for (const checkStandard of checkStandards) {
+	for (const checkStandard of method.checkStandards) {
 		for (const qcType of ["tooHigh", "okHigh", "okLow", "tooLow"]) {
-			for (const methodElement of methodElements) {
-				const expected =
-					checkStandard.expand?.["checkValues(checkStandard)"]?.find(
-						(c) => c.element === methodElement.elementID
-					)?.value ?? 0
+			for (const element of method.elements ?? []) {
+				const expected = checkStandard.values[element.id]
 
 				let concentration = 0
 
@@ -170,13 +154,14 @@ export function checkStandardRows() {
 						throw new Error("Invalid qcType")
 				}
 
+				const methodElement = methodElements.find((me) => me.element === element.id)
 				const row: InstrumentCSVRow = {
 					"Sample Name": checkStandard.name,
 					"Dilution Factor": 1,
 					"Sample Weight or Volume": 1,
-					Analyte: methodElement.symbol,
-					Mass: methodElement.mass,
-					Units: methodElement.units,
+					Analyte: element.symbol,
+					Mass: element.mass,
+					Units: methodElement?.units ?? "ppm",
 					Concentration: concentration
 				}
 
@@ -188,24 +173,19 @@ export function checkStandardRows() {
 	return output
 }
 
-export function blankRows(includeDuplicates = true) {
-	const method = get(methodStore)
-	const methodElements = get(methodElementsStore)?.sort((a, b) => a.mass - b.mass)
-	const blanks = get(blanksStore)
-
-	if (!method || !methodElements) throw new Error("Missing method or method elements")
-
-	if (!blanks || !blanks.length) return []
+export function blankRows(
+	method: Method,
+	methodElements: MethodElement[],
+	includeDuplicates = true
+) {
+	if (!method.blanks || !method.blanks.length) return []
 
 	let output: string = ""
 
-	for (let i = 0; i < blanks.length; i++) {
+	for (let i = 0; i < method.blanks.length; i++) {
 		for (const qcType of ["tooHigh", "ok"]) {
-			for (const methodElement of methodElements) {
-				const loq =
-					blanks[i].expand?.["detectionLimits(blank)"].find(
-						(c) => c.element === methodElement.elementID
-					)?.loq ?? 0
+			for (const element of method.elements ?? []) {
+				const loq = method.blanks[i].loqs[element.id]
 
 				let concentration = 0
 
@@ -220,13 +200,15 @@ export function blankRows(includeDuplicates = true) {
 						throw new Error("Invalid qcType")
 				}
 
+				const methodElement = methodElements.find((me) => me.element === element.id)
+
 				const row: InstrumentCSVRow = {
-					"Sample Name": blanks[i].name,
+					"Sample Name": method.blanks[i].name,
 					"Dilution Factor": 1,
 					"Sample Weight or Volume": 1,
-					Analyte: methodElement.symbol,
-					Mass: methodElement.mass,
-					Units: methodElement.units,
+					Analyte: element.symbol,
+					Mass: element.mass,
+					Units: methodElement?.units ?? "ppm",
 					Concentration: concentration
 				}
 
@@ -235,16 +217,17 @@ export function blankRows(includeDuplicates = true) {
 		}
 
 		if (includeDuplicates)
-			output = output + duplicateRows(method.rpdLimit, blanks[i], methodElements)
+			output = output + duplicateRows(method, methodElements, method.rpdLimit, method.blanks[i])
 	}
 
 	return output
 }
 
 function duplicateRows(
+	method: Method,
+	methodElements: MethodElement[],
 	target: number,
-	blank: BlanksResponse<ExpandedBlank>,
-	methodElements: MethodElement[]
+	blank: Blank
 ) {
 	let output: string = ""
 
@@ -252,11 +235,8 @@ function duplicateRows(
 
 	for (let i = 0; i < qcTypes.length; i++) {
 		for (const rep of [0, 1]) {
-			for (const methodElement of methodElements) {
-				const loq =
-					blank.expand?.["detectionLimits(blank)"].find(
-						(c) => c.element === methodElement.elementID
-					)?.loq ?? 0
+			for (const element of method.elements ?? []) {
+				const loq = blank.loqs[element.id]
 
 				let dups: [number, number]
 
@@ -274,13 +254,15 @@ function duplicateRows(
 						dups = [0, 0]
 				}
 
+				const methodElement = methodElements.find((me) => me.element === element.id)
+
 				const row: InstrumentCSVRow = {
 					"Sample Name": "20-00000" + i + "-0001" + (rep === 1 ? " Dup" : ""),
 					"Dilution Factor": 1,
 					"Sample Weight or Volume": 1,
-					Analyte: methodElement.symbol,
-					Mass: methodElement.mass,
-					Units: methodElement.units,
+					Analyte: element.symbol,
+					Mass: element.mass,
+					Units: methodElement?.units ?? "ppm",
 					Concentration: dups[rep]
 				}
 
@@ -297,24 +279,16 @@ function twoDuplicates(xBar: number, rpdTarget: number): [number, number] {
 	return [x1, x2]
 }
 
-export function referenceMaterialsRows() {
-	const method = get(methodStore)
-	const methodElements = get(methodElementsStore)?.sort((a, b) => a.mass - b.mass)
-	const referenceMaterials = get(referenceMaterialsStore)
-
-	if (!method || !methodElements) throw new Error("Missing method or method elements")
-
-	if (!referenceMaterials || !referenceMaterials.length) return []
+export function referenceMaterialsRows(method: Method, methodElements: MethodElement[]) {
+	if (!method.referenceMaterials || !method.referenceMaterials.length) return []
 
 	let output: string = ""
 
-	for (const referenceMaterial of referenceMaterials) {
+	for (const referenceMaterial of method.referenceMaterials) {
 		for (const qcType of ["tooHigh", "okHigh", "okLow", "tooLow"]) {
-			for (const methodElement of methodElements) {
-				const { upper, lower } =
-					referenceMaterial.expand?.["referenceMaterialsRanges(referenceMaterial)"].find(
-						(c) => c.element === methodElement.elementID
-					) ?? {}
+			for (const element of method.elements ?? []) {
+				const lower = referenceMaterial.lower[element.id]
+				const upper = referenceMaterial.upper[element.id]
 
 				let concentration = 0
 
@@ -335,13 +309,15 @@ export function referenceMaterialsRows() {
 						throw new Error("Invalid qcType")
 				}
 
+				const methodElement = methodElements.find((me) => me.element === element.id)
+
 				const row: InstrumentCSVRow = {
 					"Sample Name": referenceMaterial.name,
 					"Dilution Factor": 1,
 					"Sample Weight or Volume": 1,
-					Analyte: methodElement.symbol,
-					Mass: methodElement.mass,
-					Units: methodElement.units,
+					Analyte: element.symbol,
+					Mass: element.mass,
+					Units: methodElement?.units ?? "ppm",
 					Concentration: concentration
 				}
 
@@ -353,19 +329,16 @@ export function referenceMaterialsRows() {
 	return output
 }
 
-export function sampleRows() {
-	const methodElements = get(methodElementsStore)?.sort((a, b) => a.mass - b.mass)
-	if (!methodElements) throw new Error("Missing method elements")
-
+export function sampleRows(method: Method) {
 	let output: string = ""
 	for (let i = 1; i < 10; i++) {
-		for (const methodelement of methodElements) {
+		for (const element of method.elements ?? []) {
 			const row = SpreadCSVRow({
 				"Sample Name": `20-00000${i}-000${i}`,
 				"Dilution Factor": 1,
 				"Sample Weight or Volume": 1,
-				Analyte: methodelement.symbol,
-				Mass: methodelement.mass,
+				Analyte: element.symbol,
+				Mass: element.mass,
 				Units: "ppb",
 				Concentration: i
 			})

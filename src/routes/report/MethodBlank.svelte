@@ -22,7 +22,7 @@
 		<tr>
 			<td class="firstCol">Below LOQ</td>
 			{#each $method?.elements ?? [] as element}
-				{@const loq = sample.blank?.loqs[element.id] ?? Infinity}
+				{@const loq = sample.blank?.loqs[element.id] ?? 0}
 				{@const tdClass =
 					loq != 0 && sample.results[element.id]
 						? sample.results[element.id] < loq
