@@ -42,7 +42,7 @@
 			// @ts-expect-error y u no have import, db?
 			.catch(() => db.import(backup))
 
-		window.location.href = "/edit"
+		location.reload()
 	}
 
 	const menuLinks = [
