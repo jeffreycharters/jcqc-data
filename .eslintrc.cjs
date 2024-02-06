@@ -13,9 +13,6 @@ module.exports = {
 	settings: {
 		"svelte3/typescript": () => require("typescript")
 	},
-	rules: {
-		"sort-imports": ["error", {}]
-	},
 	overrides: [
 		{
 			files: ["*.svelte"],

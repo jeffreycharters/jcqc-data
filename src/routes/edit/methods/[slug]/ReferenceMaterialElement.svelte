@@ -44,7 +44,7 @@
 			<td>
 				<div class="w-16">
 					<input
-						type="text"
+						type="number"
 						step="any"
 						name={`${$methodElement?.element}-upper`}
 						bind:value={upper}

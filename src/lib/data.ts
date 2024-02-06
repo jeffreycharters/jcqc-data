@@ -96,6 +96,7 @@ export function parseRun(rawRunlist: RawRunlist[]) {
 					results: rawRunlist[i].measurements
 				}
 			]
+
 			continue
 		}
 

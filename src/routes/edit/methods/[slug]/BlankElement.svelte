@@ -36,7 +36,7 @@
 		<div class="w-16">
 			<input
 				step="any"
-				type="text"
+				type="number"
 				placeholder="- -"
 				bind:value={loq}
 				class="number-input mb-2 mt-1 text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"

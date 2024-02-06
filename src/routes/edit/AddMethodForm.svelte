@@ -75,14 +75,9 @@
 		formError = ""
 
 		const newMethod = {
-			name,
+			...fd.data,
 			slug: slugify(name, { lower: true }),
-			rpdLimit,
-			active: true,
-			calibrationCount,
-			description,
-			checkStandardTolerance,
-			reportSigFigs
+			active: true
 		}
 
 		db.methods

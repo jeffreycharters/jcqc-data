@@ -16,7 +16,7 @@
 
 	export let data: PageData
 
-	const method = setMethodContext(data.currentMethod ?? null)
+	const method = setMethodContext(data.currentMethod ?? undefined)
 	setElementsContext(data.elementList ?? [])
 	setMethodElementsContext(data.methodElements ?? [])
 	setCheckStandardsContext(data.checkStandards ?? [])
