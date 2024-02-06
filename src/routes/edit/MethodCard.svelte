@@ -7,11 +7,11 @@
 	import { getMethodsContext } from "$lib/storage"
 
 	export let method: Method
+	const { active } = method
+
 	const methods = getMethodsContext()
 
 	const [send, receive] = crossfade({ duration: 200 })
-
-	const { active } = method
 
 	const toggleMethodActive = async () => {
 		await db.methods.update(method.slug, { active: !active })
@@ -27,13 +27,8 @@
 	in:receive={{ key: method.slug }}
 	out:send={{ key: method.slug }}
 >
-	<h3 class="text-xl">
-		{method.name}
-	</h3>
-
-	<div class="">
-		{method.description}
-	</div>
+	<h3 class="text-xl">{method.name}</h3>
+	<div>{method.description}</div>
 
 	<hr class="pt-4" />
 

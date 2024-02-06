@@ -1,92 +1,62 @@
 <script lang="ts">
-	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
-	import { onMount } from "svelte"
-	import { db } from "$lib/db"
 
-	import pkg from "file-saver"
-	const { saveAs } = pkg
+	// @ts-expect-error
+	import IconPacman from "@tabler/icons-svelte/dist/svelte/icons/IconPacman.svelte"
 
-	onMount(async () => {
-		// @ts-expect-error no typing
-		await import("dexie-export-import") // only load in browser
-	})
+	// @ts-expect-error
+	import IconBatteryAutomotive from "@tabler/icons-svelte/dist/svelte/icons/IconBatteryAutomotive.svelte"
 
-	async function exportLocalDB() {
-		if (!browser) return
+	// @ts-expect-error
+	import IconDatabaseEdit from "@tabler/icons-svelte/dist/svelte/icons/IconDatabaseEdit.svelte"
 
-		// @ts-expect-error pain in the ass
-		const jsonDB = await db.export()
-		console.log(jsonDB)
+	// @ts-expect-error
+	import IconTestPipe from "@tabler/icons-svelte/dist/svelte/icons/IconTestPipe.svelte"
 
-		const now = new Date().toLocaleDateString("en-CA")
-		saveAs(jsonDB, `${now}-jcqc-export.json`)
-	}
+	// @ts-expect-error
+	import IconAtom2 from "@tabler/icons-svelte/dist/svelte/icons/IconAtom2.svelte"
 
-	async function importExistingDB(files: FileList | null) {
-		if (!browser || !files || !files[0]) return
-
-		const inputFile = files[0]
-		if (inputFile.type != "application/json") {
-			alert("Incorrect file type, expected application/json received " + inputFile.type)
-			return
-		}
-
-		// @ts-expect-error yeah this again
-		const backup = await db.export()
-		await db.delete()
-		await db.open()
-
-		// @ts-expect-error y u no have import, db?
-		db.import(inputFile)
-			// @ts-expect-error y u no have import, db?
-			.catch(() => db.import(backup))
-
-		location.reload()
-	}
+	// @ts-expect-error
+	import IconHomeHeart from "@tabler/icons-svelte/dist/svelte/icons/IconHomeHeart.svelte"
 
 	const menuLinks = [
-		{ text: "JCQC Main", href: "/" },
-		{ text: "Edit Methods", href: "/edit" },
-		{ text: "Edit Elements", href: "/edit/elements" },
-		{ text: "Edit Instruments", href: "/edit/instruments" },
-		{ text: "Generate Test Files", href: "/edit/testfiles" }
+		{ text: "JCQC Main", href: "/", icon: IconHomeHeart, class: "stroke-red-600" },
+		{ text: "Edit Elements", href: "/edit/elements", icon: IconAtom2, class: "stroke-lime-600" },
+		{ text: "Edit Methods", href: "/edit", icon: IconPacman, class: "stroke-yellow-500" },
+		{
+			text: "Edit Instruments",
+			href: "/edit/instruments",
+			icon: IconBatteryAutomotive,
+			class: "stroke-cyan-600"
+		},
+		{
+			text: "Generate Test Files",
+			href: "/edit/testfiles",
+			icon: IconTestPipe,
+			class: "stroke-emerald-600"
+		},
+		{
+			text: "Manage Database",
+			href: "/edit/database",
+			icon: IconDatabaseEdit,
+			class: "stroke-fuchsia-600"
+		}
 	]
-
-	let files: HTMLInputElement["files"]
 </script>
 
-<ul class="relative top-12 flex w-48 flex-col gap-2">
+<ul class="relative top-12 flex w-64 flex-col gap-2">
 	{#each menuLinks as link}
 		<a
-			class="basic-border px-2 py-1 no-underline"
+			class="basic-border px-2 py-[3px] no-underline"
 			class:bg-teal-200={$page.url.pathname === link.href}
 			href={link.href}
 		>
-			<li>
+			<li class="flex items-center gap-2">
+				<div class="shadow-inner-lg rounded-full bg-white p-[2px]">
+					<svelte:component this={link.icon} class="h-6 w-6 {link.class}" stroke="1.25" />
+				</div>
 				{link.text}
 			</li>
 		</a>
 	{/each}
-
-	<li>
-		<button class="basic-border w-full px-2 py-1 text-left" on:click={exportLocalDB}
-			>Export database</button
-		>
-	</li>
-	<li>
-		<label
-			for="dropzone-file"
-			class="basic-border flex min-w-full cursor-pointer px-2 py-1 text-left"
-		>
-			<input
-				id="dropzone-file"
-				type="file"
-				class="hidden"
-				bind:files
-				on:change={() => importExistingDB(files)}
-			/>
-			Import Database
-		</label>
-	</li>
 </ul>

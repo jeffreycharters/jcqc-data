@@ -14,7 +14,7 @@ export const load: PageLoad = (async () => {
 		a.name < b.name ? -1 : 1
 	)
 
-	const methods = await db.methods.toArray()
+	const methods = (await db.methods.toArray()).filter((m) => m.active)
 	const selectedMethod = methods.find((m) => m.slug === localStorage.getItem("method"))
 
 	return {
