@@ -30,7 +30,7 @@
 		})
 		.superRefine((data, ctx) => {
 			for (const elementID of Object.keys(data.lower)) {
-				if (data.lower[elementID] > data.upper[elementID]) {
+				if (data.lower[elementID] - data.upper[elementID] > 0) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: `Low value is greater than high for ${elementID}`

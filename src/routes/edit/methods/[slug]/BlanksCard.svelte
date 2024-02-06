@@ -29,7 +29,7 @@
 		})
 		.superRefine((data, ctx) => {
 			for (const elementID of Object.keys(data.loqs)) {
-				if (data.mdls[elementID] > data.loqs[elementID]) {
+				if (data.mdls[elementID] - data.loqs[elementID] > 0) {
 					ctx.addIssue({
 						code: z.ZodIssueCode.custom,
 						message: `MDL is greater than LOQ for ${elementID}`
