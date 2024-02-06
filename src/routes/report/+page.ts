@@ -30,8 +30,11 @@ export const load = (async () => {
 	const runlist = JSON.parse(storedRunlist) as Runlist
 	const { samples } = runlist
 
-	const usedElements = method.elements?.map((e) => e.id) ?? []
-	const methodElements = await db.methodElements.where("element").anyOf(usedElements).toArray()
+	const usedElements = method.elements?.map((e) => [e.id, method.slug]) ?? []
+	const methodElements = await db.methodElements
+		.where("[element+method]")
+		.anyOf(usedElements)
+		.toArray()
 
 	const title = `${method.name} report`
 
