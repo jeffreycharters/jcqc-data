@@ -17,6 +17,26 @@
 
 	// @ts-expect-error
 	import IconDeviceFloppy from "@tabler/icons-svelte/dist/svelte/icons/IconDeviceFloppy.svelte"
+	import { z } from "zod"
+
+	const schema = z
+		.object({
+			name: z
+				.string({ required_error: "Name is required" })
+				.min(1, "Name must be at least 1 character"),
+			mdls: z.record(z.string(), z.coerce.number({ invalid_type_error: "Invalid MDL" })),
+			loqs: z.record(z.string(), z.coerce.number({ invalid_type_error: "Invalid LOQ" }))
+		})
+		.superRefine((data, ctx) => {
+			for (const elementID of Object.keys(data.loqs)) {
+				if (data.mdls[elementID] > data.loqs[elementID]) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: `MDL is greater than LOQ for ${elementID}`
+					})
+				}
+			}
+		})
 
 	export let blank: Blank
 	let { name } = blank
@@ -59,7 +79,14 @@
 	}
 
 	function updateDetectionLimits() {
-		db.blanks.update(blank.id, blank).then(() => {
+		const fd = schema.safeParse(blank)
+
+		if (!fd.success) {
+			statusMessage = fd.error.issues.map((i) => i.message).join(". ")
+			return
+		}
+
+		db.blanks.update(blank.id, fd.data).then(() => {
 			setStatusMessage("Changes saved!")
 		})
 	}

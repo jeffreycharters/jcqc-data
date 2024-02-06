@@ -4,13 +4,6 @@
 	import { fade } from "svelte/transition"
 	import { createSwitch, melt } from "@melt-ui/svelte"
 	import { derived, writable } from "svelte/store"
-
-	// @ts-expect-error
-	import IconDeviceFloppy from "@tabler/icons-svelte/dist/svelte/icons/IconDeviceFloppy.svelte"
-
-	// @ts-expect-error
-	import IconTrash from "@tabler/icons-svelte/dist/svelte/icons/IconTrash.svelte"
-
 	import { db, type ReferenceMaterial } from "$lib/db"
 	import {
 		getElementsContext,
@@ -18,6 +11,33 @@
 		getReferenceMaterialsContext,
 		setReferenceMaterialContext
 	} from "$lib/storage"
+
+	// @ts-expect-error
+	import IconDeviceFloppy from "@tabler/icons-svelte/dist/svelte/icons/IconDeviceFloppy.svelte"
+
+	// @ts-expect-error
+	import IconTrash from "@tabler/icons-svelte/dist/svelte/icons/IconTrash.svelte"
+	import { z } from "zod"
+
+	const schema = z
+		.object({
+			name: z
+				.string({ required_error: "Name is required" })
+				.min(1, "Name must be at least 1 character"),
+			active: z.boolean().default(true),
+			lower: z.record(z.string(), z.coerce.number({ invalid_type_error: "Invalid range" })),
+			upper: z.record(z.string(), z.coerce.number({ invalid_type_error: "Invalid range" }))
+		})
+		.superRefine((data, ctx) => {
+			for (const elementID of Object.keys(data.lower)) {
+				if (data.lower[elementID] > data.upper[elementID]) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: `Low value is greater than high for ${elementID}`
+					})
+				}
+			}
+		})
 
 	export let referenceMaterial: ReferenceMaterial
 	let { name } = referenceMaterial
@@ -78,7 +98,14 @@
 	}
 
 	function updateRanges() {
-		db.referenceMaterials.update(referenceMaterial.id, referenceMaterial).then(() => {
+		const fd = schema.safeParse(referenceMaterial)
+
+		if (!fd.success) {
+			statusMessage = fd.error.issues.map((i) => i.message).join(". ")
+			return
+		}
+
+		db.referenceMaterials.update(referenceMaterial.id, fd.data).then(() => {
 			$referenceMaterials = [
 				...($referenceMaterials ?? []).filter((rm) => rm.id !== referenceMaterial.id),
 				referenceMaterial
@@ -90,20 +117,25 @@
 
 <div class="basic-border h-full w-full bg-white p-4">
 	<div class="mb-4 flex items-center justify-between">
-		<div class="flex items-baseline gap-2">
+		<div class="flex items-center gap-2">
 			{#if editing}
 				<form
-					class="flex items-center border {editing ? 'gap-1' : 'gap-2'}"
+					class="flex items-center {editing ? 'gap-1' : 'gap-2'}"
 					on:submit|preventDefault={updateName}
 				>
 					<label for="check-name">Name:</label>
 					<input class="basic-border px-2" type="text" bind:value={name} />
-					<input type="submit" value="Update" class="btn" />
+					<input type="submit" value="Update" class="btn !mb-0 !py-0" />
 				</form>
 			{:else}
 				<h3>{name}</h3>
 			{/if}
-			<button type="button" on:click={() => (editing = !editing)} class:btn={editing}>
+			<button
+				type="button"
+				on:click={() => (editing = !editing)}
+				class:btn={editing}
+				class="!mb-0 !py-0"
+			>
 				{#if editing}
 					Cancel
 				{:else}
