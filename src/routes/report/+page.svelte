@@ -19,8 +19,8 @@
 	export let data: PageData
 	const { sampleList, runlist, method, methodElements, instrument } = data
 
-	setInstrumentContext(instrument ?? null)
-	setMethodContext(method ?? null)
+	setInstrumentContext(instrument ?? undefined)
+	setMethodContext(method ?? undefined)
 	setMethodElementsContext(methodElements ?? [])
 </script>
 

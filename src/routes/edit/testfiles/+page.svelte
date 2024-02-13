@@ -9,7 +9,7 @@
 
 	export let data: PageData
 	const { methodList } = data
-	const methods = setMethodsContext(methodList ?? null)
+	const methods = setMethodsContext(methodList ?? undefined)
 
 	async function download(method: Method) {
 		const output = new Blob([await methodTestOutput(method.slug)], {
