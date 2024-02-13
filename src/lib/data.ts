@@ -155,6 +155,8 @@ export function toSigFigs(
 	n: number,
 	sigFigs: number = get(getMethodContext())?.reportSigFigs ?? 2
 ) {
+	if (n === Infinity) return "0"
+
 	let orderOfMagnitude = 0
 
 	for (let number = n; number > 10; number /= 10) {
