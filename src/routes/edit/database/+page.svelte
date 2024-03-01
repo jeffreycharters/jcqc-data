@@ -9,14 +9,12 @@
 	const { saveAs } = pkg
 
 	onMount(async () => {
-		// @ts-expect-error no typing
 		await import("dexie-export-import") // only load in browser
 	})
 
 	async function exportLocalDB() {
 		if (!browser) return
 
-		// @ts-expect-error pain in the ass
 		const jsonDB = await db.export()
 		console.log(jsonDB)
 
@@ -33,15 +31,11 @@
 			return
 		}
 
-		// @ts-expect-error yeah this again
 		const backup = await db.export()
 		await db.delete()
 		await db.open()
 
-		// @ts-expect-error y u no have import, db?
-		db.import(inputFile)
-			// @ts-expect-error y u no have import, db?
-			.catch(() => db.import(backup))
+		db.import(inputFile).catch(() => db.import(backup))
 
 		location.reload()
 	}
