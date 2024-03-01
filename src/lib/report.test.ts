@@ -23,7 +23,7 @@ describe("Check Standard", () => {
 		const highSample = { ...sample, results: { element: 11.1 } }
 
 		expect(validateCheckStandard(highSample, "element", 0.1)).toEqual({
-			passing: true,
+			passing: false,
 			recovery: 111
 		})
 	})
