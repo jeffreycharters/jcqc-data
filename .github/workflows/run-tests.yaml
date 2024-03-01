@@ -1,4 +1,4 @@
-name: Test data manipulation functions
+name: Data Manipulation Tests
 
 on: push
 
