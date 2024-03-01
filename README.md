@@ -1,6 +1,6 @@
 # JCQC Data Processor
 
-![Testing Status](https://github.com/jeffreycharters/jcqc-data/actions/workflows/run-tests.yaml/badge.svg)
+![Testing Status](https://github.com/jeffreycharters/jcqc-data/actions/workflows/run-tests.yaml/badge.svg?branch=main)
 
 At work as an analytical chemist, we crunch through a lot of data-intensive tasks.
 
