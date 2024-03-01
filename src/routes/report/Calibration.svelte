@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
-	import { getElementsContext, getMethodContext, getMethodElementsContext } from "$lib/storage"
+	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
 	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
