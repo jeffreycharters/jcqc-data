@@ -14,5 +14,6 @@ jobs:
           node-version: 20
           cache: "npm"
       - run: echo "Running tests on ${{ github.ref }}"
-      - run: npm ci
-      - run: npm test
+      - uses: pnpm/action-setup@v3
+      - run: pnpm ci
+      - run: pnpm test
