@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
 	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
-	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let calBlank: RunListEntry

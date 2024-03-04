@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest"
 import { validateCheckStandard } from "./report"
-import type { RunListEntry } from "../app"
 import type { CheckStandard } from "./db"
 
 const checkStandard: CheckStandard = {
@@ -20,20 +19,29 @@ const sample: RunListEntry = {
 
 describe("Check Standard", () => {
 	it("fails when above upper limit", () => {
-		const highSample = { ...sample, results: { element: 11.1 } }
+		const highSampleFailing = { ...sample, results: { element: 11.1 } }
 
-		expect(validateCheckStandard(highSample, "element", 0.1)).toEqual({
+		expect(validateCheckStandard(highSampleFailing, "element", 0.1)).toEqual({
 			passing: false,
 			recovery: 111
 		})
 	})
 
 	it("passes when at upper limit", () => {
-		const highSample = { ...sample, results: { element: 11.0 } }
+		const highSamplePassing = { ...sample, results: { element: 11.0 } }
 
-		expect(validateCheckStandard(highSample, "element", 0.1)).toEqual({
+		expect(validateCheckStandard(highSamplePassing, "element", 0.1)).toEqual({
 			passing: true,
 			recovery: 110
+		})
+	})
+
+	it("passes when at center value", () => {
+		const midSamplePassing = { ...sample, results: { element: 10.0 } }
+
+		expect(validateCheckStandard(midSamplePassing, "element", 0.1)).toEqual({
+			passing: true,
+			recovery: 100
 		})
 	})
 

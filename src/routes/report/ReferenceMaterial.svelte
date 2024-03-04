@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
 	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
-	import type { ReferenceMaterialRange, RunListEntry } from "../../app"
-	import Element from "../edit/elements/Element.svelte"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry

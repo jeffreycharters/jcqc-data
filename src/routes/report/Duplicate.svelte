@@ -1,25 +1,14 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
+	import { relativePercentDeviation, rpdPassingStatus } from "$lib/report"
 	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
-	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry
 	export let duplicate: RunListEntry
 
 	const method = getMethodContext()
-
 	const rpdLimit = $method?.rpdLimit ?? 0
-
-	const calculateRPD = (value: number, dupValue: number) => {
-		return (Math.abs(value - dupValue) / ((value + dupValue) / 2)) * 100
-	}
-
-	const checkIfDupPassing = (average: number, rpd: number, loq: number | undefined) => {
-		if (!rpdLimit || !loq || average < 2 * loq) return "neutral"
-		if (rpd > rpdLimit) return "fails"
-		if (rpd < rpdLimit) return "passes"
-	}
 </script>
 
 <table class="results relative">
@@ -58,12 +47,15 @@
 		<tr>
 			<td>RPD</td>
 			{#each $method?.elements ?? [] as element}
-				{@const rpd = calculateRPD(sample.results[element.id], duplicate.results[element.id])}
+				{@const rpd = relativePercentDeviation(
+					sample.results[element.id],
+					duplicate.results[element.id]
+				)}
 				{@const loq = sample.referenceBlank?.loqs[element.id]}
 				{@const average = (sample.results[element.id] + duplicate.results[element.id]) / 2}
-				{@const passing = checkIfDupPassing(average, rpd, loq)}
+				{@const passing = rpdPassingStatus(average, rpd ?? 0, loq, rpdLimit)}
 				<td class={passing}>
-					{#if !rpd}
+					{#if rpd === undefined}
 						- -
 					{:else}
 						{toSigFigs(rpd, 2)}%
