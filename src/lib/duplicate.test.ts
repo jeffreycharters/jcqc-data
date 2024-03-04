@@ -1,70 +1,38 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, test } from "vitest"
 import { relativePercentDeviation, rpdPassingStatus } from "./report"
 
 describe("Relative percent deviation", () => {
-	it("is correct with two increasing values", () => {
-		expect(relativePercentDeviation(10, 15)).toEqual(40)
-	})
-
-	it("is correct with two decreasing values", () => {
-		expect(relativePercentDeviation(15, 10)).toEqual(40)
-	})
-
-	it("is correct with two negative values", () => {
-		expect(relativePercentDeviation(-15, -10)).toEqual(40)
-	})
-
-	it("is correct with one negative value", () => {
-		expect(relativePercentDeviation(15, -10)).toEqual(1000)
-	})
-
-	it("is correct with equal values", () => {
-		expect(relativePercentDeviation(10, 10)).toEqual(0)
-	})
-
-	it("is correct with one zero value", () => {
-		expect(relativePercentDeviation(0, 10)).toEqual(200)
-	})
-
-	it("is undefined with values that average to zero", () => {
-		expect(relativePercentDeviation(-10, 10)).toBeUndefined()
-	})
-
-	it("is undefined with both zero values", () => {
-		expect(relativePercentDeviation(0, 0)).toBeUndefined()
-	})
+	test.each([
+		{ sampleResult: 10, sampleDup: 15, expected: 40 },
+		{ sampleResult: 15, sampleDup: 10, expected: 40 },
+		{ sampleResult: -15, sampleDup: -10, expected: 40 },
+		{ sampleResult: 10, sampleDup: -15, expected: 1000 },
+		{ sampleResult: -10, sampleDup: 15, expected: 1000 },
+		{ sampleResult: 10, sampleDup: 10, expected: 0 },
+		{ sampleResult: 0, sampleDup: 10, expected: 200 },
+		{ sampleResult: 0, sampleDup: 0, expected: undefined },
+		{ sampleResult: -10, sampleDup: 10, expected: undefined }
+	])(
+		"returns $expected when sample is $sampleResult and duplicate is $sampleDup",
+		({ sampleResult, sampleDup, expected }) => {
+			expect(relativePercentDeviation(sampleResult, sampleDup)).toEqual(expected)
+		}
+	)
 })
 
 describe("RPD passing status", () => {
-	it("returns neutral when missing rpd input", () => {
-		expect(rpdPassingStatus(1, undefined, 1, 1)).toEqual("neutral")
-	})
-
-	it("returns neutral when missing rpd limit", () => {
-		expect(rpdPassingStatus(1, 1, undefined, 1)).toEqual("neutral")
-	})
-
-	it("returns neutral when missing rpd limit", () => {
-		expect(rpdPassingStatus(1, 1, undefined, 1)).toEqual("neutral")
-	})
-
-	it("returns neutral when missing loq", () => {
-		expect(rpdPassingStatus(1, 1, 1, undefined)).toEqual("neutral")
-	})
-
-	it("returns neutral when average is less than 2xLOQ", () => {
-		expect(rpdPassingStatus(1, 10, 1, 1)).toEqual("neutral")
-	})
-
-	it("returns passes when rpd is below limit", () => {
-		expect(rpdPassingStatus(10, 5, 1, 20)).toEqual("passes")
-	})
-
-	it("returns passes when rpd is at limit", () => {
-		expect(rpdPassingStatus(10, 20, 1, 20)).toEqual("passes")
-	})
-
-	it("returns fails when rpd is above limit", () => {
-		expect(rpdPassingStatus(10, 21, 1, 20)).toEqual("fails")
-	})
+	test.each([
+		{ average: 10, rpd: 5, loq: 1, rpdLimit: 20, expected: "passes" },
+		{ average: 10, rpd: 20, loq: 1, rpdLimit: 20, expected: "passes" },
+		{ average: 10, rpd: 21, loq: 1, rpdLimit: 20, expected: "fails" },
+		{ average: 10, rpd: 25, loq: 5, rpdLimit: 20, expected: "neutral" },
+		{ average: 10, rpd: undefined, loq: 1, rpdLimit: 20, expected: "neutral" },
+		{ average: 10, rpd: 20, loq: undefined, rpdLimit: 20, expected: "neutral" },
+		{ average: 10, rpd: 20, loq: 1, rpdLimit: undefined, expected: "neutral" }
+	])(
+		"returns $expected with average $average, rpd $rpd, loq $loq, and rpdLimit $rpdLimit",
+		({ average, rpd, loq, rpdLimit, expected }) => {
+			expect(rpdPassingStatus(average, rpd, loq, rpdLimit)).toEqual(expected)
+		}
+	)
 })

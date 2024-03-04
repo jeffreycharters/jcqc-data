@@ -1,15 +1,17 @@
-export function validateCheckStandard(sample: RunListEntry, elementID: string, limit: number) {
-	const expected = sample.checkStandard?.values[elementID]
-	const value = sample.results[elementID]
+export function validateCheckStandard(
+	result: number | undefined,
+	target: number | undefined,
+	limit: number | undefined
+) {
+	if (result === undefined || target === undefined || limit === undefined)
+		return { passing: undefined, recovery: undefined }
 
-	if (!expected || !value) return { passing: undefined, recovery: undefined }
-
-	const lowerThreshold = expected * (1 - limit)
-	const upperThreshold = expected * (1 + limit)
+	const lowerThreshold = target * (1 - limit)
+	const upperThreshold = target * (1 + limit)
 
 	return {
-		passing: value >= lowerThreshold && value <= upperThreshold,
-		recovery: Math.round((value / expected) * 100)
+		passing: result >= lowerThreshold && result <= upperThreshold,
+		recovery: Math.round((result / target) * 100)
 	}
 }
 
@@ -22,21 +24,40 @@ export function relativePercentDeviation(value: number, dupValue: number) {
 	return Math.abs((absoluteDifference / average) * 100)
 }
 
+type StatusString = "passes" | "fails" | "neutral"
+
 export function rpdPassingStatus(
 	average: number,
 	rpd: number | undefined,
 	loq: number | undefined,
 	rpdLimit: number | undefined
-) {
-	if (rpd === undefined || !rpdLimit || !loq || average < 2 * loq) return "neutral"
+): StatusString {
+	if (rpd === undefined || !rpdLimit || !loq || average <= 2 * loq) return "neutral"
 
 	return rpd > rpdLimit ? "fails" : "passes"
 }
 
-export function blankPassingStatus(result: number | undefined, loq: number | undefined) {
+export function blankPassingStatus(
+	result: number | undefined,
+	loq: number | undefined
+): StatusString {
 	if (result === undefined || !loq) return "neutral"
 
 	if (result <= loq) return "passes"
 
 	return "fails"
+}
+
+export function referenceMaterialPassingStatus(
+	result: number | undefined,
+	ranges: ReferenceMaterialRange | undefined
+): StatusString {
+	if (!result || !ranges || (!ranges.high && !ranges.low)) return "neutral"
+
+	let { low, high } = ranges
+
+	if (low === undefined) low = -Infinity
+	if (high == undefined) high = Infinity
+
+	return result >= low && result <= high ? "passes" : "fails"
 }

@@ -1,65 +1,35 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, test } from "vitest"
 import { validateCheckStandard } from "./report"
-import type { CheckStandard } from "./db"
 
-const checkStandard: CheckStandard = {
-	id: "checkStandard",
-	name: "checkStandard",
-	values: {
-		element: 10
-	}
-}
-
-const sample: RunListEntry = {
-	name: "sample",
-	analysisNumber: 1,
-	checkStandard,
-	results: {}
-}
-
-describe("Check Standard", () => {
-	it("fails when above upper limit", () => {
-		const highSampleFailing = { ...sample, results: { element: 11.1 } }
-
-		expect(validateCheckStandard(highSampleFailing, "element", 0.1)).toEqual({
-			passing: false,
-			recovery: 111
-		})
-	})
-
-	it("passes when at upper limit", () => {
-		const highSamplePassing = { ...sample, results: { element: 11.0 } }
-
-		expect(validateCheckStandard(highSamplePassing, "element", 0.1)).toEqual({
-			passing: true,
-			recovery: 110
-		})
-	})
-
-	it("passes when at center value", () => {
-		const midSamplePassing = { ...sample, results: { element: 10.0 } }
-
-		expect(validateCheckStandard(midSamplePassing, "element", 0.1)).toEqual({
-			passing: true,
-			recovery: 100
-		})
-	})
-
-	it("passes when at lower limit", () => {
-		const highSample = { ...sample, results: { element: 9 } }
-
-		expect(validateCheckStandard(highSample, "element", 0.1)).toEqual({
-			passing: true,
-			recovery: 90
-		})
-	})
-
-	it("fails when below lower limit", () => {
-		const highSample = { ...sample, results: { element: 8.9 } }
-
-		expect(validateCheckStandard(highSample, "element", 0.1)).toEqual({
-			passing: false,
-			recovery: 89
-		})
-	})
+describe("Check standard", () => {
+	test.each([
+		{ result: 11.1, target: 10, limit: 0.1, expected: { passing: false, recovery: 111 } },
+		{ result: 11.0, target: 10, limit: 0.1, expected: { passing: true, recovery: 110 } },
+		{ result: 10, target: 10, limit: 0.1, expected: { passing: true, recovery: 100 } },
+		{ result: 9, target: 10, limit: 0.1, expected: { passing: true, recovery: 90 } },
+		{ result: 8.9, target: 10, limit: 0.1, expected: { passing: false, recovery: 89 } },
+		{
+			result: undefined,
+			target: 10,
+			limit: 0.1,
+			expected: { passing: undefined, recovery: undefined }
+		},
+		{
+			result: 11,
+			target: undefined,
+			limit: 0.1,
+			expected: { passing: undefined, recovery: undefined }
+		},
+		{
+			result: 11,
+			target: 10,
+			limit: undefined,
+			expected: { passing: undefined, recovery: undefined }
+		}
+	])(
+		"returns $expected when result is $result, target is $target and limit is $limit",
+		({ result, target, limit, expected }) => {
+			expect(validateCheckStandard(result, target, limit)).toEqual(expected)
+		}
+	)
 })

@@ -35,7 +35,11 @@
 				<td>Recovery</td>
 				{#each $method?.elements ?? [] as element}
 					{#if $methodElements?.find((me) => me.element === element.id)}
-						{@const result = validateCheckStandard(sample, element.id, checkStandardLimit)}
+						{@const result = validateCheckStandard(
+							sample.results[element.id],
+							sample.checkStandard?.values[element.id],
+							checkStandardLimit
+						)}
 						{#if result.passing != undefined}
 							<td class={result.passing ? "passes" : "fails"}>
 								{result.recovery}%
