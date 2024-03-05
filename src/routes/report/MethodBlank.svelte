@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
+	import { blankPassingStatus } from "$lib/report"
 	import { getMethodContext } from "$lib/storage"
-	import type { RunListEntry } from "../../app"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry
@@ -22,15 +22,10 @@
 		<tr>
 			<td class="firstCol">Below LOQ</td>
 			{#each $method?.elements ?? [] as element}
-				{@const loq = sample.blank?.loqs[element.id] ?? 0}
-				{@const tdClass =
-					loq != 0 && sample.results[element.id]
-						? sample.results[element.id] < loq
-							? "passes"
-							: "fails"
-						: "neutral"}
+				{@const loq = sample.blank?.loqs[element.id]}
+				{@const tdClass = blankPassingStatus(sample.results[element.id], loq)}
 				<td class={tdClass}>
-					{loq != 0 ? loq : "- -"}
+					{loq ?? "- -"}
 				</td>
 			{/each}
 		</tr>

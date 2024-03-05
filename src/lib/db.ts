@@ -1,5 +1,4 @@
 import Dexie, { type Table } from "dexie"
-import type { ElementID, RunListEntry } from "../app"
 
 export class JCQCDexie extends Dexie {
 	instruments!: Table<Instrument>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { RunListEntry } from "../../app"
 	import { toSigFigs } from "$lib/data"
 	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
 

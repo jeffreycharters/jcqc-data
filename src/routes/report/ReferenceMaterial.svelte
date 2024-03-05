@@ -1,26 +1,13 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
+	import { referenceMaterialPassingStatus } from "$lib/report"
 	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
-	import type { ReferenceMaterialRange, RunListEntry } from "../../app"
-	import Element from "../edit/elements/Element.svelte"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry
 
 	const method = getMethodContext()
 	const methodElements = getMethodElementsContext()
-
-	type PassesString = "passes" | "fails" | "neutral"
-
-	const checkRanges = (value: number, ranges: ReferenceMaterialRange): PassesString => {
-		const { low, high } = ranges
-
-		if ((low === 0 && high === 0) || (!low && !high)) return "neutral"
-		if ((!low || low === 0) && high && value < high) return "passes"
-		if ((!high || high === 0) && low && value > low) return "passes"
-		if (low && high && value > low && value < high) return "passes"
-		return "fails"
-	}
 
 	const conditionalSpace = ($methodElements?.length ?? 0) > 11 ? "" : " "
 </script>
@@ -46,7 +33,7 @@
 						low: sample.referenceMaterial?.lower[element.id],
 						high: sample.referenceMaterial?.upper[element.id]
 					}}
-					{@const passes = ranges ? checkRanges(sample.results[element.id], ranges) : "neutral"}
+					{@const passes = referenceMaterialPassingStatus(sample.results[element.id], ranges)}
 
 					<td class="{passes} whitespace-nowrap">
 						{#if passes === "neutral"}

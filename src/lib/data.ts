@@ -1,6 +1,5 @@
 import Papa from "papaparse"
 import type { InstrumentCSVRow, RawRunlist, ElementConcentrations } from "./types"
-import type { RunListEntry } from "../app"
 import { get } from "svelte/store"
 import type { Blank, Method } from "./db"
 import { getMethodContext } from "./storage"
