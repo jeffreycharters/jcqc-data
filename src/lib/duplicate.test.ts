@@ -20,15 +20,23 @@ describe("Relative percent deviation", () => {
 	)
 })
 
-describe("RPD passing status", () => {
+describe("Duplicate RPD passing status", () => {
 	test.each([
+		//
 		{ average: 10, rpd: 5, loq: 1, rpdLimit: 20, expected: "passes" },
 		{ average: 10, rpd: 20, loq: 1, rpdLimit: 20, expected: "passes" },
 		{ average: 10, rpd: 21, loq: 1, rpdLimit: 20, expected: "fails" },
-		{ average: 10, rpd: 25, loq: 5, rpdLimit: 20, expected: "neutral" },
+
+		// Result > 20% RPD and ~2x LOQ
+		{ average: 10, rpd: 25, loq: 5, rpdLimit: 20, expected: "fails" },
+		{ average: 10, rpd: 25, loq: 5.1, rpdLimit: 20, expected: "neutral" },
+		{ average: -1, rpd: 25, loq: 5, rpdLimit: 20, expected: "neutral" },
+
+		// Various undefined inputs
 		{ average: 10, rpd: undefined, loq: 1, rpdLimit: 20, expected: "neutral" },
 		{ average: 10, rpd: 20, loq: undefined, rpdLimit: 20, expected: "neutral" },
-		{ average: 10, rpd: 20, loq: 1, rpdLimit: undefined, expected: "neutral" }
+		{ average: 10, rpd: 20, loq: 1, rpdLimit: undefined, expected: "neutral" },
+		{ average: undefined, rpd: 20, loq: 1, rpdLimit: 20, expected: "neutral" }
 	])(
 		"returns $expected with average $average, rpd $rpd, loq $loq, and rpdLimit $rpdLimit",
 		({ average, rpd, loq, rpdLimit, expected }) => {

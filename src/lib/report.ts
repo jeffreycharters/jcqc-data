@@ -27,14 +27,17 @@ export function relativePercentDeviation(value: number, dupValue: number) {
 type StatusString = "passes" | "fails" | "neutral"
 
 export function rpdPassingStatus(
-	average: number,
+	average: unknown,
 	rpd: number | undefined,
 	loq: number | undefined,
 	rpdLimit: number | undefined
 ): StatusString {
-	if (rpd === undefined || !rpdLimit || !loq || average <= 2 * loq) return "neutral"
+	if (isNaN(average as number)) return "neutral"
 
-	return rpd > rpdLimit ? "fails" : "passes"
+	const averageNumber = average as number
+	if (rpd === undefined || !rpdLimit || !loq || averageNumber < 2 * loq) return "neutral"
+
+	return rpd <= rpdLimit ? "passes" : "fails"
 }
 
 export function blankPassingStatus(
