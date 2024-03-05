@@ -1,5 +1,22 @@
 import { describe, expect, test } from "vitest"
-import { relativePercentDeviation, rpdPassingStatus } from "./report"
+import { meanAverage, relativePercentDeviation, rpdPassingStatus } from "./report"
+
+describe("Mean average", () => {
+	test.each([
+		{ result: -2, duplicate: -1, expected: -1.5 },
+		{ result: -1, duplicate: -1, expected: -1 },
+		{ result: -1, duplicate: 1, expected: 0 },
+		{ result: 0, duplicate: 0, expected: 0 },
+		{ result: 0, duplicate: 1, expected: 0.5 },
+		{ result: 1, duplicate: 1, expected: 1 },
+		{ result: 1, duplicate: 2, expected: 1.5 }
+	])(
+		"returns $expected when result is $result and duplicate is $duplicate",
+		({ result, duplicate, expected }) => {
+			expect(meanAverage(result, duplicate)).toEqual(expected)
+		}
+	)
+})
 
 describe("Relative percent deviation", () => {
 	test.each([

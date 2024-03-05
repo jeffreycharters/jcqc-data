@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
-	import { relativePercentDeviation, rpdPassingStatus } from "$lib/report"
+	import { meanAverage, relativePercentDeviation, rpdPassingStatus } from "$lib/report"
 	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
 	import HeaderRow from "./HeaderRow.svelte"
 
@@ -52,7 +52,7 @@
 					duplicate.results[element.id]
 				)}
 				{@const loq = sample.referenceBlank?.loqs[element.id]}
-				{@const average = (sample.results[element.id] + duplicate.results[element.id]) / 2}
+				{@const average = meanAverage(sample.results[element.id], duplicate.results[element.id])}
 				{@const passing = rpdPassingStatus(average, rpd ?? 0, loq, rpdLimit)}
 				<td class={passing}>
 					{#if rpd === undefined}
@@ -64,10 +64,16 @@
 			{/each}
 		</tr>
 	</tbody>
+	{#if ($method?.blanks?.length ?? 0) > 1}
+		<tfoot>
+			<tr>
+				<td colspan="100">
+					<div class="text-right text-xs italic text-stone-500">
+						LOQs taken from <span class="font-bold">{sample.referenceBlank?.name ?? "unknown"}</span
+						>. If this is incorrect be sure to verify RPDs.
+					</div>
+				</td>
+			</tr>
+		</tfoot>
+	{/if}
 </table>
-{#if ($method?.blanks?.length ?? 0) > 1}
-	<div class="-mt-4 w-full pb-2 pr-8 text-right text-xs italic text-stone-500">
-		LOQs taken from <span class="font-bold">{sample.referenceBlank?.name ?? "unknown"}</span>. If
-		this is incorrect be sure to verify RPDs.
-	</div>
-{/if}

@@ -15,6 +15,10 @@ export function validateCheckStandard(
 	}
 }
 
+export function meanAverage(...values: number[]) {
+	return values.reduce((acc, value) => acc + value, 0) / values.length
+}
+
 export function relativePercentDeviation(value: number, dupValue: number) {
 	const absoluteDifference = value > dupValue ? value - dupValue : dupValue - value
 	const average = (value + dupValue) / 2
