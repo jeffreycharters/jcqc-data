@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest"
-import { meanAverage, relativePercentDeviation, rpdPassingStatus } from "./report"
+import { meanAverage, relativePercentDeviation, duplicatePassingStatus } from "./report"
 
 describe("Mean average", () => {
 	test.each([
@@ -56,8 +56,8 @@ describe("Duplicate RPD passing status", () => {
 		{ average: undefined, rpd: 20, loq: 1, rpdLimit: 20, expected: "neutral" }
 	])(
 		"returns $expected with average $average, rpd $rpd, loq $loq, and rpdLimit $rpdLimit",
-		({ average, rpd, loq, rpdLimit, expected }) => {
-			expect(rpdPassingStatus(average, rpd, loq, rpdLimit)).toEqual(expected)
+		({ average, loq, rpd, rpdLimit, expected }) => {
+			expect(duplicatePassingStatus(average, loq, rpd, rpdLimit)).toEqual(expected)
 		}
 	)
 })

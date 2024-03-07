@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toSigFigs } from "$lib/data"
-	import { meanAverage, relativePercentDeviation, rpdPassingStatus } from "$lib/report"
-	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
+	import { meanAverage, relativePercentDeviation, duplicatePassingStatus } from "$lib/report"
+	import { getMethodContext } from "$lib/storage"
 	import HeaderRow from "./HeaderRow.svelte"
 
 	export let sample: RunListEntry
@@ -39,7 +39,7 @@
 			<td>Average</td>
 			{#each $method?.elements ?? [] as element}
 				<td>
-					{toSigFigs((sample.results[element.id] + duplicate.results[element.id]) / 2)}
+					{toSigFigs(meanAverage(sample.results[element.id], duplicate.results[element.id]))}
 				</td>
 			{/each}
 		</tr>
@@ -53,7 +53,7 @@
 				)}
 				{@const loq = sample.referenceBlank?.loqs[element.id]}
 				{@const average = meanAverage(sample.results[element.id], duplicate.results[element.id])}
-				{@const passing = rpdPassingStatus(average, rpd ?? 0, loq, rpdLimit)}
+				{@const passing = duplicatePassingStatus(average, rpd ?? 0, loq, rpdLimit)}
 				<td class={passing}>
 					{#if rpd === undefined}
 						- -

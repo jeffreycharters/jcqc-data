@@ -2,7 +2,7 @@
 	import HeaderRow from "./HeaderRow.svelte"
 	import { toSigFigs } from "$lib/data"
 	import { getMethodContext, getMethodElementsContext } from "$lib/storage"
-	import { validateCheckStandard } from "$lib/report"
+	import { checkStandardPassingStatus } from "$lib/report"
 
 	export let sample: RunListEntry
 
@@ -35,18 +35,14 @@
 				<td>Recovery</td>
 				{#each $method?.elements ?? [] as element}
 					{#if $methodElements?.find((me) => me.element === element.id)}
-						{@const result = validateCheckStandard(
+						{@const result = checkStandardPassingStatus(
 							sample.results[element.id],
 							sample.checkStandard?.values[element.id],
 							checkStandardLimit
 						)}
-						{#if result.passing != undefined}
-							<td class={result.passing ? "passes" : "fails"}>
-								{result.recovery}%
-							</td>
-						{:else}
-							<td class="neutral">- -</td>
-						{/if}
+						<td class={result.inRange}>
+							{result.recovery != undefined ? `${result.recovery}%` : "- -"}
+						</td>
 					{/if}
 				{/each}
 			</tr>
