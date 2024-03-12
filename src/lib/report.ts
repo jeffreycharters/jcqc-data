@@ -39,6 +39,7 @@ export function duplicatePassingStatus(
 	if (isNaN(average as number)) return "neutral"
 
 	const averageNumber = average as number
+	console.log({ averageNumber, loq, rpd, rpdLimit })
 	if (rpd === undefined || !rpdLimit || !loq || averageNumber < 2 * loq) return "neutral"
 
 	return rpd <= rpdLimit ? "passes" : "fails"

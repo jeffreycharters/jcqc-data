@@ -53,7 +53,7 @@
 				)}
 				{@const loq = sample.referenceBlank?.loqs[element.id]}
 				{@const average = meanAverage(sample.results[element.id], duplicate.results[element.id])}
-				{@const passing = duplicatePassingStatus(average, rpd ?? 0, loq, rpdLimit)}
+				{@const passing = duplicatePassingStatus(average, loq, rpd, rpdLimit)}
 				<td class={passing}>
 					{#if rpd === undefined}
 						- -
