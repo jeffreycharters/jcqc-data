@@ -6,16 +6,11 @@
 	import { crossfade } from "svelte/transition"
 
 	// @ts-expect-error
-	import IconAtom2 from "@tabler/icons-svelte/dist/svelte/icons/IconAtom2.svelte"
-	// @ts-expect-error
-	import IconTestPipe from "@tabler/icons-svelte/dist/svelte/icons/IconTestPipe.svelte"
-	// @ts-expect-error
-	import IconCookieMan from "@tabler/icons-svelte/dist/svelte/icons/IconCookieMan.svelte"
-	// @ts-expect-error
 	import IconPlaylistAdd from "@tabler/icons-svelte/dist/svelte/icons/IconPlaylistAdd.svelte"
 
 	import type { PageData } from "./$types"
 	import { setInstrumentsContext, setMethodsContext } from "$lib/storage"
+	import DatabaseReminder from "./DatabaseReminder.svelte"
 
 	export let data: PageData
 	const { methods, instruments } = data
@@ -31,7 +26,11 @@
 	let showAddMethodForm = false
 </script>
 
-<h1 class="mb-6 mt-8">Select method to edit</h1>
+<div class="max-w-screen-lg flex justify-between my-2 items-end">
+	<h1>Select method to edit</h1>
+	<DatabaseReminder />
+</div>
+
 
 <div class="grid max-w-screen-lg grid-cols-3 gap-4">
 	{#each ($methodList ?? []).filter((method) => method.active) as method (method.slug)}
@@ -57,34 +56,9 @@
 		on:click={() => (showAddMethodForm = !showAddMethodForm)}
 		class="flex w-full items-center justify-center gap-2 rounded border border-gray-500 p-4 font-bold shadow-lg"
 	>
-		<IconPlaylistAdd class=" h-8 w-8 stroke-[1.5]" />
+		<IconPlaylistAdd class="h-8 w-8 stroke-[1.5]" />
 		Add Method
 	</button>
 </div>
 
 <AddMethodForm showAddForm={showAddMethodForm} on:close={() => (showAddMethodForm = false)} />
-<!-- 
-<h1 class="-mb-2 mt-10">Other options</h1>
-
-<div class="grid max-w-screen-lg grid-cols-3 items-stretch gap-4">
-	<div class="mt-8 h-fit w-full rounded border border-gray-800 shadow">
-		<a href="/edit/elements" class="inline-flex items-center gap-4 px-6 py-4 no-underline">
-			<IconAtom2 class="rotate-45 stroke-fuchsia-600" />
-			<h2>Edit elements</h2>
-		</a>
-	</div>
-
-	<div class="mt-8 h-fit w-full rounded border border-gray-800 shadow">
-		<a href="/edit/testfiles" class="inline-flex items-center gap-4 px-6 py-4 no-underline">
-			<IconTestPipe class="stroke-emerald-600" />
-			<h2>Generate Test Files</h2>
-		</a>
-	</div>
-
-	<div class="mt-8 h-fit w-full rounded border border-gray-800 shadow">
-		<a href="/" class="inline-flex items-center gap-4 px-6 py-4 no-underline">
-			<IconCookieMan class="-rotate-12 stroke-amber-700" />
-			<h2>Return to Main</h2>
-		</a>
-	</div>
-</div> -->

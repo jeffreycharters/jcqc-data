@@ -50,11 +50,11 @@
 		Changes made are only saved to the database in the browser you are currently using. In order to
 		keep things in sync, once you've made any changes you'll need to do the following:
 	</p>
-	<ol class="my-4 list-inside list-decimal">
+	<ol class="m-4 list-outside list-decimal">
 		<li>On the updated page, click the <strong>Export database</strong> button below.</li>
 		<li>
 			Save the file to <code class="text-teal-800">TOXI Drive/jcqc-data/DATABASE VERSIONS/</code> on
-			the network.
+			the network. You may need to drag-and-drop from the "Downloads" folder.
 		</li>
 		<li>On the other computer, open this page.</li>
 		<li>Click the <strong>Import database</strong> button below and select the saved file.</li>
