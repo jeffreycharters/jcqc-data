@@ -59,9 +59,17 @@ td.passes {
 }
 
 td.fails {
-	@apply text-center;
+	@apply text-center relative;
+	color: darkred;
 	background-color: mistyrose;
-	color: firebrick;
+}
+
+td.fails::after {
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='icon icon-tabler icons-tabler-outline icon-tabler-arrow-narrow-down'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'/%3E%3Cpath d='M12 5l0 14' /%3E%3Cpath d='M16 15l-4 4' /%3E%3Cpath d='M8 15l4 4' /%3E%3C/svg%3E");
+	position: absolute;
+	top: 12px;
+	left: 8px;
+	
 }
 
 td.neutral {
