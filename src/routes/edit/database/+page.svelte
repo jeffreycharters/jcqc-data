@@ -16,7 +16,6 @@
 		if (!browser) return
 
 		const jsonDB = await db.export()
-		console.log(jsonDB)
 
 		const now = new Date().toLocaleDateString("en-CA")
 		saveAs(jsonDB, `${now}-jcqc-export.json`)
