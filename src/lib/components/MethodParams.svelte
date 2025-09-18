@@ -180,4 +180,7 @@
 	td.first-column {
 		@apply text-left font-semibold text-gray-800;
 	}
+	tbody tr {
+		@apply hover:bg-sky-100;
+	}
 </style>
